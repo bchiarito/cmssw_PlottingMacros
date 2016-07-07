@@ -35,12 +35,15 @@ parser.add_option('--name', metavar='F', type='string', action='store',
     	    	      default = "plot",
                   dest='name',
                   help='name of file when saving')
+parser.add_option('--logz', action='store_true', default=False,
+                  dest='logz',
+                  help='log scale on z')
 parser.add_option('--logy', action='store_true', default=False,
                   dest='logy',
-                  help='logy sacle on y')
+                  help='log scale on y')
 parser.add_option('--logx', action='store_true', default=False,
                   dest='logx',
-                  help='logx sacle on x')
+                  help='log scale on x')
 parser.add_option('--scaled', action='store_true', default=False,
                   dest='scale',
                   help='scale to integral = 1')
@@ -62,6 +65,14 @@ parser.add_option('--tree', metavar='F', type='string', action='store',
                   default = 'fTree2',
                   dest='treename',
                   help='full path of TTree object in each file')
+parser.add_option('--xaxis', metavar='F', type='string', action='store',
+                  default = '',
+                  dest='xaxis',
+                  help='xaxis label')
+parser.add_option('--yaxis', metavar='F', type='string', action='store',
+                  default = '',
+                  dest='yaxis',
+                  help='yaxis label')
 parser.add_option('--leg', metavar='F', type='string', action='store',
                   default = '',
                   dest='legend',
@@ -138,14 +149,22 @@ if not options.noplot:
   if options.scale:
     newhist.Scale(1/newhist.Integral())
   # Title and Axes
-  if options.title == "" and options.name == "plot":
-    newhist.SetTitle(options.cut)
-  elif options.name == "plot":
+  if not options.title == "":
     newhist.SetTitle(options.title)
-  else:
+  elif not options.name == "plot":
     newhist.SetTitle(options.name)
-  newhist.GetXaxis().SetTitle(options.varx)
-  newhist.GetYaxis().SetTitle(options.vary)
+  else:
+    newhist.SetTitle(options.cut)
+  if not options.xaxis == "":
+    newhist.GetXaxis().SetTitle(options.xaxis)
+  else:
+    newhist.GetXaxis().SetTitle(options.varx)
+  if not options.yaxis == "":
+    newhist.GetYaxis().SetTitle(options.yaxis)
+  else:
+    newhist.GetYaxis().SetTitle(options.vary)
+  if options.logy:
+    c.SetLogz()
   if options.logy:
     c.SetLogy()
   if options.logx:

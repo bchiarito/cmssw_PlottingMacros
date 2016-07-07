@@ -75,6 +75,10 @@ parser.add_option('--tree3', metavar='F', type='string', action='store',
   	      	      default = 'fTree2',
                   dest='treename3',
                   help='full path of TTree object in each file')
+parser.add_option('--xaxis', metavar='F', type='string', action='store',
+  	      	      default = '',
+                  dest='xaxis',
+                  help='xaxis label')
 parser.add_option('--leg', metavar='F', type='string', action='store',
                   dest='legend1',
                   help='legend entry label')
@@ -239,16 +243,20 @@ if not options.noplot:
       newhist.SetMinimum(0.5)
   else:
     newhist.SetMaximum(maximum*1.15)
-  # Title and Axes
-  if options.title == "" and options.name == "plot":
-    newhist.SetTitle(options.var)
-  elif options.name == "plot":
+  # Title
+  if not options.title == "":
     newhist.SetTitle(options.title)
+  elif options.name == "plot":
+    newhist.SetTitle(options.var)
   else:
     newhist.SetTitle(options.name)
+  # X axis
   newhist.GetXaxis().SetTitle(options.var + " w/ " + options.cut)
   if options.cut == "":
     newhist.GetXaxis().SetTitle(options.var)
+  if not options.xaxis == "":
+    newhist.GetXaxis().SetTitle(options.xaxis)
+  # Y axis
   newhist.GetYaxis().SetTitle("Events")
   if options.scale:
     newhist.GetYaxis().SetTitle("Scaled to Integral 100")
