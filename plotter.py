@@ -106,6 +106,11 @@ parser.add_option('--errors', action='store_true', default=False,
 parser.add_option('--legoff', action='store_true', default=False,
                   dest='legoff',
                   help='Turns off legend')
+parser.add_option('-n', '--num', type='int', action='store',
+                  default=-1,
+                  dest='nentries',
+                  help='max number of entries to draw from files')
+
 (options, args) = parser.parse_args()
 
 if not options.quiet:
@@ -166,11 +171,18 @@ if not options.file3 == "":
 if not options.quiet:
   print "Drawing into histogram..."
 
-chain.Draw(options.var+">>"+options.name,""+ options.cut, "goff")
-if not options.file2 == "":
-  chain2.Draw(options.var+">>"+options.name+"_2",""+ options.cut, "goff")
-if not options.file3 == "":
-  chain3.Draw(options.var+">>"+options.name+"_3",""+ options.cut, "goff")
+if options.nentries==-1:
+  chain.Draw(options.var+">>"+options.name,""+ options.cut, "goff")
+  if not options.file2 == "":
+    chain2.Draw(options.var+">>"+options.name+"_2",""+ options.cut, "goff")
+  if not options.file3 == "":
+    chain3.Draw(options.var+">>"+options.name+"_3",""+ options.cut, "goff")
+else:
+  chain.Draw(options.var+">>"+options.name,""+ options.cut, "goff", options.nentries)
+  if not options.file2 == "":
+    chain2.Draw(options.var+">>"+options.name+"_2",""+ options.cut, "goff", options.nentries)
+  if not options.file3 == "":
+    chain3.Draw(options.var+">>"+options.name+"_3",""+ options.cut, "goff", options.nentries)
 
 # Print Summary
 print "\nEntries    : ", int(newhist.GetEntries())
@@ -192,25 +204,27 @@ if not options.file3 == "":
     print "Underflow 3- ", int(newhist3.GetBinContent(0))
   if not int(newhist3.GetBinContent(bins+1)) == 0:
     print "Overflow 3 - ", int(newhist3.GetBinContent(bins+1))
+print ""
 
 if not options.noplot:
-  print "\nPlotting..."
+  if not options.quiet:
+    print "Plotting..."
   c = TCanvas()
   c.cd()
   # Stats
-  newhist.SetLineColor(ROOT.kBlack)
+  newhist.SetLineColor(ROOT.kRed)
   newhist.SetFillColor(0)
   newhist.SetLineWidth(2)
   newhist.SetLineStyle(1)	
   newhist.SetStats(0)
   if not options.file2 == "":
-    newhist2.SetLineColor(ROOT.kBlue)
+    newhist2.SetLineColor(ROOT.kBlack)
     newhist2.SetFillColor(0)
     newhist2.SetLineWidth(2)
     newhist2.SetLineStyle(1)	
     newhist2.SetStats(0)
   if not options.file3 == "":
-    newhist3.SetLineColor(ROOT.kRed)
+    newhist3.SetLineColor(ROOT.kTeal)
     newhist3.SetFillColor(0)
     newhist3.SetLineWidth(2)
     newhist3.SetLineStyle(1)	
@@ -292,20 +306,69 @@ if not options.quiet:
   print "Done."
 
 # After plot Commands
-if options.save == False and options.noplot == False:
+if (not options.save) and (not options.noplot):
   cmd = "start"
   while not cmd == "":
     print "\nPress [Enter] to finish, type 'options' to see options"
-    cmd = raw_input()
+    # parse input
+    inp = raw_input()
+    i = string.find(inp,' ')
+    if i==-1:
+      cmd = inp
+      opt = ""
+    else:
+      cmd = inp[0:i]
+      opt = inp[i+1:len(inp)]
+    # begin commands
     if cmd == "save":
-      c.SaveAs(options.name + ".png")
-    if cmd == "saveas":
-      filename = raw_input("Enter filename: ")
-      c.SaveAs(filename + ".png")
+      sys.stdout.write(' ')
+      sys.stdout.flush()
+      if opt=="":
+        c.SaveAs(options.name + ".png")
+      else:
+        c.SaveAs(opt + ".png")
+    elif cmd == "saveas":
+      sys.stdout.write(' ')
+      sys.stdout.flush()
+      if opt=="":
+        filename = raw_input("Enter filename: ")
+        c.SaveAs(filename + ".png")
+      else:
+        c.SaveAs(opt + ".png")
     elif cmd == "gaus":
       newhist.Fit("gaus")
       newhist.Draw("same")
+    elif cmd == "fit":
+      if opt=="":
+        print "Must supply second argument to", cmd
+        continue
+      newhist.Fit(opt)
+      newhist.Draw("same")
+    elif cmd == "vertical":
+      if opt=="":
+        print "Must supply second argument to", cmd
+        continue
+      pos = float(opt)
+      vert_line = ROOT.TLine(pos, 0, pos, newhist.GetMaximum())
+      vert_line.Draw("same")
+      if not options.legoff:
+        leg.Draw("same")
+    elif cmd == "horizontal":
+      if opt=="":
+        print "Must supply second argument to", cmd
+        continue
+      pos = float(opt)
+      horz_line = ROOT.TLine(0, pos, high, pos)
+      horz_line.Draw("same")
+      if not options.legoff:
+        leg.Draw("same")
     elif cmd == "options":
-      print "save     saves current canvas\n" +\
-            "saveas   saves current canvas prompting for filename" +\
-            "gaus     fits to a gaussian\n"
+      print "save FILENAME    saves current canvas, optionally with supplied name\n" +\
+            "saveas FILENAME  saves current canvas prompting for filename if not given\n" +\
+            "gaus             fits to a gaussian\n" +\
+            "fit FIT          fits with supplied fitting function\n" +\
+            "vertical INT     draws a vertical line at xvalue=INT\n" +\
+            "horizontal INT   draws a horizontal line at yvalue=INT\n" +\
+            ""
+    elif not cmd == "":
+      print cmd,"not a valid command"
