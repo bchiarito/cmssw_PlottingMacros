@@ -35,20 +35,20 @@ parser.add_option('--logx', action='store_true', default=False,
 parser.add_option('--scaled', action='store_true', default=False,
                   dest='scale',
                   help='scale to integral = 1')
-parser.add_option('--file', metavar='F', type='string', action='store',
-                  dest='file1',
+parser.add_option('--sample', metavar='F', type='string', action='store',
+                  dest='sample1',
                   help='')
-parser.add_option('--file1', metavar='F', type='string', action='store',
+parser.add_option('--sample1', metavar='F', type='string', action='store',
                   default='',
-                  dest='file1',
+                  dest='sample1',
                   help='')
-parser.add_option('--file2', metavar='F', type='string', action='store',
+parser.add_option('--sample2', metavar='F', type='string', action='store',
                   default='',
-                  dest='file2',
+                  dest='sample2',
                   help='')
-parser.add_option('--file3', metavar='F', type='string', action='store',
+parser.add_option('--sample3', metavar='F', type='string', action='store',
                   default='',
-                  dest='file3',
+                  dest='sample3',
                   help='')
 parser.add_option('--save', action='store_true', default=False,
                   dest='save',
@@ -97,6 +97,9 @@ parser.add_option('--leg3', metavar='F', type='string', action='store',
 parser.add_option('--dir', action='store_true', default=False,
                   dest='dir',
                   help='treat file option as a directory instead of a single file')
+parser.add_option('--txt', action='store_true', default=False,
+                  dest='txt',
+                  help='treat file option as a .txt file with optional cross sections included')
 parser.add_option('--quiet', action='store_true', default=False,
                   dest='quiet',
                   help='less output')
@@ -110,79 +113,130 @@ parser.add_option('-n', '--num', type='int', action='store',
                   default=-1,
                   dest='nentries',
                   help='max number of entries to draw from files')
+parser.add_option('--lumi', type='float', action='store',
+  	      	      default = -1.0,
+                  dest='lumi',
+                  help='luminosity to scale to, if changd from default value')
 
 (options, args) = parser.parse_args()
 
 if not options.quiet:
   print "Begin."
 
-chain = ROOT.TChain(options.treename1)
-if not options.file2 == "":
-  chain2 = ROOT.TChain(options.treename2)
-if not options.file3 == "":
-  chain3 = ROOT.TChain(options.treename3)
+multiple_samples = (not options.sample2 == "") or \
+                   (not options.sample3 == "")
 
-if not options.quiet:
-  print "Adding files to TChain..."
+samples = []
+sample = {}
+sample['path'] = options.sample1
+sample['tree'] = options.treename1
+samples.append(sample)
+if not options.sample2 == "":
+  sample = {}
+  sample['path'] = options.sample2
+  sample['tree'] = options.treename2
+  samples.append(sample)
+if not options.sample3 == "":
+  sample = {}
+  sample['path'] = options.sample3
+  sample['tree'] = options.treename3
+  samples.append(sample)
 
-if (not options.dir):
-  chain.Add(options.file1)
-  if not options.file2 == "":
-    chain2.Add(options.file2)
-  if not options.file3 == "":
-    chain3.Add(options.file3)  
+# Make collection of TChains
+for sample in samples:
+  path = sample['path']
+  ISrootfile = False
+  ISdirectory = False
+  ISinputfile = False
+  if fnmatch.fnmatch(path, "*.root"):
+    print "I think", path, "is a rootfile"
+    ISrootfile = True
+  if fnmatch.fnmatch(path, "*/"):
+    print "I think", path, "is a directory to traverse"
+    ISdirectory = True
+  if fnmatch.fnmatch(path, "*.txt"):
+    print "I think", path, "is a text file of inputs"
+    ISinputfile = True
 
-elif options.dir:
-  rootfiles = []
-  for root, dirnames, filenames in os.walk(options.file1):
-    for filename in fnmatch.filter(filenames, '*.root'):
-      rootfiles.append(os.path.join(root, filename))
-  for rootfile in rootfiles:
-    chain.Add(rootfile)
-  if not options.file2 == "":
+  if ISrootfile:
+    chain = ROOT.TChain(sample['tree'])
+    chain.Add(path)
+    sample['entries'] = [[chain, 1, 1]]
+
+  if ISdirectory:
+    chain = ROOT.TChain(sample['tree'])
     rootfiles = []
-    for root, dirnames, filenames in os.walk(options.file2):
+    for root, dirnames, filenames in os.walk(options.file1):
       for filename in fnmatch.filter(filenames, '*.root'):
         rootfiles.append(os.path.join(root, filename))
     for rootfile in rootfiles:
-      chain2.Add(rootfile)
-  if not options.file3 == "":
-    rootfiles = []
-    for root, dirnames, filenames in os.walk(options.file3):
-      for filename in fnmatch.filter(filenames, '*.root'):
-        rootfiles.append(os.path.join(root, filename))
-    for rootfile in rootfiles:
-      chain3.Add(rootfile)
+      chain.Add(rootfile)
+    sample['entries'] = [[chain, 1, 1]]
 
+  if ISinputfile:
+    sample['entries'] = []
+    inputfile = open(path, 'r')
+    print "Reading from ", path, "..."
+    for line in inputfile:
+      chain = ROOT.TChain(sample['tree'])      
+      print line
+      sample = line.split()
+      print sample
+      # Get name, xs, and num from line
+      if len(sample) == 1:
+        path = sample[0]
+      if len(sample) == 3:
+        xs = sample[1]
+        N = sample[2]
+      if len(sample) == 2 or len(sample) == 0 or len(sample) > 3:
+        print "couldn't parse line from input file", path
+        continue
+      # add files to chain
+      if fnmatch(path, "*.root"):
+        chain.Add(path)
+      elif fnmatch(path, "*/"):
+        rootfiles = []
+        for root, dirnames, filenames in os.walk(path):
+          for filename in fnmatch.filter(filenames, '*.root'):
+            rootfiles.append(os.path.join(root, filename))
+        for rootfile in rootfiles:
+          chain.Add(rootfile)
+      else:
+        # line doesn't make sense
+        print "couldn't parse line from input file", path
+      sample['entries'].append([chain, xs, N])
+     
 if not options.quiet:
-  print "Booking histograms..."
+  print "Drawing into histogram..."
 
 i1 = string.index(options.binning,',')
 i2 = string.rindex(options.binning,',')
 bins = int(options.binning[0:i1])
 low = float(options.binning[i1+1:i2])
 high = float(options.binning[i2+1:len(options.binning)])
-newhist = ROOT.TH1F(options.name, options.name, bins, low, high)
-if not options.file2 == "":
-  newhist2 = ROOT.TH1F(options.name + "_2", options.name, bins, low, high)
-if not options.file3 == "":
-  newhist3 = ROOT.TH1F(options.name + "_3", options.name, bins, low, high)
 
-if not options.quiet:
-  print "Drawing into histogram..."
+count = 0
+for sample in samples:
+  for entry in sample['entries']:
+    chain = entry[0]
+    xs = entry[1]
+    N = entry[2]
+    count += 1
+    hist = ROOT.TH1F(options.name+"_"+str(count), options.name, bins, low, high)
+    chain.Draw(options.var+">>"+options.name+"_"+str(count),""+options.cut, "goff")
+    entry.append(hist)    
+  
+  
+    
 
-if options.nentries==-1:
-  chain.Draw(options.var+">>"+options.name,""+ options.cut, "goff")
-  if not options.file2 == "":
-    chain2.Draw(options.var+">>"+options.name+"_2",""+ options.cut, "goff")
-  if not options.file3 == "":
-    chain3.Draw(options.var+">>"+options.name+"_3",""+ options.cut, "goff")
-else:
-  chain.Draw(options.var+">>"+options.name,""+ options.cut, "goff", options.nentries)
-  if not options.file2 == "":
-    chain2.Draw(options.var+">>"+options.name+"_2",""+ options.cut, "goff", options.nentries)
-  if not options.file3 == "":
-    chain3.Draw(options.var+">>"+options.name+"_3",""+ options.cut, "goff", options.nentries)
+    # here we should add up all the constitent histograms for a particular sample,
+    # and also scale them against each other
+    # if lumi is set, scale them according to the lumi
+    # if lumi is set but the sample has no xs and N listed, just leave it alone, arbitrary units
+    # if lumi is not set, scale the sample against the sample with the median event content
+
+
+
 
 # Print Summary
 print "\nEntries    : ", int(newhist.GetEntries())
