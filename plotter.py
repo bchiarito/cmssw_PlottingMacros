@@ -102,7 +102,22 @@ parser.add_option('--noplot', action='store_true', default=False,
                   help='Do not plot anything')
 parser.add_option('--errors', action='store_true', default=False,
                   dest='errors',
-                  help='calls Sumw2() on resulting histogram')
+                  help='calls Sumw2() on all histograms')
+parser.add_option('--error1', action='store_true', default=False,
+                  dest='error1',
+                  help='calls Sumw2() on sample 1')
+parser.add_option('--error2', action='store_true', default=False,
+                  dest='error2',
+                  help='calls Sumw2() on sample 2')
+parser.add_option('--error3', action='store_true', default=False,
+                  dest='error3',
+                  help='calls Sumw2() on sample 3')
+parser.add_option('--error4', action='store_true', default=False,
+                  dest='error4',
+                  help='calls Sumw2() on sample 4')
+parser.add_option('--error5', action='store_true', default=False,
+                  dest='error5',
+                  help='calls Sumw2() on sample 5')
 parser.add_option('--legoff', action='store_true', default=False,
                   dest='legoff',
                   help='Turns off legend')
@@ -212,6 +227,7 @@ sample = {}
 sample['path'] = options.sample1
 sample['tree'] = options.treename1
 sample['label'] = options.legend1
+sample['error'] = options.error1
 if options.color1 == "":
   sample['color'] = ""
 else:
@@ -222,6 +238,7 @@ if not options.sample2 == "":
   sample['path'] = options.sample2
   sample['tree'] = options.treename2
   sample['label'] = options.legend2
+  sample['error'] = options.error2
   if options.color1 == "":
     sample['color'] = ""
   else:
@@ -232,6 +249,7 @@ if not options.sample3 == "":
   sample['path'] = options.sample3
   sample['tree'] = options.treename3
   sample['label'] = options.legend3
+  sample['error'] = options.error3
   if options.color1 == "":
     sample['color'] = ""
   else:
@@ -242,6 +260,7 @@ if not options.sample4 == "":
   sample['path'] = options.sample4
   sample['tree'] = options.treename4
   sample['label'] = options.legend4
+  sample['error'] = options.error4
   if options.color1 == "":
     sample['color'] = ""
   else:
@@ -252,6 +271,7 @@ if not options.sample5 == "":
   sample['path'] = options.sample5
   sample['tree'] = options.treename5
   sample['label'] = options.legend5
+  sample['error'] = options.error5
   if options.color1 == "":
     sample['color'] = ""
   else:
@@ -349,7 +369,10 @@ for sample in samples:
     N = entry[2]
     count += 1
     hist = ROOT.TH1F(options.name+"_"+str(count), options.name, bins, low, high)
-    chain.Draw(options.var+">>"+options.name+"_"+str(count),""+options.cut, "goff")
+    if options.nentries == -1:
+      chain.Draw(options.var+">>"+options.name+"_"+str(count),""+options.cut, "goff")
+    else:
+      chain.Draw(options.var+">>"+options.name+"_"+str(count),""+options.cut, "goff", options.nentries)
     entry.append(hist)
     hist.Scale(xs/N)
     hist_sum = hist_sum + hist
@@ -384,18 +407,23 @@ if not options.noplot:
     # Stats
     if sample['color'] == "":
       hist.SetLineColor(colorcount)
+      hist.SetMarkerColor(colorcount)
       colorcount+=1
     else:
       hist.SetLineColor(sample['color'])
+      hist.SetMarkerColor(sample['color'])
     hist.SetFillColor(0)
     hist.SetLineWidth(2)
-    hist.SetLineStyle(1)
     hist.SetStats(0)
     # Scale
-    if options.errors:
+    if sample['error'] or options.errors:
       hist.Sumw2()
+    else:
+      hist.SetMarkerSize(1)
+      hist.SetMarkerStyle(2)
     if options.scale:
-      hist.Scale(100.0/hist.Integral())
+      if not hist.Integral() == 0:
+        hist.Scale(100.0/hist.Integral())
 
   # Maximum
   maximum = 0
@@ -437,10 +465,13 @@ if not options.noplot:
   for sample in samples:
     hist = sample['summed_hist']
     if count == 0:
-      hist.Draw()
+      draw_option = ''
     else:
-      hist.Draw("same")
+      draw_option = 'same'
     count += 1
+    if not (sample['error'] or options.errors):
+      draw_option += 'P'
+    hist.Draw(draw_option)
 
   # Legend
   leg = ROOT.TLegend(0.55, 0.80, 0.9, 0.9)
