@@ -6,8 +6,11 @@ import ROOT
 import string
 from ROOT import *
 import sys
+import time
 
 from optparse import OptionParser
+
+time_begin = time.time()
 
 parser = OptionParser()
 
@@ -209,35 +212,50 @@ sample = {}
 sample['path'] = options.sample1
 sample['tree'] = options.treename1
 sample['label'] = options.legend1
-sample['color'] = rootcolor(options.color1)
+if options.color1 == "":
+  sample['color'] = ""
+else:
+  sample['color'] = rootcolor(options.color1)
 samples.append(sample)
 if not options.sample2 == "":
   sample = {}
   sample['path'] = options.sample2
   sample['tree'] = options.treename2
   sample['label'] = options.legend2
-  sample['color'] = rootcolor(options.color2)
+  if options.color1 == "":
+    sample['color'] = ""
+  else:
+    sample['color'] = rootcolor(options.color2)
   samples.append(sample)
 if not options.sample3 == "":
   sample = {}
   sample['path'] = options.sample3
   sample['tree'] = options.treename3
   sample['label'] = options.legend3
-  sample['color'] = rootcolor(options.color3)
+  if options.color1 == "":
+    sample['color'] = ""
+  else:
+    sample['color'] = rootcolor(options.color3)
   samples.append(sample)
 if not options.sample4 == "":
   sample = {}
   sample['path'] = options.sample4
   sample['tree'] = options.treename4
   sample['label'] = options.legend4
-  sample['color'] = rootcolor(options.color4)
+  if options.color1 == "":
+    sample['color'] = ""
+  else:
+    sample['color'] = rootcolor(options.color4)
   samples.append(sample)
 if not options.sample5 == "":
   sample = {}
   sample['path'] = options.sample5
   sample['tree'] = options.treename5
   sample['label'] = options.legend5
-  sample['color'] = rootcolor(options.color5)
+  if options.color1 == "":
+    sample['color'] = ""
+  else:
+    sample['color'] = rootcolor(options.color5)
   samples.append(sample)
 
 # Make collection of TChains
@@ -247,13 +265,13 @@ for sample in samples:
   ISdirectory = False
   ISinputfile = False
   if fnmatch.fnmatch(path, "*.root"):
-    print "It appears ", path, "is a rootfile"
+    #print "It appears ", path, "is a rootfile"
     ISrootfile = True
   if fnmatch.fnmatch(path, "*/"):
-    print "It appears", path, "is a directory to traverse"
+    #print "It appears", path, "is a directory to traverse"
     ISdirectory = True
   if fnmatch.fnmatch(path, "*.txt"):
-    print "It appears", path, "is a text file of inputs"
+    #print "It appears", path, "is a text file of inputs"
     ISinputfile = True
 
   if ISrootfile:
@@ -274,27 +292,34 @@ for sample in samples:
   if ISinputfile:
     sample['entries'] = []
     inputfile = open(path, 'r')
-    print "Reading from ", path, "..."
     for line in inputfile:
-      chain = ROOT.TChain(sample['tree'])      
-      print line
-      sample = line.split()
-      print sample
+      line_list = line.split()
       # Get name, xs, and num from line
-      if len(sample) == 1:
-        path = sample[0]
-      if len(sample) == 3:
-        xs = sample[1]
-        N = sample[2]
-      if len(sample) == 2 or len(sample) == 0 or len(sample) > 3:
+      if len(line_list) == 1:
+        path_to_file = line_list[0]
+        xs = 1
+        N = 1
+        treename = sample['tree']
+      if len(line_list) == 3:
+        path_to_file = line_list[0]
+        xs = float(line_list[1])
+        N = float(line_list[2])
+        treename = sample['tree']
+      if len(line_list) == 4:
+        path_to_file = line_list[0]
+        xs = float(line_list[1])
+        N = float(line_list[2])
+        treename = line_list[3]
+      if len(line_list) == 2 or len(line_list) == 0 or len(line_list) > 4:
         print "couldn't parse line from input file", path
         continue
       # add files to chain
-      if fnmatch(path, "*.root"):
-        chain.Add(path)
-      elif fnmatch(path, "*/"):
+      chain = ROOT.TChain(treename)      
+      if fnmatch.fnmatch(path, "*.root"):
+        chain.Add(path_to_file)
+      elif fnmatch.fnmatch(path_to_file, "*/"):
         rootfiles = []
-        for root, dirnames, filenames in os.walk(path):
+        for root, dirnames, filenames in os.walk(path_to_file):
           for filename in fnmatch.filter(filenames, '*.root'):
             rootfiles.append(os.path.join(root, filename))
         for rootfile in rootfiles:
@@ -332,15 +357,17 @@ for sample in samples:
   
 
 # Print Summary
+print ""
 count = 1
 for sample in samples:
   hist = sample['summed_hist']
-  print "\nEntries " + str(count) + "   : ", int(hist.GetEntries())
+  print "Entries " + str(count) + "   : ", int(hist.GetEntries())
   if not int(hist.GetBinContent(0)) == 0:
     print "Underflow " + str(count) + " - ", int(hist.GetBinContent(0))
   if not int(hist.GetBinContent(bins+1)) == 0:
     print "Overflow " + str(count) + "  - ", int(hist.GetBinContent(bins+1))
   count += 1
+print ""
   
 if not options.noplot:
   if not options.quiet:
@@ -413,6 +440,7 @@ if not options.noplot:
       hist.Draw()
     else:
       hist.Draw("same")
+    count += 1
 
   # Legend
   leg = ROOT.TLegend(0.55, 0.80, 0.9, 0.9)
@@ -430,6 +458,10 @@ if not options.noplot:
 
 if not options.quiet:
   print "Done."
+
+time_end = time.time()
+
+print "Elapsed Time: ", (time_end - time_begin)
 
 # After plot Commands
 if (not options.save) and (not options.noplot):
