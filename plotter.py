@@ -285,13 +285,16 @@ for sample in samples:
   ISdirectory = False
   ISinputfile = False
   if fnmatch.fnmatch(path, "*.root"):
-    #print "It appears ", path, "is a rootfile"
+    if not options.quiet:
+      print "It appears ", path, "is a rootfile"
     ISrootfile = True
   if fnmatch.fnmatch(path, "*/"):
-    #print "It appears", path, "is a directory to traverse"
+    if not options.quiet:
+      print "It appears", path, "is a directory to traverse"
     ISdirectory = True
   if fnmatch.fnmatch(path, "*.txt"):
-    #print "It appears", path, "is a text file of inputs"
+    if not options.quiet:
+      print "It appears", path, "is a text file of inputs"
     ISinputfile = True
 
   if ISrootfile:
