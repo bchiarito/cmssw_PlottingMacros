@@ -70,8 +70,7 @@ for event in chain:
     print 'Processing {0:10.0f}/{1:10.0f} : {2:5.2f} %'.format(count, total, percentDone )
   count += 1
 
-  if event.runNum == 254907 and event.lumiNum == 15 and event.eventNum == 22371731:
-    print "found it"
+  if event.runNum == 254905 or event.runNum == 254906 or event.runNum == 254907:
     if event.nPass >=1 and event.nTightPhoton >= 1:
       if gammatwoprongInfo.dR<0.3:
         print "dR=", gammatwoprongInfo.dR , "event number:", event.eventNum, "lumi:", event.lumiNum, "run:", event.runNum 

@@ -32,10 +32,7 @@ parser.add_option('--dir', action='store_true', default=False,
                   help='treat file option as a directory instead of a single file')
 (options, args) = parser.parse_args()
 
-out_file = TFile(options.out, "recreate")
-out_tree = TTree("tree", "tree")
-var = array('f',[-1])
-out_tree.Branch("var",var,"var/F")
+out_file = TFile(options.out, 'recreate')
 
 chain = TChain(options.treename)
 if (not options.dir):
@@ -48,23 +45,33 @@ elif options.dir:
   for rootfile in rootfiles:
     chain.Add(rootfile)
 
+gROOT.ProcessLine(
+"struct recoDiObjectInfo_t {\
+    Double_t pt;\
+    Double_t phi;\
+    Double_t eta;\
+    Double_t mass;\
+    Double_t px;\
+    Double_t py;\
+    Double_t pz;\
+    Double_t energy;\
+    Double_t dR;\
+    Double_t dPt;\
+    Double_t dPhi;\
+    Double_t dEta;\
+    Double_t dMass;\
+  };")
+gammatwoprongInfo = recoDiObjectInfo_t()
+chain.SetBranchAddress("GammaTwoProng", AddressOf(gammatwoprongInfo, "pt") )
+
 count = 0
 total = chain.GetEntries()
 for event in chain:
-  if count % 100 == 0:
+  if count % 1000 == 0:
     percentDone = float(count) / float(total) * 100.0
     print 'Processing {0:10.0f}/{1:10.0f} : {2:5.2f} %'.format(count, total, percentDone )
   count += 1
-  var = -99.9
 
-  collection = event.Col
-
-  print collection[0].Px()
-  print collection[1].Px()
-
-  var = collection[1].Px()
-
-  out_tree.Fill()
 
 # Save file with histograms
 out_file.cd()

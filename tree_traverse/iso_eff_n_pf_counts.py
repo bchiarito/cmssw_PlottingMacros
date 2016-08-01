@@ -32,6 +32,8 @@ parser.add_option('--dir', action='store_true', default=False,
                   help='treat file option as a directory instead of a single file')
 (options, args) = parser.parse_args()
 
+out_file = TFile(options.out, 'recreate')
+
 chain = TChain(options.treename)
 if (not options.dir):
   chain.Add(options.file)
@@ -62,22 +64,38 @@ gROOT.ProcessLine(
 gammatwoprongInfo = recoDiObjectInfo_t()
 chain.SetBranchAddress("GammaTwoProng", AddressOf(gammatwoprongInfo, "pt") )
 
+bins = 50
+low = 0
+high = 50
+chargedIsoCount_fail = TH1F('chargedIsoCount_fail', 'Count of PF cands in Charged Iso Cone for failing Two-Prong Candidates', bins, low, high)
+neutralIsoCount_fail = TH1F('neutralIsoCount_fail', 'Count of PF cands in Neutral Iso Cone for failing Two-Prong Candidates', bins, low, high)
+egammaIsoCount_fail = TH1F('egammaIsoCount_fail', 'Count of PF cands in EGamma Iso Cone for failing Two-Prong Candidates', bins, low, high)
+chargedIsoCount_pass = TH1F('chargedIsoCount_pass', 'Count of PF cands in Charged Iso Cone for passing Two-Prong Candidates', bins, low, high)
+neutralIsoCount_pass = TH1F('neutralIsoCount_pass', 'Count of PF cands in Neutral Iso Cone for passing Two-Prong Candidates', bins, low, high)
+egammaIsoCount_pass = TH1F('egammaIsoCount_pass', 'Count of PF cands in EGamma Iso Cone for passing Two-Prong Candidates', bins, low, high)
+
 count = 0
 total = chain.GetEntries()
 for event in chain:
-  if count % 100 == 0:
+  if count % 1000 == 0:
     percentDone = float(count) / float(total) * 100.0
     print 'Processing {0:10.0f}/{1:10.0f} : {2:5.2f} %'.format(count, total, percentDone )
   count += 1
 
-  if event.runNum == 254907 and event.lumiNum == 15 and event.eventNum == 22371731:
-    print "found it"
-    if event.nPass >=1 and event.nTightPhoton >= 1:
-      if gammatwoprongInfo.dR<0.3:
-        print "dR=", gammatwoprongInfo.dR , "event number:", event.eventNum, "lumi:", event.lumiNum, "run:", event.runNum 
-        print "[Enter] for next event"
-        raw_input()
-
+  numcands = len(event.Cand_pt)
+  for i in range(numcands):
+    if not event.Cand_passChargedIso[i]:
+      chargedIsoCount_fail.Fill(event.Cand_nChargedIsoCone[i])
+    if not event.Cand_passNeutralIso[i]:
+      neutralIsoCount_fail.Fill(event.Cand_nNeutralIsoCone[i])
+    if not event.Cand_passEGammaIso[i]:
+      egammaIsoCount_fail.Fill(event.Cand_nEGammaIsoCone[i])
+    if event.Cand_passChargedIso[i]:
+      chargedIsoCount_pass.Fill(event.Cand_nChargedIsoCone[i])
+    if event.Cand_passNeutralIso[i]:
+      neutralIsoCount_pass.Fill(event.Cand_nNeutralIsoCone[i])
+    if event.Cand_passEGammaIso[i]:
+      egammaIsoCount_pass.Fill(event.Cand_nEGammaIsoCone[i])
 
 # Save file with histograms
 out_file.cd()

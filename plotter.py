@@ -55,23 +55,23 @@ parser.add_option('--tree', metavar='F', type='string', action='store',
                   dest='treename1',
                   help='full path of TTree object in each file')
 parser.add_option('--tree1', metavar='F', type='string', action='store',
-  	      	      default = 'fTree2',
+  	      	      default = 'diphotonAnalyzer/fTree2',
                   dest='treename1',
                   help='full path of TTree object in each file')
 parser.add_option('--tree2', metavar='F', type='string', action='store',
-  	      	      default = 'fTree2',
+  	      	      default = 'diphotonAnalyzer/fTree2',
                   dest='treename2',
                   help='full path of TTree object in each file')
 parser.add_option('--tree3', metavar='F', type='string', action='store',
-  	      	      default = 'fTree2',
+  	      	      default = 'diphotonAnalyzer/fTree2',
                   dest='treename3',
                   help='full path of TTree object in each file')
 parser.add_option('--tree4', metavar='F', type='string', action='store',
-  	      	      default = 'fTree2',
+  	      	      default = 'diphotonAnalyzer/fTree2',
                   dest='treename4',
                   help='full path of TTree object in each file')
 parser.add_option('--tree5', metavar='F', type='string', action='store',
-  	      	      default = 'fTree2',
+  	      	      default = 'diphotonAnalyzer/fTree2',
                   dest='treename5',
                   help='full path of TTree object in each file')
 
