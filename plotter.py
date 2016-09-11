@@ -18,9 +18,23 @@ parser = OptionParser()
 parser.add_option('--var', metavar='F', type='string', action='store',
                   dest='var',
                   help='')
+parser.add_option('--varx', metavar='F', type='string', action='store',
+                  dest='varx',
+                  help='')
+parser.add_option('--vary', metavar='F', type='string', action='store',
+                  dest='vary',
+                  help='')
 parser.add_option('--bins', metavar='F', type='string', action='store',
                   default='100,0,100',
                   dest='binning',
+                  help='')
+parser.add_option('--binx', metavar='F', type='string', action='store',
+                  default='100,0,100',
+                  dest='binningx',
+                  help='')
+parser.add_option('--biny', metavar='F', type='string', action='store',
+                  default='100,0,100',
+                  dest='binningy',
                   help='')
 parser.add_option('--cut', metavar='F', type='string', action='store',
                   default='',
@@ -75,7 +89,40 @@ parser.add_option('--tree5', metavar='F', type='string', action='store',
                   dest='treename5',
                   help='full path of TTree object in each file')
 
-# Histogram drawing options
+# Labeling and Titles
+parser.add_option('--title', metavar='F', type='string', action='store',
+	    	          default = '',
+                  dest='title',
+                  help='Title of histogram in canvas')
+parser.add_option('--xaxis', metavar='F', type='string', action='store',
+  	      	      default = '',
+                  dest='xaxis',
+                  help='xaxis label')
+parser.add_option('--leg', metavar='F', type='string', action='store',
+                  dest='legend1',
+                  help='legend entry label')
+parser.add_option('--leg1', metavar='F', type='string', action='store',
+  	      	      default = '',
+                  dest='legend1',
+                  help='legend entry label')
+parser.add_option('--leg2', metavar='F', type='string', action='store',
+  	      	      default = '',
+                  dest='legend2',
+                  help='legend entry label')
+parser.add_option('--leg3', metavar='F', type='string', action='store',
+  	      	      default = '',
+                  dest='legend3',
+                  help='legend entry label')
+parser.add_option('--leg4', metavar='F', type='string', action='store',
+  	      	      default = '',
+                  dest='legend4',
+                  help='legend entry label')
+parser.add_option('--leg5', metavar='F', type='string', action='store',
+  	      	      default = '',
+                  dest='legend5',
+                  help='legend entry label')
+
+# Math Options
 parser.add_option('--logy', action='store_true', default=False,
                   dest='logy',
                   help='logy sacle on y')
@@ -89,17 +136,6 @@ parser.add_option('--lumi', type='float', action='store',
   	      	      default = -1.0,
                   dest='lumi',
                   help='luminosity to scale to, if changed from default value')
-parser.add_option('--title', metavar='F', type='string', action='store',
-	    	          default = '',
-                  dest='title',
-                  help='Title of histogram in canvas')
-parser.add_option('--xaxis', metavar='F', type='string', action='store',
-  	      	      default = '',
-                  dest='xaxis',
-                  help='xaxis label')
-parser.add_option('--noplot', action='store_true', default=False,
-                  dest='noplot',
-                  help='Do not plot anything')
 parser.add_option('--errors', action='store_true', default=False,
                   dest='errors',
                   help='calls Sumw2() on all histograms')
@@ -118,6 +154,8 @@ parser.add_option('--error4', action='store_true', default=False,
 parser.add_option('--error5', action='store_true', default=False,
                   dest='error5',
                   help='calls Sumw2() on sample 5')
+
+# visual Apperance
 parser.add_option('--legoff', action='store_true', default=False,
                   dest='legoff',
                   help='Turns off legend')
@@ -144,38 +182,18 @@ parser.add_option('--color5', metavar='F', type='string', action='store',
   	      	      default = '',
                   dest='color5',
                   help='color string (kRed, kTeal, etc)')
-parser.add_option('--leg', metavar='F', type='string', action='store',
-                  dest='legend1',
-                  help='legend entry label')
-parser.add_option('--leg1', metavar='F', type='string', action='store',
+parser.add_option('--data_style ', metavar='F', type='string', action='store',
   	      	      default = '',
-                  dest='legend1',
-                  help='legend entry label')
-parser.add_option('--leg2', metavar='F', type='string', action='store',
-  	      	      default = '',
-                  dest='legend2',
-                  help='legend entry label')
-parser.add_option('--leg3', metavar='F', type='string', action='store',
-  	      	      default = '',
-                  dest='legend3',
-                  help='legend entry label')
-parser.add_option('--leg4', metavar='F', type='string', action='store',
-  	      	      default = '',
-                  dest='legend4',
-                  help='legend entry label')
-parser.add_option('--leg5', metavar='F', type='string', action='store',
-  	      	      default = '',
-                  dest='legend5',
-                  help='legend entry label')
+                  dest='color5',
+                  help='color string (kRed, kTeal, etc)')
 
 # Other options
-parser.add_option('--save', action='store_true', default=False,
-                  dest='save',
-                  help='save plot')
-parser.add_option('--name', metavar='F', type='string', action='store',
-    	    	      default = "plot",
-                  dest='name',
-                  help='name of file when saving')
+parser.add_option('--twoD', action='store_true', default=False,
+                  dest='twoD',
+                  help='make 2d plot')
+parser.add_option('--noplot', action='store_true', default=False,
+                  dest='noplot',
+                  help='Do not plot anything')
 parser.add_option('--quiet', action='store_true', default=False,
                   dest='quiet',
                   help='less output')
@@ -183,6 +201,15 @@ parser.add_option('-n', '--num', type='int', action='store',
                   default=-1,
                   dest='nentries',
                   help='max number of entries to draw from files')
+# Saving
+parser.add_option('--save', action='store_true', default=False,
+                  dest='save',
+                  help='save plot')
+parser.add_option('--name', metavar='F', type='string', action='store',
+    	    	      default = "plot",
+                  dest='name',
+                  help='name of file when saving')
+
 
 (options, args) = parser.parse_args()
 
@@ -223,16 +250,17 @@ multiple_samples = (not options.sample2 == "") or \
                    (not options.sample3 == "")
 
 samples = []
-sample = {}
-sample['path'] = options.sample1
-sample['tree'] = options.treename1
-sample['label'] = options.legend1
-sample['error'] = options.error1
-if options.color1 == "":
-  sample['color'] = ""
-else:
-  sample['color'] = rootcolor(options.color1)
-samples.append(sample)
+if not options.sample1 == "":
+  sample = {}
+  sample['path'] = options.sample1
+  sample['tree'] = options.treename1
+  sample['label'] = options.legend1
+  sample['error'] = options.error1
+  if options.color1 == "":
+    sample['color'] = ""
+  else:
+    sample['color'] = rootcolor(options.color1)
+  samples.append(sample)
 if not options.sample2 == "":
   sample = {}
   sample['path'] = options.sample2
@@ -277,6 +305,9 @@ if not options.sample5 == "":
   else:
     sample['color'] = rootcolor(options.color5)
   samples.append(sample)
+if len(samples) == 0:
+  print "Must specify at least one sample with --sample"
+  sys.exit
 
 # Make collection of TChains
 for sample in samples:
@@ -361,27 +392,50 @@ bins = int(options.binning[0:i1])
 low = float(options.binning[i1+1:i2])
 high = float(options.binning[i2+1:len(options.binning)])
 
+i1x = string.index(options.binningx,',')
+i2x = string.rindex(options.binningx,',')
+binsx = int(options.binningx[0:i1x])
+lowx = float(options.binningx[i1x+1:i2x])
+highx = float(options.binningx[i2x+1:len(options.binningx)])
+
+i1y = string.index(options.binningy,',')
+i2y = string.rindex(options.binningy,',')
+binsy = int(options.binningy[0:i1y])
+lowy = float(options.binningy[i1y+1:i2y])
+highy = float(options.binningy[i2y+1:len(options.binningy)])
+
 count = 0
 sumcount = 0
 for sample in samples:
   sumcount += 1
-  hist_sum = ROOT.TH1F(options.name+"_sum_"+str(sumcount), options.name, bins, low, high)
+  if not options.twoD:
+    hist_sum = ROOT.TH1F(options.name+"_sum_"+str(sumcount), options.name, bins, low, high)
+  else:
+    hist_sum = ROOT.TH2F(options.name+"_sum_"+str(sumcount), options.name, binsx, lowx, highx, binsy, lowy, highy)
   for entry in sample['entries']:
     chain = entry[0]
     xs = entry[1]
     N = entry[2]
     count += 1
-    hist = ROOT.TH1F(options.name+"_"+str(count), options.name, bins, low, high)
-    if options.nentries == -1:
-      chain.Draw(options.var+">>"+options.name+"_"+str(count),""+options.cut, "goff")
+    if not options.twoD:
+      hist = ROOT.TH1F(options.name+"_"+str(count), options.name, bins, low, high)
     else:
-      chain.Draw(options.var+">>"+options.name+"_"+str(count),""+options.cut, "goff", options.nentries)
+      hist = ROOT.TH2F(options.name+"_"+str(count), options.name, binsx, lowx, highx, binsy, lowy, highy)
+    if options.nentries == -1:
+      if not options.twoD:
+        chain.Draw(options.var+">>"+options.name+"_"+str(count),""+options.cut, "goff")
+      else:
+        chain.Draw(options.vary+":"+options.varx+">>"+options.name+"_"+str(count),""+options.cut, "goff")
+    else:
+      if not options.twoD:
+        chain.Draw(options.var+">>"+options.name+"_"+str(count),""+options.cut, "goff", options.nentries)
+      else:
+        chain.Draw(options.vary+":"+options.varx+">>"+options.name+"_"+str(count),""+options.cut, "goff", options.nentries)
     entry.append(hist)
     hist.Scale(xs/N)
-    hist_sum = hist_sum + hist
+    hist_sum.Add(hist)
   sample['summed_hist'] = hist_sum
   
-
 # Print Summary
 print ""
 count = 1
@@ -443,26 +497,38 @@ if not options.noplot:
     else:
       hist.SetMaximum(maximum*1.15)
 
-  # Title
+  # Labels
   for sample in samples:
     hist = sample['summed_hist']
     if not options.title == "":
       hist.SetTitle(options.title)
     elif options.name == "plot":
-      hist.SetTitle(options.var)
+      if not options.twoD:
+        hist.SetTitle(options.var)
+      else:
+        if options.cut == "":
+          hist.SetTitle(options.varx + " vs " + options.vary)
+        else:
+          hist.SetTitle(options.cut)
     else:
       hist.SetTitle(options.name)
-    # X axis
-    hist.GetXaxis().SetTitle(options.var + " w/ " + options.cut)
-    if options.cut == "":
-      hist.GetXaxis().SetTitle(options.var)
-    if not options.xaxis == "":
-      hist.GetXaxis().SetTitle(options.xaxis)
-    # Y axis
-    hist.GetYaxis().SetTitle("Events")
-    if options.scale:
-      hist.GetYaxis().SetTitle("Scaled to Integral 100")
-
+    if not options.twoD:
+      # X axis
+      hist.GetXaxis().SetTitle(options.var + " w/ " + options.cut)
+      if options.cut == "":
+        hist.GetXaxis().SetTitle(options.var)
+      if not options.xaxis == "":
+        hist.GetXaxis().SetTitle(options.xaxis)
+      # Y axis
+      hist.GetYaxis().SetTitle("Events")
+      if options.scale:
+        hist.GetYaxis().SetTitle("Scaled to Integral 100")
+    else:
+      # X axis
+      hist.GetXaxis().SetTitle(options.varx)
+      # Y axis
+      hist.GetXaxis().SetTitle(options.vary)
+      
   # Draw()
   count = 0
   for sample in samples:
@@ -471,6 +537,8 @@ if not options.noplot:
       draw_option = ''
     else:
       draw_option = 'same'
+    if options.twoD:
+      draw_option += 'Colz'
     count += 1
     if not (sample['error'] or options.errors):
       draw_option += 'P'

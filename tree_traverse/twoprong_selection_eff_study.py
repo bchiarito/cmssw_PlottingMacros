@@ -24,6 +24,9 @@ parser.add_option('--out',
 parser.add_option('--file',
                   dest='file',
                   help='File or group of files using a wildcard (remember to use \\ to input a wildcard)')
+parser.add_option('--tag',
+                  dest='tag', default="",
+                  help='string leading histogram titles')
 parser.add_option('--tree',
                   dest='treename', default="diphotonAnalyzer/fTree2",
                   help='name of tree inside files')
@@ -33,6 +36,8 @@ parser.add_option('--dir', action='store_true', default=False,
 (options, args) = parser.parse_args()
 
 out_file = TFile(options.out, 'recreate')
+
+tag = options.tag
 
 chain = TChain(options.treename)
 if (not options.dir):
@@ -67,92 +72,92 @@ chain.SetBranchAddress("GammaTwoProng", AddressOf(gammatwoprongInfo, "pt") )
 pt_bins = 40
 pt_low = 0
 pt_high = 2000
-total_pt = TH1F('total_pt', 'Two-prong total number', pt_bins, pt_low, pt_high)
-chargedIso_pass_pt  = TH1F('chargedIso_pass_pt' , 'Two-prong number pass rel charged iso', pt_bins, pt_low, pt_high)
-chargedIso_eff_pt   = TH1F('chargedIso_eff_pt'  , 'Two-prong efficiency pass rel charged iso', pt_bins, pt_low, pt_high)
-neutralIso_pass_pt  = TH1F('neutralIso_pass_pt' , 'Two-prong number pass rel neutral iso', pt_bins, pt_low, pt_high)
-neutralIso_eff_pt   = TH1F('neutralIso_eff_pt'  , 'Two-prong efficiency pass rel neutral iso', pt_bins, pt_low, pt_high)
-egammaIso_pass_pt  = TH1F('egammaIso_pass_pt' , 'Two-prong number pass rel egamma iso', pt_bins, pt_low, pt_high)
-egammaIso_eff_pt   = TH1F('egammaIso_eff_pt'  , 'Two-prong efficiency pass rel egamma iso', pt_bins, pt_low, pt_high)
-photon_req_pass_pt  = TH1F('photon_req_pass_pt' , 'Two-prong number pass photon_req', pt_bins, pt_low, pt_high)
-photon_req_eff_pt   = TH1F('photon_req_eff_pt'  , 'Two-prong efficiency pass photon_req', pt_bins, pt_low, pt_high)
-overall_pass_pt  = TH1F('overall_pass_pt' , 'Two-prong number pass overall', pt_bins, pt_low, pt_high)
-overall_eff_pt   = TH1F('overall_eff_pt'  , 'Two-prong efficiency pass overall', pt_bins, pt_low, pt_high)
+total_pt = TH1F('total_pt', tag+'total number', pt_bins, pt_low, pt_high)
+chargedIso_pass_pt  = TH1F('chargedIso_pass_pt' , tag+'number pass rel charged iso', pt_bins, pt_low, pt_high)
+chargedIso_eff_pt   = TH1F('chargedIso_eff_pt'  , tag+'efficiency pass rel charged iso', pt_bins, pt_low, pt_high)
+neutralIso_pass_pt  = TH1F('neutralIso_pass_pt' , tag+'number pass rel neutral iso', pt_bins, pt_low, pt_high)
+neutralIso_eff_pt   = TH1F('neutralIso_eff_pt'  , tag+'efficiency pass rel neutral iso', pt_bins, pt_low, pt_high)
+egammaIso_pass_pt  = TH1F('egammaIso_pass_pt' , tag+'number pass rel egamma iso', pt_bins, pt_low, pt_high)
+egammaIso_eff_pt   = TH1F('egammaIso_eff_pt'  , tag+'efficiency pass rel egamma iso', pt_bins, pt_low, pt_high)
+photon_req_pass_pt  = TH1F('photon_req_pass_pt' , tag+'number pass photon_req', pt_bins, pt_low, pt_high)
+photon_req_eff_pt   = TH1F('photon_req_eff_pt'  , tag+'efficiency pass photon_req', pt_bins, pt_low, pt_high)
+overall_pass_pt  = TH1F('overall_pass_pt' , tag+'number pass overall', pt_bins, pt_low, pt_high)
+overall_eff_pt   = TH1F('overall_eff_pt'  , tag+'efficiency pass overall', pt_bins, pt_low, pt_high)
 
 eta_bins = 32
 eta_low = -4
 eta_high = 4
-total_eta = TH1F('total_eta', 'Two-prong total number', eta_bins, eta_low, eta_high)
-chargedIso_pass_eta  = TH1F('chargedIso_pass_eta' , 'Two-prong number pass rel charged iso', eta_bins, eta_low, eta_high)
-chargedIso_eff_eta   = TH1F('chargedIso_eff_eta'  , 'Two-prong efficiency pass rel charged iso', eta_bins, eta_low, eta_high)
-neutralIso_pass_eta  = TH1F('neutralIso_pass_eta' , 'Two-prong number pass rel neutral iso', eta_bins, eta_low, eta_high)
-neutralIso_eff_eta   = TH1F('neutralIso_eff_eta'  , 'Two-prong efficiency pass rel neutral iso', eta_bins, eta_low, eta_high)
-egammaIso_pass_eta  = TH1F('egammaIso_pass_eta' , 'Two-prong number pass rel egamma iso', eta_bins, eta_low, eta_high)
-egammaIso_eff_eta   = TH1F('egammaIso_eff_eta'  , 'Two-prong efficiency pass rel egamma iso', eta_bins, eta_low, eta_high)
-photon_req_pass_eta  = TH1F('photon_req_pass_eta' , 'Two-prong number pass photon_req', eta_bins, eta_low, eta_high)
-photon_req_eff_eta   = TH1F('photon_req_eff_eta'  , 'Two-prong efficiency pass photon_req', eta_bins, eta_low, eta_high)
-overall_pass_eta  = TH1F('overall_pass_eta' , 'Two-prong number pass overall', eta_bins, eta_low, eta_high)
-overall_eff_eta   = TH1F('overall_eff_eta'  , 'Two-prong efficiency pass overall', eta_bins, eta_low, eta_high)
+total_eta = TH1F('total_eta', tag+'total number', eta_bins, eta_low, eta_high)
+chargedIso_pass_eta  = TH1F('chargedIso_pass_eta' , tag+'number pass rel charged iso', eta_bins, eta_low, eta_high)
+chargedIso_eff_eta   = TH1F('chargedIso_eff_eta'  , tag+'efficiency pass rel charged iso', eta_bins, eta_low, eta_high)
+neutralIso_pass_eta  = TH1F('neutralIso_pass_eta' , tag+'number pass rel neutral iso', eta_bins, eta_low, eta_high)
+neutralIso_eff_eta   = TH1F('neutralIso_eff_eta'  , tag+'efficiency pass rel neutral iso', eta_bins, eta_low, eta_high)
+egammaIso_pass_eta  = TH1F('egammaIso_pass_eta' , tag+'number pass rel egamma iso', eta_bins, eta_low, eta_high)
+egammaIso_eff_eta   = TH1F('egammaIso_eff_eta'  , tag+'efficiency pass rel egamma iso', eta_bins, eta_low, eta_high)
+photon_req_pass_eta  = TH1F('photon_req_pass_eta' , tag+'number pass photon_req', eta_bins, eta_low, eta_high)
+photon_req_eff_eta   = TH1F('photon_req_eff_eta'  , tag+'efficiency pass photon_req', eta_bins, eta_low, eta_high)
+overall_pass_eta  = TH1F('overall_pass_eta' , tag+'number pass overall', eta_bins, eta_low, eta_high)
+overall_eff_eta   = TH1F('overall_eff_eta'  , tag+'efficiency pass overall', eta_bins, eta_low, eta_high)
 
 phi_bins = 32
 phi_low = -4
 phi_high = 4
-total_phi = TH1F('total_phi', 'Two-prong total number', phi_bins, phi_low, phi_high)
-chargedIso_pass_phi  = TH1F('chargedIso_pass_phi' , 'Two-prong number pass rel charged iso', phi_bins, phi_low, phi_high)
-chargedIso_eff_phi   = TH1F('chargedIso_eff_phi'  , 'Two-prong efficiency pass rel charged iso', phi_bins, phi_low, phi_high)
-neutralIso_pass_phi  = TH1F('neutralIso_pass_phi' , 'Two-prong number pass rel neutral iso', phi_bins, phi_low, phi_high)
-neutralIso_eff_phi   = TH1F('neutralIso_eff_phi'  , 'Two-prong efficiency pass rel neutral iso', phi_bins, phi_low, phi_high)
-egammaIso_pass_phi  = TH1F('egammaIso_pass_phi' , 'Two-prong number pass rel egamma iso', phi_bins, phi_low, phi_high)
-egammaIso_eff_phi   = TH1F('egammaIso_eff_phi'  , 'Two-prong efficiency pass rel egamma iso', phi_bins, phi_low, phi_high)
-photon_req_pass_phi  = TH1F('photon_req_pass_phi' , 'Two-prong number pass photon_req', phi_bins, phi_low, phi_high)
-photon_req_eff_phi   = TH1F('photon_req_eff_phi'  , 'Two-prong efficiency pass photon_req', phi_bins, phi_low, phi_high)
-overall_pass_phi  = TH1F('overall_pass_phi' , 'Two-prong number pass overall', phi_bins, phi_low, phi_high)
-overall_eff_phi   = TH1F('overall_eff_phi'  , 'Two-prong efficiency pass overall', phi_bins, phi_low, phi_high)
+total_phi = TH1F('total_phi', tag+'total number', phi_bins, phi_low, phi_high)
+chargedIso_pass_phi  = TH1F('chargedIso_pass_phi' , tag+'number pass rel charged iso', phi_bins, phi_low, phi_high)
+chargedIso_eff_phi   = TH1F('chargedIso_eff_phi'  , tag+'efficiency pass rel charged iso', phi_bins, phi_low, phi_high)
+neutralIso_pass_phi  = TH1F('neutralIso_pass_phi' , tag+'number pass rel neutral iso', phi_bins, phi_low, phi_high)
+neutralIso_eff_phi   = TH1F('neutralIso_eff_phi'  , tag+'efficiency pass rel neutral iso', phi_bins, phi_low, phi_high)
+egammaIso_pass_phi  = TH1F('egammaIso_pass_phi' , tag+'number pass rel egamma iso', phi_bins, phi_low, phi_high)
+egammaIso_eff_phi   = TH1F('egammaIso_eff_phi'  , tag+'efficiency pass rel egamma iso', phi_bins, phi_low, phi_high)
+photon_req_pass_phi  = TH1F('photon_req_pass_phi' , tag+'number pass photon_req', phi_bins, phi_low, phi_high)
+photon_req_eff_phi   = TH1F('photon_req_eff_phi'  , tag+'efficiency pass photon_req', phi_bins, phi_low, phi_high)
+overall_pass_phi  = TH1F('overall_pass_phi' , tag+'number pass overall', phi_bins, phi_low, phi_high)
+overall_eff_phi   = TH1F('overall_eff_phi'  , tag+'efficiency pass overall', phi_bins, phi_low, phi_high)
 
 pv_bins = 40
 pv_low = 0
 pv_high = 40
-total_pv = TH1F('total_pv','Two-prong total number', pv_bins, pv_low, pv_high)
-chargedIso_pass_pv  = TH1F('chargedIso_pass_pv' , 'Two-prong number pass rel charged iso', pv_bins, pv_low, pv_high)
-chargedIso_eff_pv   = TH1F('chargedIso_eff_pv'  , 'Two-prong efficiency pass rel charged iso', pv_bins, pv_low, pv_high)
-neutralIso_pass_pv  = TH1F('neutralIso_pass_pv' , 'Two-prong number pass rel neutral iso', pv_bins, pv_low, pv_high)
-neutralIso_eff_pv   = TH1F('neutralIso_eff_pv'  , 'Two-prong efficiency pass rel neutral iso', pv_bins, pv_low, pv_high)
-egammaIso_pass_pv  = TH1F('egammaIso_pass_pv' , 'Two-prong number pass rel egamma iso', pv_bins, pv_low, pv_high)
-egammaIso_eff_pv   = TH1F('egammaIso_eff_pv'  , 'Two-prong efficiency pass rel egamma iso', pv_bins, pv_low, pv_high)
-photon_req_pass_pv  = TH1F('photon_req_pass_pv' , 'Two-prong number pass photon_req', pv_bins, pv_low, pv_high)
-photon_req_eff_pv   = TH1F('photon_req_eff_pv'  , 'Two-prong efficiency pass photon_req', pv_bins, pv_low, pv_high)
-overall_pass_pv  = TH1F('overall_pass_pv' , 'Two-prong number pass overall', pv_bins, pv_low, pv_high)
-overall_eff_pv   = TH1F('overall_eff_pv'  , 'Two-prong efficiency pass overall', pv_bins, pv_low, pv_high)
+total_pv = TH1F('total_pv',tag+'total number', pv_bins, pv_low, pv_high)
+chargedIso_pass_pv  = TH1F('chargedIso_pass_pv' , tag+'number pass rel charged iso', pv_bins, pv_low, pv_high)
+chargedIso_eff_pv   = TH1F('chargedIso_eff_pv'  , tag+'efficiency pass rel charged iso', pv_bins, pv_low, pv_high)
+neutralIso_pass_pv  = TH1F('neutralIso_pass_pv' , tag+'number pass rel neutral iso', pv_bins, pv_low, pv_high)
+neutralIso_eff_pv   = TH1F('neutralIso_eff_pv'  , tag+'efficiency pass rel neutral iso', pv_bins, pv_low, pv_high)
+egammaIso_pass_pv  = TH1F('egammaIso_pass_pv' , tag+'number pass rel egamma iso', pv_bins, pv_low, pv_high)
+egammaIso_eff_pv   = TH1F('egammaIso_eff_pv'  , tag+'efficiency pass rel egamma iso', pv_bins, pv_low, pv_high)
+photon_req_pass_pv  = TH1F('photon_req_pass_pv' , tag+'number pass photon_req', pv_bins, pv_low, pv_high)
+photon_req_eff_pv   = TH1F('photon_req_eff_pv'  , tag+'efficiency pass photon_req', pv_bins, pv_low, pv_high)
+overall_pass_pv  = TH1F('overall_pass_pv' , tag+'number pass overall', pv_bins, pv_low, pv_high)
+overall_eff_pv   = TH1F('overall_eff_pv'  , tag+'efficiency pass overall', pv_bins, pv_low, pv_high)
 
 njet_bins = 25
 njet_low = 0
 njet_high = 25
-total_njet = TH1F('total_njet', 'Two-prong total number', njet_bins, njet_low, njet_high)
-chargedIso_pass_njet  = TH1F('chargedIso_pass_njet' , 'Two-prong number pass rel charged iso', njet_bins, njet_low, njet_high)
-chargedIso_eff_njet   = TH1F('chargedIso_eff_njet'  , 'Two-prong efficiency pass rel charged iso', njet_bins, njet_low, njet_high)
-neutralIso_pass_njet  = TH1F('neutralIso_pass_njet' , 'Two-prong number pass rel neutral iso', njet_bins, njet_low, njet_high)
-neutralIso_eff_njet   = TH1F('neutralIso_eff_njet'  , 'Two-prong efficiency pass rel neutral iso', njet_bins, njet_low, njet_high)
-egammaIso_pass_njet  = TH1F('egammaIso_pass_njet' , 'Two-prong number pass rel egamma iso', njet_bins, njet_low, njet_high)
-egammaIso_eff_njet   = TH1F('egammaIso_eff_njet'  , 'Two-prong efficiency pass rel egamma iso', njet_bins, njet_low, njet_high)
-photon_req_pass_njet  = TH1F('photon_req_pass_njet' , 'Two-prong number pass photon_req', njet_bins, njet_low, njet_high)
-photon_req_eff_njet   = TH1F('photon_req_eff_njet'  , 'Two-prong efficiency pass photon_req', njet_bins, njet_low, njet_high)
-overall_pass_njet  = TH1F('overall_pass_njet' , 'Two-prong number pass overall', njet_bins, njet_low, njet_high)
-overall_eff_njet   = TH1F('overall_eff_njet'  , 'Two-prong efficiency pass overall', njet_bins, njet_low, njet_high)
+total_njet = TH1F('total_njet', tag+'total number', njet_bins, njet_low, njet_high)
+chargedIso_pass_njet  = TH1F('chargedIso_pass_njet' , tag+'number pass rel charged iso', njet_bins, njet_low, njet_high)
+chargedIso_eff_njet   = TH1F('chargedIso_eff_njet'  , tag+'efficiency pass rel charged iso', njet_bins, njet_low, njet_high)
+neutralIso_pass_njet  = TH1F('neutralIso_pass_njet' , tag+'number pass rel neutral iso', njet_bins, njet_low, njet_high)
+neutralIso_eff_njet   = TH1F('neutralIso_eff_njet'  , tag+'efficiency pass rel neutral iso', njet_bins, njet_low, njet_high)
+egammaIso_pass_njet  = TH1F('egammaIso_pass_njet' , tag+'number pass rel egamma iso', njet_bins, njet_low, njet_high)
+egammaIso_eff_njet   = TH1F('egammaIso_eff_njet'  , tag+'efficiency pass rel egamma iso', njet_bins, njet_low, njet_high)
+photon_req_pass_njet  = TH1F('photon_req_pass_njet' , tag+'number pass photon_req', njet_bins, njet_low, njet_high)
+photon_req_eff_njet   = TH1F('photon_req_eff_njet'  , tag+'efficiency pass photon_req', njet_bins, njet_low, njet_high)
+overall_pass_njet  = TH1F('overall_pass_njet' , tag+'number pass overall', njet_bins, njet_low, njet_high)
+overall_eff_njet   = TH1F('overall_eff_njet'  , tag+'efficiency pass overall', njet_bins, njet_low, njet_high)
 
 ht_bins = 40
 ht_low = 0
 ht_high = 4000
-total_ht = TH1F('total_ht', 'Two-prong total number', ht_bins, ht_low, ht_high)
-chargedIso_pass_ht  = TH1F('chargedIso_pass_ht' , 'Two-prong number pass rel charged iso', ht_bins, ht_low, ht_high)
-chargedIso_eff_ht   = TH1F('chargedIso_eff_ht'  , 'Two-prong efficiency pass rel charged iso', ht_bins, ht_low, ht_high)
-neutralIso_pass_ht  = TH1F('neutralIso_pass_ht' , 'Two-prong number pass rel neutral iso', ht_bins, ht_low, ht_high)
-neutralIso_eff_ht   = TH1F('neutralIso_eff_ht'  , 'Two-prong efficiency pass rel neutral iso', ht_bins, ht_low, ht_high)
-egammaIso_pass_ht  = TH1F('egammaIso_pass_ht' , 'Two-prong number pass rel egamma iso', ht_bins, ht_low, ht_high)
-egammaIso_eff_ht   = TH1F('egammaIso_eff_ht'  , 'Two-prong efficiency pass rel egamma iso', ht_bins, ht_low, ht_high)
-photon_req_pass_ht  = TH1F('photon_req_pass_ht' , 'Two-prong number pass photon_req', ht_bins, ht_low, ht_high)
-photon_req_eff_ht   = TH1F('photon_req_eff_ht'  , 'Two-prong efficiency pass photon_req', ht_bins, ht_low, ht_high)
-overall_pass_ht  = TH1F('overall_pass_ht' , 'Two-prong number pass overall', ht_bins, ht_low, ht_high)
-overall_eff_ht   = TH1F('overall_eff_ht'  , 'Two-prong efficiency pass overall', ht_bins, ht_low, ht_high)
+total_ht = TH1F('total_ht', tag+'total number', ht_bins, ht_low, ht_high)
+chargedIso_pass_ht  = TH1F('chargedIso_pass_ht' , tag+'number pass rel charged iso', ht_bins, ht_low, ht_high)
+chargedIso_eff_ht   = TH1F('chargedIso_eff_ht'  , tag+'efficiency pass rel charged iso', ht_bins, ht_low, ht_high)
+neutralIso_pass_ht  = TH1F('neutralIso_pass_ht' , tag+'number pass rel neutral iso', ht_bins, ht_low, ht_high)
+neutralIso_eff_ht   = TH1F('neutralIso_eff_ht'  , tag+'efficiency pass rel neutral iso', ht_bins, ht_low, ht_high)
+egammaIso_pass_ht  = TH1F('egammaIso_pass_ht' , tag+'number pass rel egamma iso', ht_bins, ht_low, ht_high)
+egammaIso_eff_ht   = TH1F('egammaIso_eff_ht'  , tag+'efficiency pass rel egamma iso', ht_bins, ht_low, ht_high)
+photon_req_pass_ht  = TH1F('photon_req_pass_ht' , tag+'number pass photon_req', ht_bins, ht_low, ht_high)
+photon_req_eff_ht   = TH1F('photon_req_eff_ht'  , tag+'efficiency pass photon_req', ht_bins, ht_low, ht_high)
+overall_pass_ht  = TH1F('overall_pass_ht' , tag+'number pass overall', ht_bins, ht_low, ht_high)
+overall_eff_ht   = TH1F('overall_eff_ht'  , tag+'efficiency pass overall', ht_bins, ht_low, ht_high)
 
 count = 0
 total = chain.GetEntries()
