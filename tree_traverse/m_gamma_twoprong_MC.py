@@ -9,25 +9,19 @@ from optparse import OptionParser
 
 parser = OptionParser()
 parser.add_option('--file',
-                  dest='file', default='samples/trees/SinglePhoton/crab_SinglePhoton_RunD',
+                  dest='file', default='',
                   help='File or group of files using a wildcard (remember to use \\ to input a wildcard)')
 parser.add_option('--tree',
                   dest='tree', default='fTree2',
                   help='')
 parser.add_option('--out',
-                  dest='out', default="SinglePhoton_runD_fakeratepred_histograms.root",
+                  dest='out', default="",
                   help='output file')
-parser.add_option('--fakerate',
-                  dest='fakerate', default="",
-                  help='file with fake rate histograms')
 (options, args) = parser.parse_args()
 
 path = options.file
 tree = options.tree
 fakefile = TFile(options.fakerate)
-
-fakehisto = fakefile.Get('fakerate_m0toInf_pt')
-fakehisto_axis = fakehisto.GetXaxis()
 
 bins = 71
 low = 0
@@ -41,20 +35,13 @@ mass_windows = [[0,300], [0,400], [300,500], [400,600], [500,700],
                 [1600,1800], [1700,1900], [1800,2000], [0,2000], [0,'Inf']]
 
 for mass_window in mass_windows:
-  histo = TH1D('m_gammaTwoProng'+str(mass_window[0])+'_'+str(mass_window[1]), 'M_GammaEta mass window '+str(mass_window[0])+' to '+str(mass_window[1])+' MeV', bins, low, high)
-  histo_endcap = TH1D('m_gammaTwoProng'+str(mass_window[0])+'_'+str(mass_window[1])+'_Endcap', 'M_GammaEta mass window '+str(mass_window[0])+' to '+str(mass_window[1])+' MeV, Endcap Photon', bins, low, high)
-  histo_barrel = TH1D('m_gammaTwoProng'+str(mass_window[0])+'_'+str(mass_window[1])+'_Barrel', 'M_GammaEta mass window '+str(mass_window[0])+' to '+str(mass_window[1])+' MeV, Barrel Photon', bins, low, high)
+  histo = TH1D('m_gammaTwoProng_gjetsMC_'+str(mass_window[0])+'_'+str(mass_window[1]), 'M_GammaEta mass window '+str(mass_window[0])+' to '+str(mass_window[1])+' MeV', bins, low, high)
+  histo_endcap = TH1D('m_gammaTwoProng_gjetsMC_'+str(mass_window[0])+'_'+str(mass_window[1])+'_Endcap', 'M_GammaEta mass window '+str(mass_window[0])+' to '+str(mass_window[1])+' MeV, Endcap Photon', bins, low, high)
+  histo_barrel = TH1D('m_gammaTwoProng_gjetsMC_'+str(mass_window[0])+'_'+str(mass_window[1])+'_Barrel', 'M_GammaEta mass window '+str(mass_window[0])+' to '+str(mass_window[1])+' MeV, Barrel Photon', bins, low, high)
   
-  histo_bkgpred = TH1D('m_gammaTwoProng'+str(mass_window[0])+'_'+str(mass_window[1])+'_bkgpred', 'M_GammaEta Fake Background mass window '+str(mass_window[0])+' to '+str(mass_window[1])+' MeV', bins, low, high)
-  histo_endcap_bkgpred = TH1D('m_gammaTwoProng'+str(mass_window[0])+'_'+str(mass_window[1])+'_Endcap'+'_bkgpred', 'M_GammaEta Fake Background mass window '+str(mass_window[0])+' to '+str(mass_window[1])+' MeV, Endcap Photon', bins, low, high)
-  histo_barrel_bkgpred = TH1D('m_gammaTwoProng'+str(mass_window[0])+'_'+str(mass_window[1])+'_Barrel'+'_bkgpred', 'M_GammaEta Fake Background mass window '+str(mass_window[0])+' to '+str(mass_window[1])+' MeV, Barrel Photon', bins, low, high)
-
   mass_window.append(histo)
   mass_window.append(histo_barrel)
   mass_window.append(histo_endcap)
-  mass_window.append(histo_bkgpred)
-  mass_window.append(histo_barrel_bkgpred)
-  mass_window.append(histo_endcap_bkgpred)
 
 # Make TChain
 chain = TChain(tree)
@@ -232,38 +219,6 @@ for event in chain:
         if abs(Photon1.scEta) < 2.5 and abs(Photon1.scEta) > 1.566:
           hist_endcap.Fill(PhiCand.M())
         
-  # background prediction
-  if hasPhoton and (not hasTwoProngTight) and hasTwoProngLoose:
-    # Construct invariant mass
-    PhotonCand = TLorentzVector()
-    PhotonCand.SetPtEtaPhiM(Photon1.pt, Photon1.eta, Photon1.phi, 0)
-    EtaCand = TLorentzVector()
-    EtaCand.SetPtEtaPhiM(event.TwoProngLoose_pt[0], event.TwoProngLoose_eta[0], event.TwoProngLoose_phi[0], event.TwoProngLoose_mass[0])
-    EtaMass = event.TwoProngLoose_Mass[0]
-    PhiCand = PhotonCand + EtaCand
-    # Fill histograms
-    for window in mass_windows:
-      mass_low = window[0]
-      mass_high = window[1]
-      hist = window[5]
-      hist_barrel = window[6]
-      hist_endcap = window[7]
-      fakefactor_ptbin = fakehisto_axis.FindBin(EtaCand.Pt())
-      fake_factor = fakehisto.GetBinContent(fakefactor_ptbin)
-      if mass_high == 'Inf':
-        hist.Fill(PhiCand.M() * fake_factor)
-        if abs(Photon1.scEta) < 1.4442:
-          hist_barrel.Fill(PhiCand.M() * fake_factor)
-        if abs(Photon1.scEta) < 2.5 and abs(Photon1.scEta) > 1.566:
-          hist_endcap.Fill(PhiCand.M() * fake_factor)
-      elif EtaMass > mass_low/1000.0 and EtaMass <= mass_high/1000.0:
-        hist.Fill(PhiCand.M() * fake_factor)
-        if abs(Photon1.scEta) < 1.4442:
-          hist_barrel.Fill(PhiCand.M() * fake_factor)
-        if abs(Photon1.scEta) < 2.5 and abs(Photon1.scEta) > 1.566:
-          hist_endcap.Fill(PhiCand.M() * fake_factor)
-
-  
 # Save file with histograms
 outputfile.cd()
 outputfile.Write()
