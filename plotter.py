@@ -131,7 +131,7 @@ parser.add_option('--logx', action='store_true', default=False,
                   help='logx sacle on x')
 parser.add_option('--scaled', action='store_true', default=False,
                   dest='scale',
-                  help='scale to integral = 1')
+                  help='scale to integral = 100')
 parser.add_option('--lumi', type='float', action='store',
   	      	      default = -1.0,
                   dest='lumi',
@@ -496,6 +496,7 @@ if not options.noplot:
         hist.SetMinimum(0.5)
     else:
       hist.SetMaximum(maximum*1.15)
+      hist.SetMinimum(0) 
 
   # Labels
   for sample in samples:
@@ -541,7 +542,7 @@ if not options.noplot:
       draw_option += 'Colz'
     count += 1
     if not (sample['error'] or options.errors):
-      draw_option += 'P'
+      draw_option += ''
     hist.Draw(draw_option)
 
   # Legend

@@ -243,7 +243,7 @@ for event in chain:
   if event.nJets >= 1:
     jet = TLorentzVector()
     jet.SetPtEtaPhiM(event.jet_pt[0], event.jet_eta[0], event.jet_phi[0], event.jet_mass[0])
-    has_leading_photon = True
+    has_leading_jet = True
 
   if options.selection == 'photon':
     if has_leading_photon:
