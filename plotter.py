@@ -470,7 +470,7 @@ if not options.noplot:
       hist.SetLineColor(sample['color'])
       hist.SetMarkerColor(sample['color'])
     hist.SetFillColor(0)
-    hist.SetLineWidth(2)
+    hist.SetLineWidth(1)
     hist.SetStats(0)
     # Scale
     if sample['error'] or options.errors:
@@ -528,7 +528,7 @@ if not options.noplot:
       # X axis
       hist.GetXaxis().SetTitle(options.varx)
       # Y axis
-      hist.GetXaxis().SetTitle(options.vary)
+      hist.GetYaxis().SetTitle(options.vary)
       
   # Draw()
   count = 0
