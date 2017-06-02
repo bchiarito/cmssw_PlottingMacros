@@ -1,21 +1,11 @@
 from ROOT import *
 from array import array
 from math import *
+from optparse import OptionParser
 import sys
 import os
 import glob
 import fnmatch
-from optparse import OptionParser
-
-def delta_phi(phi1, phi2):
-  dphi = math.fabs(phi1 - phi2)
-  return delta_phi_helper(dphi)
-
-def delta_phi_helper(dphi):
-  if dphi > 3.1415926535:
-    return delta_phi_helper(dphi - 3.1415926535)
-  else:
-    return dphi
 
 parser = OptionParser()
 parser.add_option('--out',
@@ -44,25 +34,6 @@ elif options.dir:
       rootfiles.append(os.path.join(root, filename))
   for rootfile in rootfiles:
     chain.Add(rootfile)
-
-gROOT.ProcessLine(
-"struct recoDiObjectInfo_t {\
-    Double_t pt;\
-    Double_t phi;\
-    Double_t eta;\
-    Double_t mass;\
-    Double_t px;\
-    Double_t py;\
-    Double_t pz;\
-    Double_t energy;\
-    Double_t dR;\
-    Double_t dPt;\
-    Double_t dPhi;\
-    Double_t dEta;\
-    Double_t dMass;\
-  };")
-gammatwoprongInfo = recoDiObjectInfo_t()
-chain.SetBranchAddress("GammaTwoProng", AddressOf(gammatwoprongInfo, "pt") )
 
 count = 0
 total = chain.GetEntries()
