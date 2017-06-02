@@ -43,8 +43,8 @@ events_photon_plus_HLT_Photon175 = 0
 events_photon_plus_HLT_Photon22_Iso = 0
 events_photon_plus_HLT = 0
 
-nbins = 19
-bins_array = [0,10,20,30,40,60,80,100,120,140,160,180,200,220,240,300,400,500,600,1000]
+nbins = 20
+bins_array = [0,10,20,30,40,50,60,80,100,120,140,160,180,200,220,240,300,400,500,600,1000]
 bins = array('d', bins_array)
 low = 0
 high = 600
