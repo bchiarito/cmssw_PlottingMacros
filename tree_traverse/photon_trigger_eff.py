@@ -46,12 +46,18 @@ events_photon_plus_HLT = 0
 nbins = 20
 bins_array = [0,10,20,30,40,50,60,80,100,120,140,160,180,200,220,240,300,400,500,600,1000]
 bins = array('d', bins_array)
-low = 0
-high = 600
 
-hist_photon = TH1F("hist_photon","Has HptID photon",nbins,bins)
-hist_trigger = TH1F("hist_trigger","Has HptID photon and Passes trigger",nbins,bins)
-hist_eff = TH1F("hist_eff","HLT_Photon175 or HLT_Photon22_R9Id90_HE10_IsoM;leading high-pt-id-photon p_{T};Efficency",nbins,bins)
+eff_nume = TH1F("eff_nume","HLT_Photon175 or HLT_Photon22_R9Id90_HE10_IsoM Numerator;leading high-pt-id-photon p_{T};Efficency",nbins,bins)
+eff_deno = TH1F("eff_deno","Denominator;leading high-pt-id-photon p_{T};Efficency",nbins,bins)
+eff = TH1F("eff","HLT_Photon175 or HLT_Photon22_R9Id90_HE10_IsoM;leading high-pt-id-photon p_{T};Efficency",nbins,bins)
+
+eff_175_nume = TH1F("eff_175_nume","HLT_Photon175 Numerator;leading high-pt-id-photon p_{T};Efficency",nbins,bins)
+#eff_175_deno = TH1F("eff_175_deno","HLT_Photon175 Denominator;leading high-pt-id-photon p_{T};Efficency",nbins,bins)
+eff_175 = TH1F("eff_175","HLT_Photon175;leading high-pt-id-photon p_{T};Efficency",nbins,bins)
+
+eff_22iso_nume = TH1F("eff_22iso_nume","HLT_Photon22_R9Id90_HE10_IsoM Numerator;leading high-pt-id-photon p_{T};Efficency",nbins,bins)
+#eff_22iso_deno = TH1F("eff_22iso_deno","HLT_Photon175 Denominator;leading high-pt-id-photon p_{T};Efficency",nbins,bins)
+eff_22iso = TH1F("eff_22iso","HLT_Photon22_R9Id90_HE10_IsoM;leading high-pt-id-photon p_{T};Efficency",nbins,bins)
 
 count = 0
 total = chain.GetEntries()
@@ -67,16 +73,21 @@ for event in chain:
     events_HLT_Photon22_Iso += 1
   if (event.HLT_Photon175 or event.HLT_Photon22_Iso):
     events_HLT_full += 1
-  if event.nTightPhotons > 0:
-    events_with_photon += 1
-    hist_photon.Fill(event.Photon_pt[0])
   if event.HLT_Photon175 and (event.nTightPhotons > 0):
     events_photon_plus_HLT_Photon175 += 1
   if event.HLT_Photon22_Iso and (event.nTightPhotons > 0):
     events_photon_plus_HLT_Photon22_Iso += 1
+
+  if event.nTightPhotons > 0:
+    events_with_photon += 1
+    eff_deno.Fill(event.Photon_pt[0])
   if (event.HLT_Photon175 or event.HLT_Photon22_Iso) and (event.nTightPhotons > 0):
     events_photon_plus_HLT += 1
-    hist_trigger.Fill(event.Photon_pt[0])
+    eff_nume.Fill(event.Photon_pt[0])
+  if (event.HLT_Photon175) and (event.nTightPhotons > 0):
+    eff_175_nume.Fill(event.Photon_pt[0])
+  if (event.HLT_Photon22_Iso) and (event.nTightPhotons > 0):
+    eff_22iso_nume.Fill(event.Photon_pt[0])
 
 print "Total Events:", count
 print "Events with photon object:", events_with_photon
@@ -87,15 +98,22 @@ print "Events with photon object and HLT_Photon175:", events_photon_plus_HLT_Pho
 print "Events with photon object and HLT_Photon22_Iso:", events_photon_plus_HLT_Photon22_Iso
 print "Events with photon object and pass combination trigger:", events_photon_plus_HLT
 
-hist_photon.Sumw2()
-hist_trigger.Sumw2()
+eff_nume.Sumw2()
+eff_deno.Sumw2()
+eff.Add(eff_nume)
+eff.Divide(eff_deno)
 
-hist_eff.Add(hist_trigger)
-hist_eff.Divide(hist_photon)
+eff_175_nume.Sumw2()
+eff_175.Add(eff_175_nume)
+eff_175.Divide(eff_deno)
 
-hist_eff.SetStats(0)
-hist_eff.Draw()
-raw_input()
+eff_22iso_nume.Sumw2()
+eff_22iso.Add(eff_22iso_nume)
+eff_22iso.Divide(eff_deno)
+
+#eff.SetStats(0)
+#eff.Draw()
+#raw_input()
 
 # Save file with histograms
 out_file.cd()
