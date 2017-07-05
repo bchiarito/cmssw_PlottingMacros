@@ -4,7 +4,6 @@ import fnmatch
 import math
 import ROOT
 import string
-from ROOT import *
 import sys
 import time
 
@@ -14,7 +13,7 @@ time_begin = time.time()
 
 parser = OptionParser()
 
-# Variable options
+# Plotting (variable, bins, etc) options
 parser.add_option('--var', metavar='F', type='string', action='store',
                   dest='var',
                   help='')
@@ -155,7 +154,7 @@ parser.add_option('--error5', action='store_true', default=False,
                   dest='error5',
                   help='calls Sumw2() on sample 5')
 
-# visual Apperance
+# Visual Apperance
 parser.add_option('--legoff', action='store_true', default=False,
                   dest='legoff',
                   help='Turns off legend')
@@ -225,7 +224,7 @@ def rootcolor(color_string):
   elif color_string == "Black":
     return ROOT.kBlack
   elif color_string == "Pink":
-    return ROOT.kPink
+    return ROOT.kPink+10
   elif color_string == "Cyan":
     return ROOT.kCyan
   elif color_string == "Yellow":
@@ -242,6 +241,8 @@ def rootcolor(color_string):
     return ROOT.kGray
   elif color_string == "White":
     return ROOT.kWhite
+  else:
+    return color_string
 
 if not options.quiet:
   print "Begin."
@@ -452,7 +453,7 @@ print ""
 if not options.noplot:
   if not options.quiet:
     print "Plotting..."
-  c = TCanvas()
+  c = ROOT.TCanvas()
   c.cd()
   if options.logy:
     c.SetLogy()
@@ -594,9 +595,9 @@ if (not options.save) and (not options.noplot):
       sys.stdout.flush()
       if opt=="":
         filename = raw_input("Enter filename: ")
-        c.SaveAs(filename + ".png")
+        c.SaveAs(filename)
       else:
-        c.SaveAs(opt + ".png")
+        c.SaveAs(opt)
     elif cmd == "gaus":
       hist.Fit("gaus")
       hist.Draw("same")
@@ -626,7 +627,7 @@ if (not options.save) and (not options.noplot):
         leg.Draw("same")
     elif cmd == "options":
       print "save FILENAME    saves current canvas, optionally with supplied name\n" +\
-            "saveas FILENAME  saves current canvas prompting for filename if not given\n" +\
+            "saveas FILENAME  saves current canvas, specify file extension explicately\n" +\
             "gaus             fits to a gaussian\n" +\
             "fit FIT          fits with supplied fitting function\n" +\
             "vertical INT     draws a vertical line at xvalue=INT\n" +\
