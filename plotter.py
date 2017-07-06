@@ -326,14 +326,17 @@ for sample in samples:
     if not options.quiet:
       print "It appears ", path, "is a rootfile"
     ISrootfile = True
-  if fnmatch.fnmatch(path, "*/"):
+  elif fnmatch.fnmatch(path, "*/"):
     if not options.quiet:
       print "It appears", path, "is a directory to traverse"
     ISdirectory = True
-  if fnmatch.fnmatch(path, "*.txt"):
+  elif fnmatch.fnmatch(path, "*.txt"):
     if not options.quiet:
       print "It appears", path, "is a text file of inputs"
     ISinputfile = True
+  else:
+    print "Do not recognize sample, must end with /, .root, or .txt"
+    sys.exit()
 
   if ISrootfile:
     chain = ROOT.TChain(sample['tree'])
