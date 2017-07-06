@@ -13,6 +13,12 @@ time_begin = time.time()
 
 parser = OptionParser()
 
+# tune to have arguments
+# 1D             normal plot
+# 1D-multivar    multiple variables, same sample
+# 1D-multisample multiple samples, all the same variable
+# 2D             normal 2d plot
+
 # Plotting (variable, bins, etc) options
 parser.add_option('--var', metavar='F', type='string', action='store',
                   dest='var',
