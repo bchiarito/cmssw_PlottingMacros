@@ -3,13 +3,16 @@ import os
 from subprocess import call
 from optparse import OptionParser
 
+time_begin = time.time()
+
 parser = OptionParser()
 parser.add_option('--onefile',action='store_true',default=False,dest='onefile')
+parser.add_option('--yestoall',action='store_true',default=False,dest='yestoall')
 parser.add_option('--weights',action='store',default="",dest='weightfile')
 (options, args) = parser.parse_args()
 
 # Usage
-# arg 1 is crab directory
+# arg 1 is a mutlicrab directory
 # will dump merged rootfiles into one level up from crab directory
 # if onefile option is supplied, those merged rootfiles will then also be merged
 # if weights file is supplied, then mergeTFileServiceHistograms is used instead with the weights
@@ -40,7 +43,10 @@ for subdir in subdirs:
 
 for command in commands:
   print command + "\n"
-response = raw_input("continue with these commands (y to continue)?")
+if not options.yestoall:
+  response = raw_input("continue with these commands (y to continue)? ")
+else:
+  response = "y"
 if response == "y":
   for command in commands:
     call(command, shell=True)
@@ -50,10 +56,16 @@ if options.onefile and options.weightfile == "":
   for rootfile in rootfiles:
     hadd_command += rootfile+" "
   print "\n" + hadd_command
-  response = raw_input("\ncontinue with this command (y to continue)? ")
+  if not options.yestoall:
+    response = raw_input("\ncontinue with this command (y to continue)? ")
+  else:
+    response = "y"
   if response == "y":
     call(hadd_command, shell=True) 
-    cleanup = raw_input("clean up (y for yes)? ")
+    if not options.yestoall:
+      cleanup = raw_input("clean up (y for yes)? ")
+    else:
+      cleanup = "y"
     if cleanup == "y":
       for rootfile in rootfiles:
         print "removed file", rootfile
@@ -69,12 +81,21 @@ if options.weightfile != "":
     weights_string += line.strip()+","
   weights_string = weights_string[0:len(weights_string)-1]
   merge_command += "--weights " + weights_string
-  print merge_command
-  response = raw_input("\ncontinue with this command (y to continue)? ")
+  print "\n"+merge_command
+  if not options.yestoall:
+    response = raw_input("\ncontinue with this command (y to continue)? ")
+  else:
+    response = "y"
   if response == "y":
     call(merge_command, shell=True)
-    cleanup = raw_input("clean up (y for yes)? ")
+    if not options.yestoall:
+      cleanup = raw_input("clean up (y for yes)? ")
+    else:
+      cleanup = "y"
     if cleanup == "y":
       for rootfile in rootfiles:
         print "removed file", rootfile
         os.remove(rootfile)
+
+time_end = time.time()
+print "Elapsed Time: ", (time_end - time_begin)
