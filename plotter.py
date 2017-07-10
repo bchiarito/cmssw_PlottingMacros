@@ -375,7 +375,8 @@ for sample in samples:
         N = float(line_list[2])
         treename = line_list[3]
       if len(line_list) == 2 or len(line_list) == 0 or len(line_list) > 4:
-        print "couldn't parse line from input file", path
+        print "couldn't parse this line from input file", path
+        print line
         continue
       # add files to chain
       chain = ROOT.TChain(treename)      
@@ -390,7 +391,8 @@ for sample in samples:
           chain.Add(rootfile)
       else:
         # line doesn't make sense
-        print "couldn't parse line from input file", path
+        print "couldn't parse this line from input file", path
+        print line
       sample['entries'].append([chain, xs, N])
      
 if not options.quiet:
@@ -570,6 +572,21 @@ if not options.noplot:
     c.SaveAs(options.name + ".png")
 
 if not options.quiet:
+  print "Done."
+
+if options.noplot:
+  print "writing histograms to root file output"
+  outfilename = options.name + ".root"
+  if outfilename == "plot.root":
+    outfilename = "output_of_plotter.root"
+  outputfile = ROOT.TFile(outfilename,"recreate")
+  hists = []
+  for sample in samples:
+    hists.append(sample['summed_hist'])
+  outputfile.cd()
+  for hist in hists:
+    hist.Write()
+  outputfile.Close()
   print "Done."
 
 time_end = time.time()
