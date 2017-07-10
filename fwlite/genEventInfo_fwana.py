@@ -37,7 +37,7 @@ for event in events:
   # Get Products
   geninfo = geninfohandle.product()
 
-  '''print "weight", geninfo.weight()
+  print "weight", geninfo.weight()
   print "weightProduct", geninfo.weightProduct()
   print "qScale", geninfo.qScale()
   print "QCD", geninfo.alphaQCD()
@@ -46,15 +46,16 @@ for event in events:
   print "weights:"
   weights = geninfo.weights()
   for w in weights:
-    print w'''
+    print w
+  raw_input()
 
-  weight.Fill(geninfo.weight())
+  '''weight.Fill(geninfo.weight())
   qscale.Fill(geninfo.qScale())
   qed.Fill(geninfo.alphaQED())
   qcd.Fill(geninfo.alphaQCD())
   ws = geninfo.weights()
   for w in ws:
-    weights.Fill(w)
+    weights.Fill(w)'''
 
 # Save file with histograms
 outputfile.cd()
