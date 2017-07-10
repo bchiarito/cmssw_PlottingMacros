@@ -330,12 +330,12 @@ for sample in samples:
     if not options.quiet:
       print "It appears", path, "is a directory to traverse"
     ISdirectory = True
-  elif fnmatch.fnmatch(path, "*.txt"):
+  elif fnmatch.fnmatch(path, "*.dat"):
     if not options.quiet:
       print "It appears", path, "is a text file of inputs"
     ISinputfile = True
   else:
-    print "Do not recognize sample, must end with /, .root, or .txt"
+    print "Do not recognize sample, must end with /, .root, or .dat"
     sys.exit()
 
   if ISrootfile:
