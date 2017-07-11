@@ -571,14 +571,14 @@ if not options.noplot:
   if options.save == True:
     c.SaveAs(options.name + ".png")
 
-if not options.quiet:
-  print "Done."
+  if not options.quiet:
+    print "Done."
 
 if options.noplot:
-  print "writing histograms to root file output"
   outfilename = options.name + ".root"
   if outfilename == "plot.root":
     outfilename = "output_of_plotter.root"
+  print "Writing histogram to root file " + outfilename + "..."
   outputfile = ROOT.TFile(outfilename,"recreate")
   hists = []
   for sample in samples:
