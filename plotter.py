@@ -367,12 +367,12 @@ for sample in samples:
       if len(line_list) == 3:
         path_to_file = line_list[0]
         xs = float(line_list[1])
-        N = float(line_list[2])
+        N = max( float(line_list[2]) , options.nentries)
         treename = sample['tree']
       if len(line_list) == 4:
         path_to_file = line_list[0]
         xs = float(line_list[1])
-        N = float(line_list[2])
+        N = max( float(line_list[2]) , options.nentries)
         treename = line_list[3]
       if len(line_list) == 2 or len(line_list) == 0 or len(line_list) > 4:
         print "couldn't parse this line from input file", path
