@@ -103,6 +103,10 @@ parser.add_option('--xaxis', metavar='F', type='string', action='store',
   	      	      default = '',
                   dest='xaxis',
                   help='xaxis label')
+parser.add_option('--yaxis', metavar='F', type='string', action='store',
+  	      	      default = '',
+                  dest='yaxis',
+                  help='yaxis label')
 parser.add_option('--leg', metavar='F', type='string', action='store',
                   dest='legend1',
                   help='legend entry label')
@@ -454,10 +458,11 @@ count = 1
 for sample in samples:
   hist = sample['summed_hist']
   print "Entries " + str(count) + "   : ", int(hist.GetEntries())
-  if not int(hist.GetBinContent(0)) == 0:
-    print "Underflow " + str(count) + " - ", int(hist.GetBinContent(0))
-  if not int(hist.GetBinContent(bins+1)) == 0:
-    print "Overflow " + str(count) + "  - ", int(hist.GetBinContent(bins+1))
+  if not options.twoD:
+    if not int(hist.GetBinContent(0)) == 0:
+      print "Underflow " + str(count) + " - ", int(hist.GetBinContent(0))
+    if not int(hist.GetBinContent(bins+1)) == 0:
+      print "Overflow " + str(count) + "  - ", int(hist.GetBinContent(bins+1))
   count += 1
 print ""
   
@@ -513,6 +518,7 @@ if not options.noplot:
   # Labels
   for sample in samples:
     hist = sample['summed_hist']
+    # Title
     if not options.title == "":
       hist.SetTitle(options.title)
     elif options.name == "plot":
@@ -538,9 +544,15 @@ if not options.noplot:
         hist.GetYaxis().SetTitle("Scaled to Integral 100")
     else:
       # X axis
-      hist.GetXaxis().SetTitle(options.varx)
+      if not options.xaxis == "":
+        hist.GetXaxis().SetTitle(options.xaxis)
+      else:
+        hist.GetXaxis().SetTitle(options.varx)
       # Y axis
-      hist.GetYaxis().SetTitle(options.vary)
+      if not options.yaxis == "":
+        hist.GetYaxis().SetTitle(options.yaxis)
+      else:
+        hist.GetYaxis().SetTitle(options.vary)
       
   # Draw()
   count = 0
@@ -608,6 +620,9 @@ if (not options.save) and (not options.noplot):
     else:
       cmd = inp[0:i]
       opt = inp[i+1:len(inp)]
+    draw_option = ""
+    if options.twoD:
+      draw_option += 'Colz'
     # begin commands
     if cmd == "save":
       sys.stdout.write(' ')
@@ -624,15 +639,27 @@ if (not options.save) and (not options.noplot):
         c.SaveAs(filename)
       else:
         c.SaveAs(opt)
+    elif cmd == "title":
+      sys.stdout.write(' ')
+      sys.stdout.flush()
+      if opt=="":
+        new_title = raw_input("Enter title for plot: ")
+        hist.SetTitle(new_title)
+        hist.Draw(draw_option)
+      else:  
+        hist.SetTitle(opt)
+        hist.Draw(draw_option)
     elif cmd == "gaus":
       hist.Fit("gaus")
-      hist.Draw("same")
+      draw_option += "same"
+      hist.Draw(draw_options)
     elif cmd == "fit":
       if opt=="":
         print "Must supply second argument to", cmd
         continue
       hist.Fit(opt)
-      hist.Draw("same")
+      draw_option += "same"
+      hist.Draw(draw_options)
     elif cmd == "vertical":
       if opt=="":
         print "Must supply second argument to", cmd
@@ -658,6 +685,7 @@ if (not options.save) and (not options.noplot):
             "fit FIT          fits with supplied fitting function\n" +\
             "vertical INT     draws a vertical line at xvalue=INT\n" +\
             "horizontal INT   draws a horizontal line at yvalue=INT\n" +\
+            "title NEW_TITLE  changes plot title to NEW_TITLE\n" +\
             ""
     elif not cmd == "":
       print cmd,"not a valid command"
