@@ -555,6 +555,8 @@ if not options.noplot:
         hist.GetYaxis().SetTitle(options.vary)
       
   # Draw()
+  if options.twoD:
+    ROOT.gStyle.SetPalette(55)
   count = 0
   for sample in samples:
     hist = sample['summed_hist']
