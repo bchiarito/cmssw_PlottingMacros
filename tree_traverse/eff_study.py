@@ -135,13 +135,13 @@ for event in chain:
   if event_loosematched >= 3:
     event_has3ormoreloosematched += 1
 
-  if event.nPass == 0:
+  if event.nTwoProngs == 0:
     event_has0tight += 1
-  if event.nPass == 1:
+  if event.nTwoProngs == 1:
     event_has1tight += 1
-  if event.nPass == 2:
+  if event.nTwoProngs == 2:
     event_has2tight += 1
-  if event.nPass >= 3:
+  if event.nTwoProngs >= 3:
     event_has3ormoretight += 1
 
 
