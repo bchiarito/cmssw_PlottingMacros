@@ -7,6 +7,8 @@ parser.add_option('--leg1',action='store',default='',dest='leg1')
 parser.add_option('--leg2',action='store',default='',dest='leg2')
 parser.add_option('--leg3',action='store',default='',dest='leg3')
 parser.add_option('--leg4',action='store',default='',dest='leg4')
+parser.add_option('--title',action='store',default='',dest='title')
+parser.add_option('--save',action='store',default='',dest='save')
 (options,args) = parser.parse_args()
 
 files = []
@@ -30,9 +32,28 @@ objs = []
 count = 0
 for fi in files:
   obj = fi.Get('eff_genobj_'+var)
-  obj.SetLineColor(kPink+count)
+  'obj.SetLineColor(kPink+count)'
+  '''if count == 0:
+    obj.SetLineColor(kBlue+4)
+    obj.SetMarkerStyle(5)
+  if count == 1:
+    obj.SetLineColor(kBlue+2)
+  if count == 2:
+    obj.SetLineColor(kPink+2)
+  if count == 3:
+    obj.SetLineColor(kPink)''' 
+  #if count == 1:
+  #  obj.SetLineColor(kBlue)
+  #elif count == 2:
+  #  obj.SetLineColor(kRed)
+  #elif count == 0:
+  #  obj.SetLineColor(kGray+2)
+  #else:
+  #  obj.SetLineColor(kGray)
+  obj.SetLineColor(kBlack)
   count += 1
   objs.append(obj)
+    
 
 c = TCanvas()
 c.cd()
@@ -49,14 +70,17 @@ for i in range(len(objs)):
     obj.SetMaximum(1.1)
     obj.SetMinimum(0.0)
   leg.AddEntry(obj, names[i], "l")
-  obj.SetTitle("Gen obj within R=0.1 to RECO obj, 10k Signal MC")
+  if options.title == "":
+    obj.SetTitle("Gen obj within R=0.1 to RECO obj")
+  else:
+    obj.SetTitle(options.title)
   obj.GetYaxis().SetTitle("Efficiency")
   obj.GetXaxis().SetTitle(var)
   obj.SetStats(0)
-  #obj.Draw()
   obj.Draw("Same")
 leg.Draw("Same")
 
-
-raw_input()
-
+if not options.save == "":
+  c.SaveAs(options.save)
+else:
+  raw_input()

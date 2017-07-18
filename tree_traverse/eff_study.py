@@ -80,6 +80,7 @@ eff_genobj_eta_numer = TH1F("eff_genobj_eta_numer","",15,-3,3)
 eff_genobj_eta_denom = TH1F("eff_genobj_eta_denom","",15,-3,3)
 eff_genobj_eta       = TH1F("eff_genobj_eta"      ,"",15,-3,3)
 
+print total, "Total Events."
 
 for event in chain:
   if count % 1000 == 0:
@@ -87,7 +88,6 @@ for event in chain:
     print 'Processing {0:10.0f}/{1:10.0f} : {2:5.2f} %'.format(count, total, percentDone )
   count += 1
 
-  # gen object basis
   for i in range(len(event.GenEta_candDR)):
     genetas_total += 1
     if event.GenEta_candDR[i] < 0.1:
@@ -120,10 +120,10 @@ for event in chain:
   if event_tightmatched >= 3:
     event_has3ormoretightmatched += 1
 
-  event_loosematched = 0.0
-  for i in range(len(event.TwoProngLoose_genDR)):
+  '''event_loosematched = 0.0
+  for i in range(len(event.Cand_genDR)):
     loosecands_total += 1
-    if event.TwoProngLoose_genDR[i] < 0.1:
+    if event.Cand_genDR[i] < 0.1:
       loosecands_matched += 1
       event_loosematched += 1
   if event_loosematched == 0:
@@ -133,7 +133,7 @@ for event in chain:
   if event_loosematched == 2:
     event_has2loosematched += 1
   if event_loosematched >= 3:
-    event_has3ormoreloosematched += 1
+    event_has3ormoreloosematched += 1'''
 
   if event.nTwoProngs == 0:
     event_has0tight += 1
@@ -148,13 +148,13 @@ for event in chain:
 # print cutflow
 print ""
 print "-Per Generator Object basis-"
-print "fraction of Gen a0s matched to loose twoprong:", genetas_matchedToCand / genetas_total
+print "fraction of Gen a0s matched to cand  twoprong:", genetas_matchedToCand / genetas_total
 print "fraction of Gen a0s matched to tight twoprong:", genetas_matchedToPass / genetas_total
 print "fraction of Gen a0s matched to ak4 jet       :", genetas_matchedToJet / genetas_total
 print ""
 print "-Per RECO Object basis-"
 print "fraction of tight TwoProngs matched to Gen a0:", tightcands_matched / tightcands_total
-print "fraction of loose TwoProngs matched to Gen a0:", loosecands_matched / loosecands_total
+#print "fraction of cand  TwoProngs matched to Gen a0:", loosecands_matched / loosecands_total
 print ""
 print "-Per Event basis-"
 print "fraction of events with exactly 0 matched tight twoprongs:" , event_has0tightmatched / total
@@ -162,11 +162,11 @@ print "fraction of events with exactly 1 matched tight twoprongs:" , event_has1t
 print "fraction of events with exactly 2 matched tight twoprongs:" , event_has2tightmatched / total
 print "fraction of events with 3 or more matched tight twoprongs:" , event_has3ormoretightmatched / total
 print ""
-print "fraction of events with exactly 0 matched loose twoprongs:" , event_has0loosematched / total
-print "fraction of events with exactly 1 matched loose twoprongs:" , event_has1loosematched / total
-print "fraction of events with exactly 2 matched loose twoprongs:" , event_has2loosematched / total
-print "fraction of events with 3 or more matched loose twoprongs:" , event_has3ormoreloosematched / total
-print ""
+#print "fraction of events with exactly 0 matched cand twoprongs:" , event_has0loosematched / total
+#print "fraction of events with exactly 1 matched cand twoprongs:" , event_has1loosematched / total
+#print "fraction of events with exactly 2 matched cand twoprongs:" , event_has2loosematched / total
+#print "fraction of events with 3 or more matched cand twoprongs:" , event_has3ormoreloosematched / total
+#print ""
 print "-Efficiency without matching-"
 N0 = event_has0tight
 N1 = event_has1tight
