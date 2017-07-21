@@ -23,15 +23,18 @@ parser.add_option('-q','--quiet', action='store_true', default=False, dest='quie
 parser.add_option('-n', '--num', type='int', action='store', default=-1, dest='nentries', help='max number of entries to read from files')
 parser.add_option('--tree', '--trees', type='string', action='store', dest='treename', help='path to TTree')
 
+parser.add_option('--var1', type='string', action='store', dest='var1', help='first variable in TTree to plot')
+parser.add_option('--var2', type='string', action='store', dest='var2', help='second variable in TTree to plot')
+
 # 2D options
-twod_options = OptionGroup(parser, '2D Plot Options', 'setting these puts plotter in 2D mode')
+twod_options = OptionGroup(parser, '2D Plot Options', 'Setting these puts plotter in 2D mode')
 twod_options.add_option('--varx', type='string', action='store', dest='varx', help='xaxis variable, makes plot 2D')
 twod_options.add_option('--vary', type='string', action='store', dest='vary', help='yaxis variable, makes plot 2D')
 twod_options.add_option('--binx', '--binsx', type='string', action='store', dest='binningx', help='xaxis binning, makes plot 2D')
 twod_options.add_option('--biny', '--binsy', type='string', action='store', dest='binningy', help='yaxis binning, makes plot 2D')
 
 # Visual options
-visual_options = OptionGroup(parser, 'Visual Options', 'Effects the visual appearce of the plot. Note that --colorN=ROOTCOLOR appears under Individual Sample Options.')
+visual_options = OptionGroup(parser, 'Visual Options', 'Affects the visual appearce of the plot. Note that --colorN=ROOTCOLOR appears under Individual Sample Options.')
 visual_options.add_option('--title', type='string', action='store', dest='title', help='title')
 visual_options.add_option('--xaxis', type='string', action='store', dest='xaxis', help='xaxis label')
 visual_options.add_option('--yaxis', type='string', action='store', dest='yaxis', help='yaxis label')
@@ -73,10 +76,6 @@ parser.add_option_group(twod_options)
 parser.add_option_group(sample_options)
 (options, args) = parser.parse_args()
 
-if options.var == None:
-  print "Must supply the name of the variable to be plotted with --var"
-  sys.exit()
-
 ind_treenames = False
 if (not options.treename1==None) or \
    (not options.treename2==None) or \
@@ -99,6 +98,24 @@ if (not options.varx==None) or \
    (not options.binningx==None) or \
    (not options.binningy==None):
   twod_mode = True
+
+doublevar_mode = False
+if (not options.var1==None) or \
+   (not options.var2==None):
+  doublevar_mode = True
+
+if doublevar_mode and twod_mode:
+  print "Double varialbe mode and 2D plot mode not compatible"
+  sys.exit()
+
+
+if not doublevar_mode and options.var == None:
+  print "Must supply the name of the variable to be plotted with --var"
+  sys.exit()
+
+if doublevar_mode and (options.var1==None or options.var2==None):
+  print "Must supply the name of the variables to be plotted with --var1 and --var2"
+  sys.exit()
 
 samples = []
 for i in range(len(args)):
@@ -226,47 +243,86 @@ sumcount = 0
 for sample in samples:
   sumcount += 1
   # main hist
-  if not twod_mode:
-    hist_sum = ROOT.TH1F("hist"+"_sum_"+str(sumcount), "hist", bins, low, high)
-  else:
+  if twod_mode:
     hist_sum = ROOT.TH2F("hist"+"_sum_"+str(sumcount), "hist", binsx, lowx, highx, binsy, lowy, highy)
+  if doublevar_mode:
+    hist_sum1 = ROOT.TH1F("hist1"+"_sum_"+str(sumcount), "hist", bins, low, high)
+    hist_sum2 = ROOT.TH1F("hist2"+"_sum_"+str(sumcount), "hist", bins, low, high)
+  else:
+    hist_sum = ROOT.TH1F("hist"+"_sum_"+str(sumcount), "hist", bins, low, high)
   for entry in sample['entries']:
     chain = entry[0]
     xs = entry[1]
     N = entry[2]
     count += 1
     # entry hist
-    if not twod_mode:
-      hist = ROOT.TH1F("hist"+"_"+str(count), "hist", bins, low, high)
-    else:
+    if twod_mode:
       hist = ROOT.TH2F("hist"+"_"+str(count), "hist", binsx, lowx, highx, binsy, lowy, highy)
+    if doublevar_mode:
+      hist1 = ROOT.TH1F("hist1"+"_"+str(count), "hist", bins, low, high)
+      hist2 = ROOT.TH1F("hist2"+"_"+str(count), "hist", bins, low, high)
+    else:
+      hist = ROOT.TH1F("hist"+"_"+str(count), "hist", bins, low, high)
     # TTree.Draw()
     if options.nentries == -1:
-      if not twod_mode:
-        chain.Draw(options.var+">>"+"hist"+"_"+str(count),""+options.cut, "goff")
-      else:
+      if twod_mode:
         chain.Draw(options.vary+":"+options.varx+">>"+"hist"+"_"+str(count),""+options.cut, "goff")
-    else:
-      if not twod_mode:
-        chain.Draw(options.var+">>"+"hist"+"_"+str(count),""+options.cut, "goff", options.nentries)
+      if doublevar_mode:
+        chain.Draw(options.var1+">>"+"hist1"+"_"+str(count),""+options.cut, "goff")
+        chain.Draw(options.var2+">>"+"hist2"+"_"+str(count),""+options.cut, "goff")
       else:
+        chain.Draw(options.var+">>"+"hist"+"_"+str(count),""+options.cut, "goff")
+    else:
+      if twod_mode:
         chain.Draw(options.vary+":"+options.varx+">>"+"hist"+"_"+str(count),""+options.cut, "goff", options.nentries)
-    entry.append(hist)
-    hist.Scale(xs/N)
-    hist_sum.Add(hist)
-  sample['summed_hist'] = hist_sum
+      if doublevar_mode:
+        chain.Draw(options.var1+">>"+"hist1"+"_"+str(count),""+options.cut, "goff", options.nentries)
+        chain.Draw(options.var2+">>"+"hist2"+"_"+str(count),""+options.cut, "goff", options.nentries)
+      else:
+        chain.Draw(options.var+">>"+"hist"+"_"+str(count),""+options.cut, "goff", options.nentries)
+    if doublevar_mode:
+      entry.append(hist1)
+      entry.append(hist2)
+      hist1.Scale(xs/N)
+      hist2.Scale(xs/N)
+      hist_sum1.Add(hist1)
+      hist_sum2.Add(hist2)
+      sample['summed_hist1'] = hist_sum1
+      sample['summed_hist2'] = hist_sum2
+      sample['summed_hist'] = None
+    else:
+      entry.append(hist)
+      hist.Scale(xs/N)
+      hist_sum.Add(hist)
+      sample['summed_hist'] = hist_sum
   
 # Print Summary
 count = 1
-for sample in samples:
-  hist = sample['summed_hist']
-  print "Entries " + str(count) + "   : ", int(hist.GetEntries())
-  if not twod_mode:
-    if not int(hist.GetBinContent(0)) == 0:
-      print "Underflow " + str(count) + " - ", int(hist.GetBinContent(0))
-    if not int(hist.GetBinContent(bins+1)) == 0:
-      print "Overflow " + str(count) + "  - ", int(hist.GetBinContent(bins+1))
-  count += 1
+if not doublevar_mode:
+  for sample in samples:
+    hist = sample['summed_hist']
+    print "Entries " + str(count) + "   : ", int(hist.GetEntries())
+    if not twod_mode:
+      if not int(hist.GetBinContent(0)) == 0:
+        print "Underflow " + str(count) + " - ", int(hist.GetBinContent(0))
+      if not int(hist.GetBinContent(bins+1)) == 0:
+        print "Overflow " + str(count) + "  - ", int(hist.GetBinContent(bins+1))
+    count += 1
+else:
+  for sample in samples:
+    hist1 = sample['summed_hist1']
+    hist2 = sample['summed_hist2']
+    print "Entries var1 " + str(count) + "   : ", int(hist1.GetEntries())
+    print "Entries var2 " + str(count) + "   : ", int(hist2.GetEntries())
+    if not int(hist1.GetBinContent(0)) == 0:
+      print "Underflow var1 " + str(count) + " - ", int(hist1.GetBinContent(0))
+    if not int(hist2.GetBinContent(0)) == 0:
+      print "Underflow var2 " + str(count) + " - ", int(hist2.GetBinContent(0))
+    if not int(hist1.GetBinContent(bins+1)) == 0:
+      print "Overflow var1 " + str(count) + "  - ", int(hist1.GetBinContent(bins+1))
+    if not int(hist2.GetBinContent(bins+1)) == 0:
+      print "Overflow var2 " + str(count) + "  - ", int(hist2.GetBinContent(bins+1))
+    count += 1
 
 if options.noplot:
   time_end = time.time()
@@ -284,6 +340,8 @@ if options.logx:
 colorcount = 1
 for sample in samples:
   hist = sample['summed_hist']
+  if doublevar_mode:
+    hist = sample['summed_hist1']
   # Color
   if sample['color'] == None:
     hist.SetLineColor(colorcount)
@@ -316,6 +374,9 @@ for sample in samples:
       hist.Scale(100.0/hist.Integral())
 
 if options.stacked or options.sidebyside:
+  if doublevar_mode:
+    print "double variable mode incompatible with --stacked and --sidebyside"
+    sys.exit()
   hs = ROOT.THStack('hs','')
   for sample in samples:
     hist = sample['summed_hist']
@@ -330,9 +391,13 @@ if options.stacked or options.sidebyside:
 maximum = 0
 for sample in samples:
   hist = sample['summed_hist']
+  if doublevar_mode:
+    hist = sample['summed_hist1']
   maximum = max(maximum, hist.GetMaximum())
 for sample in samples:
   hist = sample['summed_hist']
+  if doublevar_mode:
+    hist = sample['summed_hist1']
   if options.logy:
     hist.SetMaximum(maximum*4)
   else:
@@ -342,6 +407,8 @@ for sample in samples:
 # Labels
 for sample in samples:
   hist = sample['summed_hist']
+  if doublevar_mode:
+    hist = sample['summed_hist1']
   title = ''
   xaxis = ''
   yaxis = ''
@@ -349,8 +416,10 @@ for sample in samples:
   if not options.title == None:
     title = options.title
   else:
-    if not twod_mode:
+    if not twod_mode and not doublevar_mode:
       title = options.var
+    elif not twod_mode and doublevar_mode:
+      title = options.var1 + " and " + options.var2 
     else:
       if options.cut == '':
         title = options.varx + " vs " + options.vary
@@ -358,9 +427,15 @@ for sample in samples:
         title = options.cut
   if not twod_mode:
     # X axis
-    xaxis = options.var + " w/ " + options.cut
+    if doublevar_mode:
+      xaxis = options.var1 + " and " + options.var2 + " w/ " + options.cut
+    else:
+      xaxis = options.var + " w/ " + options.cut
     if options.cut == '':
-      xaxis = options.var
+      if doublevar_mode:
+        xaxis = options.var1 + " and " + options.var2
+      else:
+        xaxis = options.var
     if not options.xaxis == None:
       xaxis = options.xaxis
     # Y axis
@@ -394,20 +469,34 @@ if options.save == None:
     c.Modified()
   else:  
     for sample in samples:
-      hist = sample['summed_hist']
-      if options.noline:
-        draw_option = 'same'
+      if doublevar_mode:
+        hist1 = sample['summed_hist1']
+        hist2 = sample['summed_hist2']
+        if options.noline:
+          draw_option = 'same'
+        else:
+          draw_option = 'hist same'
+        if sample['error'] or options.errors:
+          draw_option += ' e'
+        hist1.Draw(draw_option)
+        hist2.Draw(draw_option) 
       else:
-        draw_option = 'hist same'
-      if twod_mode:
-        draw_option += ' Colz'
-      if sample['error'] or options.errors:
-        draw_option += ' e'
-      hist.Draw(draw_option)
+        hist = sample['summed_hist']
+        if options.noline:
+          draw_option = 'same'
+        else:
+          draw_option = 'hist same'
+        if twod_mode:
+          draw_option += ' Colz'
+        if sample['error'] or options.errors:
+          draw_option += ' e'
+        hist.Draw(draw_option)
   # Legend
   leg = ROOT.TLegend(0.55, 0.80, 0.9, 0.9)
   for sample in samples:
     hist = sample['summed_hist']
+    if doublevar_mode:
+      hist = sample['summed_hist1']
     if sample['label'] == None:
       leg.AddEntry(hist, sample['path'], "l")
     else:
