@@ -108,13 +108,16 @@ if doublevar_mode and twod_mode:
   print "Double varialbe mode and 2D plot mode not compatible"
   sys.exit()
 
-
-if not doublevar_mode and options.var == None:
+if not doublevar_mode and not twod_mode and options.var == None:
   print "Must supply the name of the variable to be plotted with --var"
   sys.exit()
 
 if doublevar_mode and (options.var1==None or options.var2==None):
   print "Must supply the name of the variables to be plotted with --var1 and --var2"
+  sys.exit()
+
+if twod_mode and (options.varx==None or options.vary==None or options.binningx==None or options.binningy==None):
+  print "Must supply options --varx, --vary, --binsx, --binsy for use with 2D plotting mode"
   sys.exit()
 
 samples = []
@@ -245,7 +248,7 @@ for sample in samples:
   # main hist
   if twod_mode:
     hist_sum = ROOT.TH2F("hist"+"_sum_"+str(sumcount), "hist", binsx, lowx, highx, binsy, lowy, highy)
-  if doublevar_mode:
+  elif doublevar_mode:
     hist_sum1 = ROOT.TH1F("hist1"+"_sum_"+str(sumcount), "hist", bins, low, high)
     hist_sum2 = ROOT.TH1F("hist2"+"_sum_"+str(sumcount), "hist", bins, low, high)
   else:
@@ -258,7 +261,7 @@ for sample in samples:
     # entry hist
     if twod_mode:
       hist = ROOT.TH2F("hist"+"_"+str(count), "hist", binsx, lowx, highx, binsy, lowy, highy)
-    if doublevar_mode:
+    elif doublevar_mode:
       hist1 = ROOT.TH1F("hist1"+"_"+str(count), "hist", bins, low, high)
       hist2 = ROOT.TH1F("hist2"+"_"+str(count), "hist", bins, low, high)
     else:
@@ -267,7 +270,7 @@ for sample in samples:
     if options.nentries == -1:
       if twod_mode:
         chain.Draw(options.vary+":"+options.varx+">>"+"hist"+"_"+str(count),""+options.cut, "goff")
-      if doublevar_mode:
+      elif doublevar_mode:
         chain.Draw(options.var1+">>"+"hist1"+"_"+str(count),""+options.cut, "goff")
         chain.Draw(options.var2+">>"+"hist2"+"_"+str(count),""+options.cut, "goff")
       else:
@@ -275,7 +278,7 @@ for sample in samples:
     else:
       if twod_mode:
         chain.Draw(options.vary+":"+options.varx+">>"+"hist"+"_"+str(count),""+options.cut, "goff", options.nentries)
-      if doublevar_mode:
+      elif doublevar_mode:
         chain.Draw(options.var1+">>"+"hist1"+"_"+str(count),""+options.cut, "goff", options.nentries)
         chain.Draw(options.var2+">>"+"hist2"+"_"+str(count),""+options.cut, "goff", options.nentries)
       else:
@@ -555,7 +558,7 @@ while not cmd == "":
       filename = raw_input("Enter filename: ")
       c.SaveAs(filename)
     else:
-      c.SaveAs(opt + ".png")
+      c.SaveAs(opt)
   elif cmd == "title":
     if opt=="":
       sys.stdout.write(' ')
