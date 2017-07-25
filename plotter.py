@@ -159,7 +159,7 @@ for sample in samples:
       print "It appears", path, "is a text file of inputs"
     ISinputfile = True
   else:
-    print "Do not recognize sample, must end with /, .root, or .dat"
+    print "Do not recognize", path, ", must end with /, .root, or .dat"
     sys.exit()
 
   if ISrootfile:
@@ -204,7 +204,7 @@ for sample in samples:
         continue
       # add files to chain
       chain = ROOT.TChain(treename)      
-      if fnmatch.fnmatch(path, "*.root"):
+      if fnmatch.fnmatch(path_to_file, "*.root"):
         chain.Add(path_to_file)
       elif fnmatch.fnmatch(path_to_file, "*/"):
         rootfiles = []
@@ -393,10 +393,13 @@ if options.stacked or options.sidebyside:
 # Maximum
 maximum = 0
 for sample in samples:
-  hist = sample['summed_hist']
   if doublevar_mode:
-    hist = sample['summed_hist1']
-  maximum = max(maximum, hist.GetMaximum())
+    hist1 = sample['summed_hist1']
+    hist2 = sample['summed_hist2']
+    maximum = max(maximum, hist1.GetMaximum(), hist2.GetMaximum())
+  else:
+    hist = sample['summed_hist']
+    maximum = max(maximum, hist.GetMaximum())
 for sample in samples:
   hist = sample['summed_hist']
   if doublevar_mode:
