@@ -46,8 +46,9 @@ if options.masslow and options.masshigh:
 
 out_file = TFile(options.out, 'recreate')
 
+dirs = []
 chain = TChain(options.treename)
-if (not options.dir):
+if (not options.dir) and (not options.dat):
   chain.Add(options.file)
 elif options.dir:
   rootfiles = []
@@ -57,7 +58,6 @@ elif options.dir:
   for rootfile in rootfiles:
     chain.Add(rootfile)
 elif options.dat:
-  dirs = []
   path = options.file
   inputfile = open(path, 'r')
   for line in inputfile:
@@ -83,7 +83,7 @@ elif options.dat:
       print line
       continue
     # add files to chain
-    chain = ROOT.TChain(treename)
+    chain = TChain(treename)
     if fnmatch.fnmatch(path_to_file, "*.root"):
       chain.Add(path_to_file)
     elif fnmatch.fnmatch(path_to_file, "*/"):
@@ -107,85 +107,91 @@ mvl = TH2F('mvl' ,'mid vs low', 100,0,1, 100,0,1)
 
 full = TH2F('full', 'Dalitz Plot', 100,0,1, 100,0,1)
 
-count = 0
-total = chain.GetEntries()
-for event in chain:
-  if count % 1000 == 0:
-    percentDone = float(count) / float(total) * 100.0
-    print 'Processing {0:10.0f}/{1:10.0f} : {2:5.2f} %'.format(count, total, percentDone )
-  count += 1
+lumi = 1.0
 
-  for i in range(len(event.TwoProng_pt)):
-    norm_leading_photonmass = event.TwoProng_CHpos_mass[i]*event.TwoProng_CHpos_mass[i] + event.TwoProng_CHneg_mass[i]*event.TwoProng_CHneg_mass[i] + \
-                              event.TwoProng_photon_Mass[i]*event.TwoProng_photon_Mass[i] + event.TwoProng_Mass[i]*event.TwoProng_Mass[i]
+for entry in dirs:
+  chain = entry[0]
+  xs = entry[1]
+  N = entry[2]
+  total = chain.GetEntries()
+  count = 0
+  for event in chain:
+    if count % 1000 == 0:
+      percentDone = float(count) / float(total) * 100.0
+      print 'Processing {0:10.0f}/{1:10.0f} : {2:5.2f} %'.format(count, total, percentDone )
+    count += 1
 
-    norm_leading_pi0mass = event.TwoProng_CHpos_mass[i]*event.TwoProng_CHpos_mass[i] + event.TwoProng_CHneg_mass[i]*event.TwoProng_CHneg_mass[i] + \
-                           0.135*0.135 + event.TwoProng_Mass[i]*event.TwoProng_Mass[i]
+    for i in range(len(event.TwoProng_pt)):
+      norm_leading_photonmass = event.TwoProng_CHpos_mass[i]*event.TwoProng_CHpos_mass[i] + event.TwoProng_CHneg_mass[i]*event.TwoProng_CHneg_mass[i] + \
+                                event.TwoProng_photon_Mass[i]*event.TwoProng_photon_Mass[i] + event.TwoProng_Mass[i]*event.TwoProng_Mass[i]
 
-    norm_summed_photonmass = event.TwoProng_CHpos_mass[i]*event.TwoProng_CHpos_mass[i] + event.TwoProng_CHneg_mass[i]*event.TwoProng_CHneg_mass[i] + \
-                             event.TwoProng_photon_mass[i]*event.TwoProng_photon_mass[i] + event.TwoProng_mass[i]*event.TwoProng_mass[i]
+      norm_leading_pi0mass = event.TwoProng_CHpos_mass[i]*event.TwoProng_CHpos_mass[i] + event.TwoProng_CHneg_mass[i]*event.TwoProng_CHneg_mass[i] + \
+                             0.135*0.135 + event.TwoProng_Mass[i]*event.TwoProng_Mass[i]
 
-    norm_summed_pi0mass = event.TwoProng_CHpos_mass[i]*event.TwoProng_CHpos_mass[i] + event.TwoProng_CHneg_mass[i]*event.TwoProng_CHneg_mass[i] + \
-                          0.135*0.135 + event.TwoProng_mass[i]*event.TwoProng_mass[i]
+      norm_summed_photonmass = event.TwoProng_CHpos_mass[i]*event.TwoProng_CHpos_mass[i] + event.TwoProng_CHneg_mass[i]*event.TwoProng_CHneg_mass[i] + \
+                               event.TwoProng_photon_mass[i]*event.TwoProng_photon_mass[i] + event.TwoProng_mass[i]*event.TwoProng_mass[i]
 
-    if options.exclusive:
-      if event.TwoProng_photon_nElectron[i] > 0:
+      norm_summed_pi0mass = event.TwoProng_CHpos_mass[i]*event.TwoProng_CHpos_mass[i] + event.TwoProng_CHneg_mass[i]*event.TwoProng_CHneg_mass[i] + \
+                            0.135*0.135 + event.TwoProng_mass[i]*event.TwoProng_mass[i]
+
+      if options.exclusive:
+        if event.TwoProng_photon_nElectron[i] > 0:
+          continue
+        if event.TwoProng_photon_nGamma[i] == 1:
+          continue
+
+      if options.overlap:
+        if event.TwoProng_photon_nElectron[i] > 0:
+          continue
+        if event.TwoProng_photon_nGamma[i] > 1:
+          continue
+
+      if options.use_leading:
+        obj_mass = event.TwoProng_Mass[i]
+      else:
+        obj_mass = event.TwoProng_mass[i]
+      if options.masslow and obj_mass > 0.7:
         continue
-      if event.TwoProng_photon_nGamma[i] == 1:
+      if options.masshigh and obj_mass < 0.7:
         continue
 
-    if options.overlap:
-      if event.TwoProng_photon_nElectron[i] > 0:
-        continue
-      if event.TwoProng_photon_nGamma[i] > 1:
-        continue
+      if not options.pi0mass:
+        norm_s = norm_summed_photonmass
+        norm_l = norm_leading_photonmass
+      else:
+        norm_s = norm_summed_pi0mass
+        norm_l = norm_leading_pi0mass
 
-    if options.use_leading:
-      obj_mass = event.TwoProng_Mass[i]
-    else:
-      obj_mass = event.TwoProng_mass[i]
-    if options.masslow and obj_mass > 0.8:
-      continue
-    if options.masshigh and obj_mass < 0.8:
-      continue
+      if options.use_leading:
+        norm = norm_l
+        msmaller = min(event.TwoProng_mPosPho_l[i], event.TwoProng_mNegPho_l[i]) / norm
+        mlarger = max(event.TwoProng_mPosPho_l[i], event.TwoProng_mNegPho_l[i]) / norm
+        m12 = event.TwoProng_mPosNeg[i] / norm
+        m23 = event.TwoProng_mPosPho_l[i] / norm
+        m13 = event.TwoProng_mNegPho_l[i] / norm
+      else:
+        norm = norm_s
+        msmaller = min(event.TwoProng_mPosPho[i], event.TwoProng_mNegPho[i]) / norm
+        mlarger = max(event.TwoProng_mPosPho[i], event.TwoProng_mNegPho[i]) / norm
+        m12 = event.TwoProng_mPosNeg[i] / norm
+        m23 = event.TwoProng_mPosPho[i] / norm
+        m13 = event.TwoProng_mNegPho[i] / norm
 
-    if not options.pi0mass:
-      norm_s = norm_summed_photonmass
-      norm_l = norm_leading_photonmass
-    else:
-      norm_s = norm_summed_pi0mass
-      norm_l = norm_leading_pi0mass
+      mtracks = event.TwoProng_mPosNeg[i] / norm
+      high = max(m12, m23, m13)
+      low = min(m12, m23, m13)
+      if m12 < high and m12 > low:
+        mid = m12
+      if m23 < high and m23 > low:
+        mid = m23
+      if m13 < high and m13 > low:
+        mid = m13
 
-    if options.use_leading:
-      norm = norm_l
-      msmaller = min(event.TwoProng_mPosPho_l[i], event.TwoProng_mNegPho_l[i]) / norm
-      mlarger = max(event.TwoProng_mPosPho_l[i], event.TwoProng_mNegPho_l[i]) / norm
-      m12 = event.TwoProng_mPosNeg[i] / norm
-      m23 = event.TwoProng_mPosPho_l[i] / norm
-      m13 = event.TwoProng_mNegPho_l[i] / norm
-    else:
-      norm = norm_s
-      msmaller = min(event.TwoProng_mPosPho[i], event.TwoProng_mNegPho[i]) / norm
-      mlarger = max(event.TwoProng_mPosPho[i], event.TwoProng_mNegPho[i]) / norm
-      m12 = event.TwoProng_mPosNeg[i] / norm
-      m23 = event.TwoProng_mPosPho[i] / norm
-      m13 = event.TwoProng_mNegPho[i] / norm
-
-    mtracks = event.TwoProng_mPosNeg[i] / norm
-    high = max(m12, m23, m13)
-    low = min(m12, m23, m13)
-    if m12 < high and m12 > low:
-      mid = m12
-    if m23 < high and m23 > low:
-      mid = m23
-    if m13 < high and m13 > low:
-      mid = m13
-
-    hvm.Fill(mid, high)
-    hvl.Fill(low, high)
-    mvl.Fill(low, mid)
-    tvl.Fill(mlarger, mtracks)
-    tvs.Fill(msmaller, mtracks)
+      hvm.Fill(mid, high, xs*lumi/N)
+      hvl.Fill(low, high, xs*lumi/N)
+      mvl.Fill(low, mid, xs*lumi/N)
+      tvl.Fill(mlarger, mtracks, xs*lumi/N)
+      tvs.Fill(msmaller, mtracks, xs*lumi/N)
 
 if options.double:
   full.Add(tvl)
