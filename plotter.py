@@ -8,6 +8,7 @@ import sys
 import time
 from optparse import OptionParser
 from optparse import OptionGroup
+from optparse import SUPPRESS_HELP
 
 time_begin = time.time()
 usage = "Usage: %prog [options] sample1 sample2 sample3 ... -v VAR -b BINNING -c CUT"
@@ -15,26 +16,27 @@ parser = OptionParser(usage=usage)
 
 # Basic options
 parser.add_option('-v', '--var', type='string', action='store', dest='var', help='variable in TTree to plot')
-parser.add_option('-b', '--bin', '--bins', type='string', metavar='NUM,LOW,HIGH', action='store', default='100,0,100', dest='binning', help='binning, commas are mandatory')
-parser.add_option('-c', '--cut', type='string', action='store', default='', dest='cut', help='cut string')
+parser.add_option('-b', '--bin', '--bins', type='string', metavar='NUM,LOW,HIGH', action='store', default='100,0,100', dest='binning', help='')
+parser.add_option('-c', '--cut', type='string', action='store', default='', dest='cut', metavar='CUT_STRING', help='')
 parser.add_option('--noplot', action='store_true', default=False, dest='noplot', help='do not plot anything, just gives cutflow')
-parser.add_option('--save', '--saveas', type='string',action='store', dest='save', help='save plot, must supply extension .C .root or .image (like .png)')
+parser.add_option('--save', '--saveas', type='string',action='store', dest='save', metavar='ROOTFILE_NAME', help='')
 parser.add_option('-q','--quiet', action='store_true', default=False, dest='quiet', help='less output and omit command prompt at end of running')
-parser.add_option('-n', '--num', type='int', action='store', default=-1, dest='nentries', help='max number of entries to read from files')
-parser.add_option('--tree', '--trees', type='string', action='store', dest='treename', help='path to TTree')
+parser.add_option('-n', '--num', type='int', action='store', default=-1, dest='nentries', metavar='MAX_ENTRIES', help='')
+parser.add_option('--tree', '--trees', type='string', action='store', dest='treename', metavar='PATH_TO_TREE', help='')
 
-parser.add_option('--var1', type='string', action='store', dest='var1', help='first variable in TTree to plot')
-parser.add_option('--var2', type='string', action='store', dest='var2', help='second variable in TTree to plot')
+doublevar_options = OptionGroup(parser, 'Double Variable Options', 'Setting these puts plotter in double variable mode')
+doublevar_options.add_option('--var1', type='string', action='store', dest='var1', help='')
+doublevar_options.add_option('--var2', type='string', action='store', dest='var2', help='')
 
 # 2D options
 twod_options = OptionGroup(parser, '2D Plot Options', 'Setting these puts plotter in 2D mode')
-twod_options.add_option('--varx', type='string', action='store', dest='varx', help='xaxis variable, makes plot 2D')
-twod_options.add_option('--vary', type='string', action='store', dest='vary', help='yaxis variable, makes plot 2D')
-twod_options.add_option('--binx', '--binsx', type='string', action='store', dest='binningx', help='xaxis binning, makes plot 2D')
-twod_options.add_option('--biny', '--binsy', type='string', action='store', dest='binningy', help='yaxis binning, makes plot 2D')
+twod_options.add_option('--varx', type='string', action='store', dest='varx', help='')
+twod_options.add_option('--vary', type='string', action='store', dest='vary', help='')
+twod_options.add_option('--binx', '--binsx', type='string', action='store', dest='binningx', help='')
+twod_options.add_option('--biny', '--binsy', type='string', action='store', dest='binningy', help='')
 
 # Visual options
-visual_options = OptionGroup(parser, 'Visual Options', 'Affects the visual appearce of the plot. Note that --colorN=ROOTCOLOR appears under Individual Sample Options.')
+visual_options = OptionGroup(parser, 'Visual Options', '')
 visual_options.add_option('--title', type='string', action='store', dest='title', help='title')
 visual_options.add_option('--xaxis', type='string', action='store', dest='xaxis', help='xaxis label')
 visual_options.add_option('--yaxis', type='string', action='store', dest='yaxis', help='yaxis label')
@@ -49,29 +51,30 @@ visual_options.add_option('--lumi', type='float', action='store', dest='lumi', h
 visual_options.add_option('--noline', action='store_true', default=False, dest='noline', help='do not connect histogram with line')
 
 # Individual sample options
-sample_options = OptionGroup(parser, 'Individual Sample Options', 'The ability to set different setting for each individual sample.')
-sample_options.add_option('--tree1', type='string', action='store', default='diphotonAnalyzer/fTree2', dest='treename1', help='path to TTree')
-sample_options.add_option('--tree2', type='string', action='store', default='diphotonAnalyzer/fTree2', dest='treename2', help='path to TTree')
-sample_options.add_option('--tree3', type='string', action='store', default='diphotonAnalyzer/fTree2', dest='treename3', help='path to TTree')
-sample_options.add_option('--tree4', type='string', action='store', default='diphotonAnalyzer/fTree2', dest='treename4', help='path to TTree')
-sample_options.add_option('--tree5', type='string', action='store', default='diphotonAnalyzer/fTree2', dest='treename5', help='path to TTree')
-sample_options.add_option('--error1', action='store_true', default=False, dest='error1', help='calls Sumw2()')
-sample_options.add_option('--error2', action='store_true', default=False, dest='error2', help='calls Sumw2()')
-sample_options.add_option('--error3', action='store_true', default=False, dest='error3', help='calls Sumw2()')
-sample_options.add_option('--error4', action='store_true', default=False, dest='error4', help='calls Sumw2()')
-sample_options.add_option('--error5', action='store_true', default=False, dest='error5', help='calls Sumw2()')
-sample_options.add_option('--leg', '--leg1', type='string', action='store', dest='legend1', help='legend entry label')
-sample_options.add_option('--leg2', type='string', action='store', dest='legend2', help='legend entry label')
-sample_options.add_option('--leg3', type='string', action='store', dest='legend3', help='legend entry label')
-sample_options.add_option('--leg4', type='string', action='store', dest='legend4', help='legend entry label')
-sample_options.add_option('--leg5', type='string', action='store', dest='legend5', help='legend entry label')
-sample_options.add_option('--color', '--color1', type='string', action='store', dest='color1', help='color string (kRed, kTeal, etc)')
-sample_options.add_option('--color2', type='string', action='store', dest='color2', help='color string (kRed, kTeal, etc)')
-sample_options.add_option('--color3', type='string', action='store', dest='color3', help='color string (kRed, kTeal, etc)')
-sample_options.add_option('--color4', type='string', action='store', dest='color4', help='color string (kRed, kTeal, etc)')
-sample_options.add_option('--color5', type='string', action='store', dest='color5', help='color string (kRed, kTeal, etc)')
+sample_options = OptionGroup(parser, 'Individual Sample Options', 'Set individual sample options with --treeN --errorN --legN --colorN.')
+sample_options.add_option('--tree1', type='string', action='store', default='diphotonAnalyzer/fTree2', dest='treename1', help=SUPPRESS_HELP)
+sample_options.add_option('--tree2', type='string', action='store', default='diphotonAnalyzer/fTree2', dest='treename2', help=SUPPRESS_HELP)
+sample_options.add_option('--tree3', type='string', action='store', default='diphotonAnalyzer/fTree2', dest='treename3', help=SUPPRESS_HELP)
+sample_options.add_option('--tree4', type='string', action='store', default='diphotonAnalyzer/fTree2', dest='treename4', help=SUPPRESS_HELP)
+sample_options.add_option('--tree5', type='string', action='store', default='diphotonAnalyzer/fTree2', dest='treename5', help=SUPPRESS_HELP)
+sample_options.add_option('--error1', action='store_true', default=False, dest='error1', help=SUPPRESS_HELP)
+sample_options.add_option('--error2', action='store_true', default=False, dest='error2', help=SUPPRESS_HELP)
+sample_options.add_option('--error3', action='store_true', default=False, dest='error3', help=SUPPRESS_HELP)
+sample_options.add_option('--error4', action='store_true', default=False, dest='error4', help=SUPPRESS_HELP)
+sample_options.add_option('--error5', action='store_true', default=False, dest='error5', help=SUPPRESS_HELP)
+sample_options.add_option('--leg', '--leg1', type='string', action='store', dest='legend1', help=SUPPRESS_HELP)
+sample_options.add_option('--leg2', type='string', action='store', dest='legend2', help=SUPPRESS_HELP)
+sample_options.add_option('--leg3', type='string', action='store', dest='legend3', help=SUPPRESS_HELP)
+sample_options.add_option('--leg4', type='string', action='store', dest='legend4', help=SUPPRESS_HELP)
+sample_options.add_option('--leg5', type='string', action='store', dest='legend5', help=SUPPRESS_HELP)
+sample_options.add_option('--color', '--color1', type='string', action='store', dest='color1', help=SUPPRESS_HELP)
+sample_options.add_option('--color2', type='string', action='store', dest='color2', help=SUPPRESS_HELP)
+sample_options.add_option('--color3', type='string', action='store', dest='color3', help=SUPPRESS_HELP)
+sample_options.add_option('--color4', type='string', action='store', dest='color4', help=SUPPRESS_HELP)
+sample_options.add_option('--color5', type='string', action='store', dest='color5', help=SUPPRESS_HELP)
 
 parser.add_option_group(visual_options)
+parser.add_option_group(doublevar_options)
 parser.add_option_group(twod_options)
 parser.add_option_group(sample_options)
 (options, args) = parser.parse_args()
@@ -506,10 +509,6 @@ if options.save == None:
       leg.AddEntry(hist, sample['label'], "l")  
   if not options.legoff:
     leg.Draw("same")
-  # Save canvas
-  if not options.save == None:
-    print "Writing canvas to file " + outfilename + "..."
-    c.SaveAs(outputfilename)
 
 if not options.save == None:
   outfilename = options.save
