@@ -97,6 +97,7 @@ elif options.dat:
       # line doesn't make sense
       print "couldn't parse this line from input file", path
       print line
+    N = chain.GetEntries()
     dirs.append([chain, xs, N])
 
 tvl = TH2F('tracks_v_larger' ,'tracks vs larger', 100,0,1, 100,0,1)
@@ -109,14 +110,15 @@ full = TH2F('full', 'Dalitz Plot', 100,0,1, 100,0,1)
 
 lumi = 1.0
 
-for entry in dirs:
-  chain = entry[0]
-  xs = entry[1]
-  N = entry[2]
+for entry in range(len(dirs)):
+  chain = dirs[entry][0]
+  xs = dirs[entry][1]
+  N = dirs[entry][2]
   total = chain.GetEntries()
   count = 0
+  print 'Processing', entry, 'of', len(dirs), 'total entries.'
   for event in chain:
-    if count % 1000 == 0:
+    if count % 100000 == 0:
       percentDone = float(count) / float(total) * 100.0
       print 'Processing {0:10.0f}/{1:10.0f} : {2:5.2f} %'.format(count, total, percentDone )
     count += 1
