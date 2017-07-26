@@ -46,6 +46,7 @@ high = 2
 
 reco_leading_over_gen = TH1F('reco_leading_over_gen','',num_bins,low,high)
 reco_summed_over_gen = TH1F('reco_summed_over_gen','',num_bins,low,high)
+reco_leading_pi0_over_gen = TH1F('reco_leading_pi0_over_gen','',num_bins,low,high)
 
 reco_leading_over_gen_single = TH1F('reco_leading_over_gen_single','',num_bins,low,high)
 reco_leading_over_gen_multi = TH1F('reco_leading_over_gen_multi','',num_bins,low,high)
@@ -69,56 +70,88 @@ for event in chain:
     gen_vec.SetPtEtaPhiM(event.GenEta_pt[i], event.GenEta_eta[i], event.GenEta_phi[i], event.GenEta_mass[i])
     closest_reco = -1
     min_dr = 999.0
-    for j in range(len(event.TwoProng_pt)):
+    for j in range(len(event.Cand_pt)):
       twoprong_vec = TLorentzVector()
-      twoprong_vec.SetPtEtaPhiM(event.TwoProng_pt[j], event.TwoProng_eta[j], event.TwoProng_phi[j], event.TwoProng_mass[j])
+      twoprong_vec.SetPtEtaPhiM(event.Cand_pt[j], event.Cand_eta[j], event.Cand_phi[j], event.Cand_mass[j])
       dr = twoprong_vec.DeltaR(gen_vec)
       if dr < min_dr:
         min_dr = dr
         closest_reco = j
+
     if min_dr < 0.1:
-      if event.TwoProng_photon_nElectron[closest_reco] > 0:
-        if event.TwoProng_photon_nGamma[closest_reco] == 1.0:
+      if event.Cand_photon_nElectron[closest_reco] > 0:
+        if event.Cand_photon_nGamma[closest_reco] == 1.0:
           reco_over_gen_photon.Fill(reco_pt_leading / gen_pt)
           reco_over_gen_electron.Fill(reco_pt_summed / gen_pt)
       else:
+        # build twoprong vecs
+        chpos = TLorentzVector()
+        chpos.SetPtEtaPhiM(event.Cand_CHpos_pt[closest_reco], event.Cand_CHpos_eta[closest_reco], event.Cand_CHpos_phi[closest_reco], event.Cand_CHpos_mass[closest_reco])
+        chneg = TLorentzVector()
+        chneg.SetPtEtaPhiM(event.Cand_CHneg_pt[closest_reco], event.Cand_CHneg_eta[closest_reco], event.Cand_CHneg_phi[closest_reco], event.Cand_CHneg_mass[closest_reco])
+        pho = TLorentzVector()
+        pho.SetPtEtaPhiM(event.Cand_photon_pt_l[closest_reco], event.Cand_photon_eta_l[closest_reco], event.Cand_photon_phi_l[closest_reco], event.Cand_photon_mass_l[closest_reco])
+        pho_wpi0mass = TLorentzVector()
+        pho_wpi0mass.SetPtEtaPhiM(event.Cand_photon_pt_l[closest_reco], event.Cand_photon_eta_l[closest_reco], event.Cand_photon_phi_l[closest_reco], event.Cand_photon_Mass[closest_reco])
+        pho_summed = TLorentzVector()
+        pho_summed.SetPtEtaPhiM(event.Cand_photon_pt[closest_reco], event.Cand_photon_eta[closest_reco], event.Cand_photon_phi[closest_reco], event.Cand_photon_mass[closest_reco])
+
+        twoprong_vec_summed = chpos + chneg + pho_summed
+        twoprong_vec_leading = chpos + chneg + pho
+        twoprong_vec_leading_pi0 = chpos + chneg + pho_wpi0mass
+
+        # get pt
         gen_pt = event.GenEta_pt[i]
-        reco_pt_summed = event.TwoProng_pt[closest_reco]
-        reco_pt_leading = event.TwoProng_pt_l[closest_reco]
+        reco_pt_summed = twoprong_vec_summed.Pt()
+        reco_pt_leading = twoprong_vec_leading.Pt()
+        reco_pt_leading_pi0 = twoprong_vec_leading_pi0.Pt()
+
+        # fill
         reco_leading_over_gen.Fill(reco_pt_leading / gen_pt)
+        reco_leading_pi0_over_gen.Fill(reco_pt_leading_pi0 / gen_pt)
         reco_summed_over_gen.Fill(reco_pt_summed / gen_pt) 
-        if event.TwoProng_photon_nGamma[closest_reco] == 1.0:
+
+        # fill different regions
+        if event.Cand_photon_nGamma[closest_reco] == 1.0:
           reco_summed_over_gen_single.Fill(reco_pt_summed / gen_pt) 
           reco_leading_over_gen_single.Fill(reco_pt_leading / gen_pt)
-          diff = reco_pt_summed - reco_pt_leading
         else:
           reco_summed_over_gen_multi.Fill(reco_pt_summed / gen_pt) 
           reco_leading_over_gen_multi.Fill(reco_pt_leading / gen_pt)
-        if reco_pt_leading / gen_pt > 1.2:
+        if reco_pt_leading / gen_pt > 2:
           print "event", event.eventNum, "run", event.runNum, "lumi", event.lumiNum
           print "reco pt", reco_pt_leading, "gen pt", gen_pt
           print "gen phi", event.GenEta_phi[i], "gen eta", event.GenEta_eta[i]
           print "dr", min_dr
           #raw_input()
+        #diff = reco_pt_summed - reco_pt_leading_pi0
+        #if not diff == 0:
+        #  print diff
 
-
-reco_summed_over_gen_multi.SetStats(0)
-reco_summed_over_gen_multi.SetTitle("Signal 125 MC, nPF photon in box > 1")
-reco_summed_over_gen_multi.GetXaxis().SetTitle("Reco pT / Generator pT")
-reco_summed_over_gen_multi.GetYaxis().SetTitle("tight object count")
-reco_summed_over_gen_multi.SetLineColor(kBlack)
-reco_summed_over_gen_multi.Draw()
-reco_leading_over_gen_multi.SetLineColor(kRed)
-reco_leading_over_gen_multi.Draw('same')
-
-leg = TLegend(0.1,0.8,0.3,0.9)
-leg.AddEntry(reco_summed_over_gen_multi, 'summed', 'l')
-leg.AddEntry(reco_leading_over_gen_multi, 'leading', 'l')
-leg.Draw('same')
-
-raw_input()
 
 # Save file with histograms
 out_file.cd()
 out_file.Write()
+
+# Plot
+hist1 = reco_leading_pi0_over_gen
+hist2 = reco_leading_over_gen
+
+maximum = max(hist1.GetMaximum(), hist2.GetMaximum())
+hist1.SetMaximum(maximum*1.2)
+hist1.SetStats(0)
+hist1.SetTitle("Signal 125 MC, nPF photon in box > 1")
+hist1.GetXaxis().SetTitle("Reco pT / Generator pT")
+hist1.GetYaxis().SetTitle("cand object count")
+hist1.SetLineColor(kBlack)
+hist1.Draw()
+hist2.SetLineColor(kRed)
+hist2.Draw('same')
+
+leg = TLegend(0.1,0.8,0.3,0.9)
+leg.AddEntry(hist1, 'leading and pi0', 'l')
+leg.AddEntry(hist2, 'summed', 'l')
+leg.Draw('same')
+
+raw_input()
 out_file.Close()
