@@ -24,8 +24,13 @@ parser.add_option('--dat', action='store_true', default=False,
                   dest='dat',
                   help='')
 
-parser.add_option('--summed',dest="use_leading", action='store_false',default=True)
-parser.add_option('--pi0',dest="pi0mass", action='store_true',default=False)
+
+parser.add_option('--saveplot', dest='saveplot', help='')
+
+parser.add_option('--leading',dest="use_leading", action='store_true')
+parser.add_option('--summed',dest="use_leading", action='store_false',default=False)
+parser.add_option('--pi0mass',dest="pi0mass", action='store_true',default=False)
+parser.add_option('--photonmass',dest="pi0mass", action='store_false')
 parser.add_option('--plot',dest="plot", action='store_true',default=False)
 parser.add_option('--title',dest="title", action='store')
 parser.add_option('--overlap',dest="overlap", action='store_true',default=False)
@@ -110,23 +115,23 @@ full = TH2F('full', 'Dalitz Plot', 100,0,1, 100,0,1)
 count = 0
 total = chain.GetEntries()
 for event in chain:
-  if count % 1000 == 0:
+  if count % 100000 == 0:
     percentDone = float(count) / float(total) * 100.0
     print 'Processing {0:10.0f}/{1:10.0f} : {2:5.2f} %'.format(count, total, percentDone )
   count += 1
 
   for i in range(len(event.TwoProng_pt)):
     norm_leading_photonmass = event.TwoProng_CHpos_mass[i]*event.TwoProng_CHpos_mass[i] + event.TwoProng_CHneg_mass[i]*event.TwoProng_CHneg_mass[i] + \
-                              event.TwoProng_photon_Mass[i]*event.TwoProng_photon_Mass[i] + event.TwoProng_Mass[i]*event.TwoProng_Mass[i]
+                              event.TwoProng_photon_mass_l[i]*event.TwoProng_photon_mass_l[i] + event.TwoProng_mass_l[i]*event.TwoProng_mass_l[i]
 
     norm_leading_pi0mass = event.TwoProng_CHpos_mass[i]*event.TwoProng_CHpos_mass[i] + event.TwoProng_CHneg_mass[i]*event.TwoProng_CHneg_mass[i] + \
-                           0.135*0.135 + event.TwoProng_Mass[i]*event.TwoProng_Mass[i]
+                           event.TwoProng_photon_Mass[i]*event.TwoProng_photon_Mass[i] + event.TwoProng_Mass_l[i]*event.TwoProng_Mass_l[i]
 
     norm_summed_photonmass = event.TwoProng_CHpos_mass[i]*event.TwoProng_CHpos_mass[i] + event.TwoProng_CHneg_mass[i]*event.TwoProng_CHneg_mass[i] + \
                              event.TwoProng_photon_mass[i]*event.TwoProng_photon_mass[i] + event.TwoProng_mass[i]*event.TwoProng_mass[i]
 
     norm_summed_pi0mass = event.TwoProng_CHpos_mass[i]*event.TwoProng_CHpos_mass[i] + event.TwoProng_CHneg_mass[i]*event.TwoProng_CHneg_mass[i] + \
-                          0.135*0.135 + event.TwoProng_mass[i]*event.TwoProng_mass[i]
+                          event.TwoProng_photon_Mass[i]*event.TwoProng_photon_Mass[i] + event.TwoProng_Mass[i]*event.TwoProng_Mass[i]
 
     if options.exclusive:
       if event.TwoProng_photon_nElectron[i] > 0:
@@ -144,9 +149,9 @@ for event in chain:
       obj_mass = event.TwoProng_Mass[i]
     else:
       obj_mass = event.TwoProng_mass[i]
-    if options.masslow and obj_mass > 0.8:
+    if options.masslow and obj_mass > 0.75:
       continue
-    if options.masshigh and obj_mass < 0.8:
+    if options.masshigh and obj_mass < 0.75:
       continue
 
     if not options.pi0mass:
@@ -158,13 +163,31 @@ for event in chain:
 
     if options.use_leading:
       norm = norm_l
+    else:
+      norm = norm_s
+
+    if options.use_leading and not options.pi0mass: # leading, photon mass
       msmaller = min(event.TwoProng_mPosPho_l[i], event.TwoProng_mNegPho_l[i]) / norm
       mlarger = max(event.TwoProng_mPosPho_l[i], event.TwoProng_mNegPho_l[i]) / norm
       m12 = event.TwoProng_mPosNeg[i] / norm
       m23 = event.TwoProng_mPosPho_l[i] / norm
       m13 = event.TwoProng_mNegPho_l[i] / norm
-    else:
-      norm = norm_s
+
+    elif options.use_leading and options.pi0mass: # leading, pi0mass
+      msmaller = min(event.TwoProng_mPosPho_lpi0[i], event.TwoProng_mNegPho_lpi0[i]) / norm
+      mlarger = max(event.TwoProng_mPosPho_lpi0[i], event.TwoProng_mNegPho_lpi0[i]) / norm
+      m12 = event.TwoProng_mPosNeg[i] / norm
+      m23 = event.TwoProng_mPosPho_lpi0[i] / norm
+      m13 = event.TwoProng_mNegPho_lpi0[i] / norm
+
+    elif not options.use_leading and options.pi0mass: # summed, pi0mass
+      msmaller = min(event.TwoProng_mPosPho_pi0[i], event.TwoProng_mNegPho_pi0[i]) / norm
+      mlarger = max(event.TwoProng_mPosPho_pi0[i], event.TwoProng_mNegPho_pi0[i]) / norm
+      m12 = event.TwoProng_mPosNeg[i] / norm
+      m23 = event.TwoProng_mPosPho_pi0[i] / norm
+      m13 = event.TwoProng_mNegPho_pi0[i] / norm
+
+    elif not options.use_leading and not options.pi0mass: # summed, photon mass
       msmaller = min(event.TwoProng_mPosPho[i], event.TwoProng_mNegPho[i]) / norm
       mlarger = max(event.TwoProng_mPosPho[i], event.TwoProng_mNegPho[i]) / norm
       m12 = event.TwoProng_mPosNeg[i] / norm
@@ -172,6 +195,7 @@ for event in chain:
       m13 = event.TwoProng_mNegPho[i] / norm
 
     mtracks = event.TwoProng_mPosNeg[i] / norm
+
     high = max(m12, m23, m13)
     low = min(m12, m23, m13)
     if m12 < high and m12 > low:
@@ -196,6 +220,7 @@ else:
   full.Add(mvl)
 
 if options.plot:
+  c = TCanvas()
   if options.double:
     full.GetXaxis().SetTitle('\mathrm{smaller}\ m_{\gamma\ \mathrm{track}}\ ,\ \mathrm{larger}\ m_{\gamma\ \mathrm{track}}')
     full.GetYaxis().SetTitle('m_{\mathrm{track1\ track2}}')
@@ -206,7 +231,11 @@ if options.plot:
   if not options.title == None:
     full.SetTitle(options.title)
   full.Draw('Colz')
-  raw_input()
+
+  if not options.saveplot == None:
+    c.SaveAs(options.saveplot)
+  else:
+    raw_input()
 
 # Save file with histograms
 out_file.cd()
