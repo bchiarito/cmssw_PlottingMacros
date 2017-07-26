@@ -42,15 +42,16 @@ for fi in files:
     obj.SetLineColor(kPink+2)
   if count == 3:
     obj.SetLineColor(kPink)''' 
-  #if count == 1:
-  #  obj.SetLineColor(kBlue)
-  #elif count == 2:
-  #  obj.SetLineColor(kRed)
+  if count == 0:
+    obj.SetLineColor(kBlue)
+  elif count == 4:
+    obj.SetLineColor(kRed)
   #elif count == 0:
   #  obj.SetLineColor(kGray+2)
   #else:
   #  obj.SetLineColor(kGray)
-  obj.SetLineColor(kBlack)
+  else:
+    obj.SetLineColor(kBlack)
   count += 1
   objs.append(obj)
     
