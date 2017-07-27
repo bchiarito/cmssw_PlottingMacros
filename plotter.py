@@ -19,11 +19,13 @@ parser.add_option('-v', '--var', type='string', action='store', dest='var', help
 parser.add_option('-b', '--bin', '--bins', type='string', metavar='NUM,LOW,HIGH', action='store', default='100,0,100', dest='binning', help='')
 parser.add_option('-c', '--cut', type='string', action='store', default='', dest='cut', metavar='CUT_STRING', help='')
 parser.add_option('--noplot', action='store_true', default=False, dest='noplot', help='do not plot anything, just gives cutflow')
-parser.add_option('--save', '--saveas', type='string',action='store', dest='save', metavar='ROOTFILE_NAME', help='')
+parser.add_option('--save', '--saveas', type='string',action='store', dest='save', metavar='ROOTFILE.root', help='')
+parser.add_option('--saveplot', type='string',action='store', dest='saveplot', metavar='FILE.ext', help='')
 parser.add_option('-q','--quiet', action='store_true', default=False, dest='quiet', help='less output and omit command prompt at end of running')
 parser.add_option('-n', '--num', type='int', action='store', default=-1, dest='nentries', metavar='MAX_ENTRIES', help='')
 parser.add_option('--tree', '--trees', type='string', action='store', dest='treename', metavar='PATH_TO_TREE', help='')
 
+# doublevar options
 doublevar_options = OptionGroup(parser, 'Double Variable Options', 'Setting these puts plotter in double variable mode')
 doublevar_options.add_option('--var1', type='string', action='store', dest='var1', help='')
 doublevar_options.add_option('--var2', type='string', action='store', dest='var2', help='')
@@ -43,12 +45,16 @@ visual_options.add_option('--yaxis', type='string', action='store', dest='yaxis'
 visual_options.add_option('--legoff', action='store_true', default=False, dest='legoff', help='turns off the legend')
 visual_options.add_option('--stacked', action='store_true', default=False, dest='stacked', help='stacked histograms using THStack')
 visual_options.add_option('--sidebyside', action='store_true', default=False, dest='sidebyside', help='stacked histograms using THStack and Draw("nostackb")')
-visual_options.add_option('--errors', '--error',action='store_true', default=False, dest='errors', help='calls Sumw2() on all histograms')
-visual_options.add_option('--logy', action='store_true', default=False, dest='logy', help='logy sacle on y')
-visual_options.add_option('--logx', action='store_true', default=False, dest='logx', help='logx sacle on x')
-visual_options.add_option('--scaled', action='store_true', default=False, dest='scale', help='scale to integral = 100')
-visual_options.add_option('--lumi', type='float', action='store', dest='lumi', help='luminosity to scale to')
 visual_options.add_option('--noline', action='store_true', default=False, dest='noline', help='do not connect histogram with line')
+visual_options.add_option('--errors', '--error',action='store_true', default=False, dest='errors', help='calls Sumw2() on all histograms')
+visual_options.add_option('--logz', action='store_true', default=False, dest='logz', help='log scale on z')
+visual_options.add_option('--logy', action='store_true', default=False, dest='logy', help='log scale on y')
+visual_options.add_option('--logx', action='store_true', default=False, dest='logx', help='log scale on x')
+visual_options.add_option('--scaled', action='store_true', default=False, dest='scale', help='scale to integral = 100')
+visual_options.add_option('--mcweight', action='store_true', default=False, dest='mcweight', help='weight entries by XS and Ngen')
+visual_options.add_option('--smallrun', action='store', dest='smallrun', help='correct mcN if small run')
+visual_options.add_option('--lumi', type='float', action='store', dest='lumi', default=1.0, help='integrated luminosity to scale to (pb^1)')
+visual_options.add_option('--2016lumi', action='store_true', default=False, dest='lumi_set_to_2016', help='set integreated luminiosity to 2016 total')
 
 # Individual sample options
 sample_options = OptionGroup(parser, 'Individual Sample Options', 'Set individual sample options with --treeN --errorN --legN --colorN.')
@@ -122,6 +128,11 @@ if doublevar_mode and (options.var1==None or options.var2==None):
 if twod_mode and (options.varx==None or options.vary==None or options.binningx==None or options.binningy==None):
   print "Must supply options --varx, --vary, --binsx, --binsy for use with 2D plotting mode"
   sys.exit()
+
+if options.lumi_set_to_2016:
+  lumi = 41010.0
+else:
+  lumi = options.lumi
 
 samples = []
 for i in range(len(args)):
@@ -270,37 +281,30 @@ for sample in samples:
     else:
       hist = ROOT.TH1F("hist"+"_"+str(count), "hist", bins, low, high)
     # TTree.Draw()
+    if twod_mode:
+      draw_string = options.vary+":"+options.varx
+    else:
+      draw_string = options.var
+    draw_string = draw_string + ">>"+"hist"+"_"+str(count)
+
+    if options.cut == "" or options.cut == None:
+      cut_string = "1"
+    else:
+      cut_string = options.cut
+    if options.mcweight and not options.smallrun == None:
+      cut_string = "("+cut_string+")*(mcXS/min(mcN,"+options.smallrun+"))"
+    elif options.mcweight and options.smallrun == None:
+      cut_string = "("+cut_string+")*(mcXS/mcN)"
+
     if options.nentries == -1:
-      if twod_mode:
-        chain.Draw(options.vary+":"+options.varx+">>"+"hist"+"_"+str(count),""+options.cut, "goff")
-      elif doublevar_mode:
-        chain.Draw(options.var1+">>"+"hist1"+"_"+str(count),""+options.cut, "goff")
-        chain.Draw(options.var2+">>"+"hist2"+"_"+str(count),""+options.cut, "goff")
-      else:
-        chain.Draw(options.var+">>"+"hist"+"_"+str(count),""+options.cut, "goff")
+      chain.Draw(draw_string, cut_string, "goff")
     else:
-      if twod_mode:
-        chain.Draw(options.vary+":"+options.varx+">>"+"hist"+"_"+str(count),""+options.cut, "goff", options.nentries)
-      elif doublevar_mode:
-        chain.Draw(options.var1+">>"+"hist1"+"_"+str(count),""+options.cut, "goff", options.nentries)
-        chain.Draw(options.var2+">>"+"hist2"+"_"+str(count),""+options.cut, "goff", options.nentries)
-      else:
-        chain.Draw(options.var+">>"+"hist"+"_"+str(count),""+options.cut, "goff", options.nentries)
-    if doublevar_mode:
-      entry.append(hist1)
-      entry.append(hist2)
-      hist1.Scale(xs/N)
-      hist2.Scale(xs/N)
-      hist_sum1.Add(hist1)
-      hist_sum2.Add(hist2)
-      sample['summed_hist1'] = hist_sum1
-      sample['summed_hist2'] = hist_sum2
-      sample['summed_hist'] = None
-    else:
-      entry.append(hist)
-      hist.Scale(xs/N)
-      hist_sum.Add(hist)
-      sample['summed_hist'] = hist_sum
+      chain.Draw(draw_string, cut_string, "goff", options.nentries)
+
+    entry.append(hist)
+    hist.Scale(xs/N)
+    hist_sum.Add(hist)
+  sample['summed_hist'] = hist_sum
   
 # Print Summary
 count = 1
@@ -335,10 +339,27 @@ if options.noplot:
   print "Elapsed Time: ", (time_end - time_begin)
   sys.exit()
 
+if not options.save == None:
+  outfilename = options.save
+  print "Writing histogram(s) to file " + outfilename + ".root..."
+  outputfile = ROOT.TFile(outfilename+'.root',"recreate")
+  outputfile.cd()
+  for sample in samples:
+    sample['summed_hist'].Write()
+  if options.stacked or options.sidebyside:
+    hs.Write()
+  outputfile.Close()
+
+  time_end = time.time()
+  print "Elapsed Time: ", (time_end - time_begin)
+  sys.exit()
+  
 if not options.quiet:
   print "Plotting..."
 c = ROOT.TCanvas()
 c.cd()
+if options.logz:
+  c.SetLogz()
 if options.logy:
   c.SetLogy()
 if options.logx:
@@ -448,9 +469,12 @@ for sample in samples:
     if not options.xaxis == None:
       xaxis = options.xaxis
     # Y axis
-    yaxis = "Events"
-    if options.scale:
+    if not options.yaxis == None:
+      yaxis = options.yaxis
+    elif options.scale:
       yaxis = "Scaled to Integral 100"
+    else:
+      yaxis = "Events"
   else:
     # X axis
     if not options.xaxis == None:
@@ -513,20 +537,18 @@ if options.save == None:
   if not options.legoff:
     leg.Draw("same")
 
-if not options.save == None:
-  outfilename = options.save
-  print "Writing histogram(s) to file " + outfilename + ".root ..."
-  outputfile = ROOT.TFile(outfilename+'.root',"recreate")
-  outputfile.cd()
-  for sample in samples:
-    sample['summed_hist'].Write()
-  if options.stacked or options.sidebyside:
-    hs.Write()
-  outputfile.Close()
-  
+if not options.saveplot == None:
+  print "Writing plot to file " + options.saveplot + "..."
+  filename = options.saveplot
+  c.SaveAs(filename)
+
 if not options.quiet:
   time_end = time.time()
   print "Elapsed Time: ", (time_end - time_begin)
+
+if not options.saveplot == None:
+  sys.exit()
+
 if options.quiet:
   raw_input()
   sys.exit()
