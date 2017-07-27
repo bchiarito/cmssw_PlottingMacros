@@ -179,7 +179,7 @@ for sample in samples:
   if ISrootfile:
     chain = ROOT.TChain(sample['tree'])
     chain.Add(path)
-    sample['entries'] = [[chain, 1, 1]]
+    sample['entries'] = [[chain, -1.0, -1.0]]
 
   if ISdirectory:
     chain = ROOT.TChain(sample['tree'])
@@ -189,7 +189,7 @@ for sample in samples:
         rootfiles.append(os.path.join(root, filename))
     for rootfile in rootfiles:
       chain.Add(rootfile)
-    sample['entries'] = [[chain, 1, 1]]
+    sample['entries'] = [[chain, -1.0, -1.0]]
 
   if ISinputfile:
     sample['entries'] = []
@@ -199,18 +199,26 @@ for sample in samples:
       # Get name, xs, and num from line
       if len(line_list) == 1:
         path_to_file = line_list[0]
-        xs = 1
-        N = 1
+        xs = -1.0
+        N = -1.0
         treename = sample['tree']
       if len(line_list) == 3:
         path_to_file = line_list[0]
         xs = float(line_list[1])
-        N = max( float(line_list[2]) , options.nentries)
+        N = float(line_list[2])
+        if not options.nentries == -1:
+          N = min(N, options.nentries)
+        if not options.smallrun == None:
+          N = min(N, int(options.smallrun))
         treename = sample['tree']
       if len(line_list) == 4:
         path_to_file = line_list[0]
         xs = float(line_list[1])
-        N = max( float(line_list[2]) , options.nentries)
+        N = float(line_list[2])
+        if not options.nentries == -1:
+          N = min(N, options.nentries)
+        if not options.smallrun == None:
+          N = min(N, int(options.smallrun))
         treename = line_list[3]
       if len(line_list) == 2 or len(line_list) == 0 or len(line_list) > 4:
         print "couldn't parse this line from input file", path
@@ -292,9 +300,9 @@ for sample in samples:
     else:
       cut_string = options.cut
     if options.mcweight and not options.smallrun == None:
-      cut_string = "("+cut_string+")*(mcXS/min(mcN,"+options.smallrun+"))"
+      cut_string = "("+cut_string+")*(mcXS*"+str(lumi)+"/min(mcN,"+options.smallrun+"))"
     elif options.mcweight and options.smallrun == None:
-      cut_string = "("+cut_string+")*(mcXS/mcN)"
+      cut_string = "("+cut_string+")*(mcXS*"+str(lumi)+"/mcN)"
 
     if options.nentries == -1:
       chain.Draw(draw_string, cut_string, "goff")
@@ -302,7 +310,8 @@ for sample in samples:
       chain.Draw(draw_string, cut_string, "goff", options.nentries)
 
     entry.append(hist)
-    hist.Scale(xs/N)
+    if not(xs == -1.0 or N == -1.0):
+      hist.Scale(xs*lumi/N)
     hist_sum.Add(hist)
   sample['summed_hist'] = hist_sum
   
