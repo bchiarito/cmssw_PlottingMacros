@@ -102,6 +102,7 @@ elif options.dat:
       # line doesn't make sense
       print "couldn't parse this line from input file", path
       print line
+    N = chain.GetEntries()
     dirs.append([chain, xs, N])
 
 tvl = TH2F('tracks_v_larger' ,'tracks vs larger', 100,0,1, 100,0,1)
