@@ -21,6 +21,7 @@ parser.add_option('--reportevery', dest='reportevery', default=1000,help='')
 parser.add_option('--plot',dest="plot", action='store_true',default=False)
 parser.add_option('--title',dest="title", action='store')
 parser.add_option('--smallrun',dest="smallrun", action='store')
+parser.add_option('--logz', action='store_true', default=False, dest='logz', help='')
 
 parser.add_option('--lumi', dest='lumi', default=1.0,help='integrated lumi in pb^-1')
 parser.add_option('--2016lumi', action='store_true', default=False, dest='lumi_set_to_2016', help='')
@@ -36,8 +37,9 @@ parser.add_option('--photonmass',dest="pi0mass", action='store_false')
 parser.add_option('--overlap',dest="overlap", action='store_true',default=False)
 parser.add_option('--exclusive',dest="exclusive", action='store_true',default=False)
 
-parser.add_option('--double',dest="double", action='store_true',default=False)
-parser.add_option('--triple',dest="double", action='store_false')
+parser.add_option('--double',dest="double", action='store_true', default=False)
+parser.add_option('--triple',dest="triple", action='store_true', default=False)
+parser.add_option('--pt',dest="pt", action='store_true', default=False)
 
 parser.add_option('--masslow',dest="masslow", action='store_true',default=False)
 parser.add_option('--masshigh',dest="masshigh", action='store_true',default=False)
@@ -53,7 +55,27 @@ if options.masslow and options.masshigh:
 
 if options.lumi_set_to_2016:
   lumi = 41070.0
-lumi = options.lumi
+else:
+  lumi = options.lumi
+
+doublever = options.double
+triplever = options.triple
+ptver = options.pt
+
+vers = 0
+if doublever:
+  vers += 1
+if triplever:
+  vers += 1
+if ptver:
+  vers += 1
+
+if vers == 2 or vers == 3:
+  print "only use one of --double, --triple, --pt"
+  sys.exit()
+
+if vers == 0:
+  ptver = True
 
 out_file = TFile(options.out, 'recreate')
 
@@ -120,6 +142,15 @@ hvl = TH2F('hvl' ,'high vs low', 100,0,1, 100,0,1)
 mvl = TH2F('mvl' ,'mid vs low', 100,0,1, 100,0,1)
 full = TH2F('full', 'Dalitz Plot', 100,0,1, 100,0,1)
 
+hist_d1s = TH1F('d1s', 'distance 1 squared', 30,0,0.6)
+hist_d2s = TH1F('d2s', 'distance 1 squared', 30,0,0.6)
+hist_d3s = TH1F('d3s', 'distance 1 squared', 30,0,0.6)
+hist_ds = TH1F('ds', 'sum distance squared', 90,0,1.8)
+
+pvl = TH2F('pvl' ,'photon vs larger', 100,0,1, 100,0,1)
+pvs = TH2F('pvs' ,'photon vs smaller', 100,0,1, 100,0,1)
+full_pt = TH2F('full_pt' ,'pT asymmetry', 100,0,1, 100,0,1)
+
 for entry in range(len(entries)):
   chain = entries[entry][0]
   xs = entries[entry][1]
@@ -140,7 +171,7 @@ for entry in range(len(entries)):
         print 'Processing {0:10.0f}/{1:10.0f} : {2:5.2f} %'.format(count, total, percentDone )
     count += 1
 
-    if options.tight:
+    if options.tight and not ptver:
       for i in range(len(event.TwoProng_pt)):
         norm_leading_photonmass = event.TwoProng_CHpos_mass[i]*event.TwoProng_CHpos_mass[i] + event.TwoProng_CHneg_mass[i]*event.TwoProng_CHneg_mass[i] + \
                                   event.TwoProng_photon_mass_l[i]*event.TwoProng_photon_mass_l[i] + event.TwoProng_mass_l[i]*event.TwoProng_mass_l[i]
@@ -213,7 +244,31 @@ for entry in range(len(entries)):
           m13 = event.TwoProng_mNegPho[i] / norm
 
         mtracks = event.TwoProng_mPosNeg[i] / norm
-    else:
+        high = max(m12, m23, m13)
+        low = min(m12, m23, m13)
+        if m12 < high and m12 > low:
+          mid = m12
+        if m23 < high and m23 > low:
+          mid = m23
+        if m13 < high and m13 > low:
+          mid = m13
+
+        hvm.Fill(mid, high, xs*lumi/N)
+        hvl.Fill(low, high, xs*lumi/N)
+        mvl.Fill(low, mid, xs*lumi/N)
+        tvl.Fill(mlarger, mtracks, xs*lumi/N)
+        tvs.Fill(msmaller, mtracks, xs*lumi/N)
+
+        d1s = (high - 1.0/3.0)**2 + (mid - 1.0/3.0)**2
+        d2s = (high - 1.0/3.0)**2 + (low - 1.0/3.0)**2
+        d3s = (mid - 1.0/3.0)**2 + (low - 1.0/3.0)**2
+
+        hist_d1s.Fill(d1s, xs*lumi/N)
+        hist_d2s.Fill(d2s, xs*lumi/N)
+        hist_d3s.Fill(d3s, xs*lumi/N)
+        hist_ds.Fill(d1s+d2s+d3s, xs*lumi/N)
+
+    elif not options.tight and not ptver:
       for i in range(len(event.Cand_pt)):
         norm_leading_photonmass = event.Cand_CHpos_mass[i]*event.Cand_CHpos_mass[i] + event.Cand_CHneg_mass[i]*event.Cand_CHneg_mass[i] + \
                                   event.Cand_photon_mass_l[i]*event.Cand_photon_mass_l[i] + event.Cand_mass_l[i]*event.Cand_mass_l[i]
@@ -287,44 +342,82 @@ for entry in range(len(entries)):
 
         mtracks = event.Cand_mPosNeg[i] / norm
 
-    high = max(m12, m23, m13)
-    low = min(m12, m23, m13)
-    if m12 < high and m12 > low:
-      mid = m12
-    if m23 < high and m23 > low:
-      mid = m23
-    if m13 < high and m13 > low:
-      mid = m13
+        high = max(m12, m23, m13)
+        low = min(m12, m23, m13)
+        if m12 < high and m12 > low:
+          mid = m12
+        if m23 < high and m23 > low:
+          mid = m23
+        if m13 < high and m13 > low:
+          mid = m13
 
-    hvm.Fill(mid, high, xs*lumi/N)
-    hvl.Fill(low, high, xs*lumi/N)
-    mvl.Fill(low, mid, xs*lumi/N)
-    tvl.Fill(mlarger, mtracks, xs*lumi/N)
-    tvs.Fill(msmaller, mtracks, xs*lumi/N)
+        hvm.Fill(mid, high, xs*lumi/N)
+        hvl.Fill(low, high, xs*lumi/N)
+        mvl.Fill(low, mid, xs*lumi/N)
+        tvl.Fill(mlarger, mtracks, xs*lumi/N)
+        tvs.Fill(msmaller, mtracks, xs*lumi/N)
 
-if options.double:
+        d1s = (high - 1.0/3.0)**2 + (mid - 1.0/3.0)**2
+        d2s = (high - 1.0/3.0)**2 + (low - 1.0/3.0)**2
+        d3s = (mid - 1.0/3.0)**2 + (low - 1.0/3.0)**2
+
+        hist_d1s.Fill(d1s, xs*lumi/N)
+        hist_d2s.Fill(d2s, xs*lumi/N)
+        hist_d3s.Fill(d3s, xs*lumi/N)
+        hist_ds.Fill(d1s+d2s+d3s, xs*lumi/N)
+
+    if options.tight and ptver:
+      for i in range(len(event.TwoProng_pt)):
+        pt_photon = event.TwoProng_photon_pt[i]
+        pt_track1 = event.TwoProng_CHpos_pt[i]
+        pt_track2 = event.TwoProng_CHneg_pt[i]
+        norm = pt_photon + pt_track1 + pt_track2
+        ptg = pt_photon / norm
+        pt1 = pt_track1 / norm
+        pt2 = pt_track2 / norm
+
+        pvl.Fill(max(pt1, pt2), ptg, xs*lumi/N)
+        pvs.Fill(min(pt1, pt2), ptg, xs*lumi/N)
+
+if doublever:
   full.Add(tvl)
   full.Add(tvs)
-else:
+elif triplever:
   full.Add(hvm)
   full.Add(hvl)
   full.Add(mvl)
+elif ptver:
+  full_pt.Add(pvl)
+  full_pt.Add(pvs)
 
 time_end = time.time()
 print "Elapsed Time: ", (time_end - time_begin)
 
 if options.plot:
   c = TCanvas()
-  if options.double:
+  if options.logz:
+    c.SetLogz()
+  if doublever:
     full.GetXaxis().SetTitle('\mathrm{smaller}\ m_{\gamma\ \mathrm{track}}\ ,\ \mathrm{larger}\ m_{\gamma\ \mathrm{track}}')
     full.GetYaxis().SetTitle('m_{\mathrm{track1\ track2}}')
-  else:
+    full.SetStats(0)
+    if not options.title == None:
+      full.SetTitle(options.title)
+    full.Draw('Colz')
+  elif triplever:
     full.GetXaxis().SetTitle('high, high, med')
     full.GetYaxis().SetTitle('med, low, low')
-  full.SetStats(0)
-  if not options.title == None:
-    full.SetTitle(options.title)
-  full.Draw('Colz')
+    full.SetStats(0)
+    if not options.title == None:
+      full.SetTitle(options.title)
+    full.Draw('Colz')
+  elif ptver:
+    full_pt.GetYaxis().SetTitle('normalized photon pt')
+    full_pt.GetXaxis().SetTitle('normalized smaller track pt, larger track pt')
+    full_pt.SetStats(0)
+    if not options.title == None:
+      full_pt.SetTitle(options.title)
+    full_pt.Draw('Colz')
 
   if not options.saveplot == None:
     c.SaveAs(options.saveplot)
