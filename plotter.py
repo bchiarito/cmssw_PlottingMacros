@@ -1,3 +1,4 @@
+from __future__ import print_function
 import os
 import glob
 import fnmatch
@@ -21,14 +22,18 @@ parser.add_option('-c', '--cut', type='string', action='store', default='', dest
 parser.add_option('--noplot', action='store_true', default=False, dest='noplot', help='do not plot anything, just gives cutflow')
 parser.add_option('--save', '--saveas', type='string',action='store', dest='save', metavar='ROOTFILE.root', help='')
 parser.add_option('--saveplot', type='string',action='store', dest='saveplot', metavar='FILE.ext', help='')
-parser.add_option('-q','--quiet', action='store_true', default=False, dest='quiet', help='less output and omit command prompt at end of running')
+parser.add_option('-q','--quiet', action='store_true', default=True, dest='quiet', help='less output')
+parser.add_option('--verb', '--verbose', action='store_false', dest='quiet', help='more output')
 parser.add_option('-n', '--num', type='int', action='store', default=-1, dest='nentries', metavar='MAX_ENTRIES', help='')
-parser.add_option('--tree', '--trees', type='string', action='store', dest='treename', metavar='PATH_TO_TREE', help='')
+parser.add_option('--tree', '--trees', type='string', action='store', dest='treename', default='diphotonAnalyzer/fTree2', metavar='PATH_TO_TREE', help='')
 
-# doublevar options
-doublevar_options = OptionGroup(parser, 'Double Variable Options', 'Setting these puts plotter in double variable mode')
-doublevar_options.add_option('--var1', type='string', action='store', dest='var1', help='')
-doublevar_options.add_option('--var2', type='string', action='store', dest='var2', help='')
+# multivar options
+multivar_options = OptionGroup(parser, 'Multi-Variable Options', 'Setting --var1 --var2 ... --varN puts plotter in mutli-variable mode')
+multivar_options.add_option('--var1', type='string', action='store', dest='var1', help=SUPPRESS_HELP)
+multivar_options.add_option('--var2', type='string', action='store', dest='var2', help=SUPPRESS_HELP)
+multivar_options.add_option('--var3', type='string', action='store', dest='var3', help=SUPPRESS_HELP)
+multivar_options.add_option('--var4', type='string', action='store', dest='var4', help=SUPPRESS_HELP)
+multivar_options.add_option('--var5', type='string', action='store', dest='var5', help=SUPPRESS_HELP)
 
 # 2D options
 twod_options = OptionGroup(parser, '2D Plot Options', 'Setting these puts plotter in 2D mode')
@@ -58,16 +63,16 @@ visual_options.add_option('--2016lumi', action='store_true', default=False, dest
 
 # Individual sample options
 sample_options = OptionGroup(parser, 'Individual Sample Options', 'Set individual sample options with --treeN --errorN --legN --colorN.')
-sample_options.add_option('--tree1', type='string', action='store', default='diphotonAnalyzer/fTree2', dest='treename1', help=SUPPRESS_HELP)
-sample_options.add_option('--tree2', type='string', action='store', default='diphotonAnalyzer/fTree2', dest='treename2', help=SUPPRESS_HELP)
-sample_options.add_option('--tree3', type='string', action='store', default='diphotonAnalyzer/fTree2', dest='treename3', help=SUPPRESS_HELP)
-sample_options.add_option('--tree4', type='string', action='store', default='diphotonAnalyzer/fTree2', dest='treename4', help=SUPPRESS_HELP)
-sample_options.add_option('--tree5', type='string', action='store', default='diphotonAnalyzer/fTree2', dest='treename5', help=SUPPRESS_HELP)
-sample_options.add_option('--error1', action='store_true', default=False, dest='error1', help=SUPPRESS_HELP)
-sample_options.add_option('--error2', action='store_true', default=False, dest='error2', help=SUPPRESS_HELP)
-sample_options.add_option('--error3', action='store_true', default=False, dest='error3', help=SUPPRESS_HELP)
-sample_options.add_option('--error4', action='store_true', default=False, dest='error4', help=SUPPRESS_HELP)
-sample_options.add_option('--error5', action='store_true', default=False, dest='error5', help=SUPPRESS_HELP)
+sample_options.add_option('--tree1', type='string', action='store', dest='treename1', help=SUPPRESS_HELP)
+sample_options.add_option('--tree2', type='string', action='store', dest='treename2', help=SUPPRESS_HELP)
+sample_options.add_option('--tree3', type='string', action='store', dest='treename3', help=SUPPRESS_HELP)
+sample_options.add_option('--tree4', type='string', action='store', dest='treename4', help=SUPPRESS_HELP)
+sample_options.add_option('--tree5', type='string', action='store', dest='treename5', help=SUPPRESS_HELP)
+sample_options.add_option('--error1', action='store_true', dest='error1', help=SUPPRESS_HELP)
+sample_options.add_option('--error2', action='store_true', dest='error2', help=SUPPRESS_HELP)
+sample_options.add_option('--error3', action='store_true', dest='error3', help=SUPPRESS_HELP)
+sample_options.add_option('--error4', action='store_true', dest='error4', help=SUPPRESS_HELP)
+sample_options.add_option('--error5', action='store_true', dest='error5', help=SUPPRESS_HELP)
 sample_options.add_option('--leg', '--leg1', type='string', action='store', dest='legend1', help=SUPPRESS_HELP)
 sample_options.add_option('--leg2', type='string', action='store', dest='legend2', help=SUPPRESS_HELP)
 sample_options.add_option('--leg3', type='string', action='store', dest='legend3', help=SUPPRESS_HELP)
@@ -80,11 +85,32 @@ sample_options.add_option('--color4', type='string', action='store', dest='color
 sample_options.add_option('--color5', type='string', action='store', dest='color5', help=SUPPRESS_HELP)
 
 parser.add_option_group(visual_options)
-parser.add_option_group(doublevar_options)
 parser.add_option_group(twod_options)
+parser.add_option_group(multivar_options)
 parser.add_option_group(sample_options)
+# get options
 (options, args) = parser.parse_args()
+# prevents ROOT from also reading options
+sys.argv = []
+# import colors
+from ROOT import kRed
+from ROOT import kWhite
+from ROOT import kBlack 
+from ROOT import kGray 
+from ROOT import kRed 
+from ROOT import kGreen 
+from ROOT import kBlue 
+from ROOT import kYellow 
+from ROOT import kMagenta 
+from ROOT import kCyan 
+from ROOT import kOrange 
+from ROOT import kSpring 
+from ROOT import kTeal 
+from ROOT import kAzure 
+from ROOT import kViolet 
+from ROOT import kPink 
 
+# check options
 ind_treenames = False
 if (not options.treename1==None) or \
    (not options.treename2==None) or \
@@ -108,25 +134,27 @@ if (not options.varx==None) or \
    (not options.binningy==None):
   twod_mode = True
 
-doublevar_mode = False
+if twod_mode:
+  options.legoff = True
+
+multivar_mode = False
 if (not options.var1==None) or \
-   (not options.var2==None):
-  doublevar_mode = True
+   (not options.var2==None) or \
+   (not options.var3==None) or \
+   (not options.var4==None) or \
+   (not options.var5==None):
+  multivar_mode = True
 
-if doublevar_mode and twod_mode:
-  print "Double varialbe mode and 2D plot mode not compatible"
+if multivar_mode and twod_mode:
+  print("Multi-variable mode and 2D mode are not compatible")
   sys.exit()
 
-if not doublevar_mode and not twod_mode and options.var == None:
-  print "Must supply the name of the variable to be plotted with --var"
-  sys.exit()
-
-if doublevar_mode and (options.var1==None or options.var2==None):
-  print "Must supply the name of the variables to be plotted with --var1 and --var2"
+if not multivar_mode and not twod_mode and options.var == None:
+  print("Must supply the name of the variable to be plotted with --var")
   sys.exit()
 
 if twod_mode and (options.varx==None or options.vary==None or options.binningx==None or options.binningy==None):
-  print "Must supply options --varx, --vary, --binsx, --binsy for use with 2D plotting mode"
+  print("Must supply options --varx, --vary, --binsx, --binsy for use with 2D plotting mode")
   sys.exit()
 
 if options.lumi_set_to_2016:
@@ -135,23 +163,48 @@ else:
   lumi = options.lumi
 
 samples = []
-for i in range(len(args)):
-  sample = {}
-  sample['path'] = args[i]
-  if not ind_treenames:
-    sample['tree'] = options.treename
-  else:
-    sample['tree'] = eval("options.treename"+str(i+1))
-  if not ind_errors:
-    sample['error'] = options.errors
-  else:
-    sample['error'] = eval("options.error"+str(i+1))
-  sample['label'] = eval("options.legend"+str(i+1))
-  sample['color'] = eval("options.color"+str(i+1))
-  samples.append(sample)
+if not multivar_mode:
+  for i in range(len(args)):
+    sample = {}
+    sample['path'] = args[i]
+    if not ind_treenames:
+      sample['tree'] = options.treename
+    else:
+      sample['tree'] = eval("options.treename"+str(i+1))
+    if not ind_errors:
+      sample['error'] = options.errors
+    else:
+      sample['error'] = eval("options.error"+str(i+1))
+    sample['label'] = eval("options.legend"+str(i+1))
+    sample['color'] = eval("options.color"+str(i+1))
+    sample['var'] = options.var
+    samples.append(sample)
+else:
+  if len(args) > 1:
+    print("Can only use one sample if plotting multiple variables (with --var1, --var2, etc)")
+    sys.exit()
+  variables = []
+  variables.append([options.var1, options.legend1, options.color1])
+  variables.append([options.var2, options.legend2, options.color2])
+  variables.append([options.var3, options.legend3, options.color3])
+  variables.append([options.var4, options.legend4, options.color4])
+  variables.append([options.var5, options.legend5, options.color5])
+  for var in variables:
+    variable = {}
+    variable['path'] = args[0]
+    variable['tree'] = options.treename
+    variable['error'] = options.errors
+    if not var[1] == None:
+      variable['label'] = var[1]
+    else:
+      variable['label'] = var[0]
+    variable['color'] = var[2]
+    variable['var'] = var[0]
+    if not var[0] == None:
+      samples.append(variable)
 
 if len(samples) == 0:
-  print "Must specify at least one sample as arugment"
+  print("Must specify at least one sample as arugment")
   sys.exit()
 
 # Make collection of TChains
@@ -162,18 +215,18 @@ for sample in samples:
   ISinputfile = False
   if fnmatch.fnmatch(path, "*.root"):
     if not options.quiet:
-      print "It appears ", path, "is a rootfile"
+      print("It appears", path, "is a rootfile")
     ISrootfile = True
   elif fnmatch.fnmatch(path, "*/"):
     if not options.quiet:
-      print "It appears", path, "is a directory to traverse"
+      print("It appears", path, "is a directory to traverse")
     ISdirectory = True
   elif fnmatch.fnmatch(path, "*.dat"):
     if not options.quiet:
-      print "It appears", path, "is a text file of inputs"
+      print("It appears", path, "is a text file of inputs")
     ISinputfile = True
   else:
-    print "Do not recognize", path, ", must end with /, .root, or .dat"
+    print("Do not recognize", path, ", must end with /, .root, or .dat")
     sys.exit()
 
   if ISrootfile:
@@ -221,8 +274,8 @@ for sample in samples:
           N = min(N, int(options.smallrun))
         treename = line_list[3]
       if len(line_list) == 2 or len(line_list) == 0 or len(line_list) > 4:
-        print "couldn't parse this line from input file", path
-        print line
+        print("couldn't parse this line from input file", path)
+        print(line)
         continue
       # add files to chain
       chain = ROOT.TChain(treename)      
@@ -237,12 +290,12 @@ for sample in samples:
           chain.Add(rootfile)
       else:
         # line doesn't make sense
-        print "couldn't parse this line from input file", path
-        print line
+        print("couldn't parse this line from input file", path)
+        print(line)
       sample['entries'].append([chain, xs, N])
      
 if not options.quiet:
-  print "Drawing into histogram..."
+  print("Drawing into histogram...")
 
 i1 = string.index(options.binning,',')
 i2 = string.rindex(options.binning,',')
@@ -267,48 +320,28 @@ count = 0
 sumcount = 0
 for sample in samples:
   sumcount += 1
-  # main hist
-  if twod_mode:
-    hist_sum = ROOT.TH2F("hist"+"_sum_"+str(sumcount), "hist", binsx, lowx, highx, binsy, lowy, highy)
-  elif doublevar_mode:
-    hist_sum1 = ROOT.TH1F("hist1"+"_sum_"+str(sumcount), "hist", bins, low, high)
-    hist_sum2 = ROOT.TH1F("hist2"+"_sum_"+str(sumcount), "hist", bins, low, high)
-  else:
-    hist_sum = ROOT.TH1F("hist"+"_sum_"+str(sumcount), "hist", bins, low, high)
+  hist_sum = ROOT.TH2F("hist"+"_sum_"+str(sumcount), "hist", binsx, lowx, highx, binsy, lowy, highy) if twod_mode else \
+             ROOT.TH1F("hist"+"_sum_"+str(sumcount), "hist", bins, low, high)
   for entry in sample['entries']:
     chain = entry[0]
     xs = entry[1]
     N = entry[2]
     count += 1
-    # entry hist
-    if twod_mode:
-      hist = ROOT.TH2F("hist"+"_"+str(count), "hist", binsx, lowx, highx, binsy, lowy, highy)
-    elif doublevar_mode:
-      hist1 = ROOT.TH1F("hist1"+"_"+str(count), "hist", bins, low, high)
-      hist2 = ROOT.TH1F("hist2"+"_"+str(count), "hist", bins, low, high)
-    else:
-      hist = ROOT.TH1F("hist"+"_"+str(count), "hist", bins, low, high)
-    # TTree.Draw()
-    if twod_mode:
-      draw_string = options.vary+":"+options.varx
-    else:
-      draw_string = options.var
+    hist = ROOT.TH2F("hist"+"_"+str(count), "hist", binsx, lowx, highx, binsy, lowy, highy) if twod_mode else \
+           ROOT.TH1F("hist"+"_"+str(count), "hist", bins, low, high)
+    draw_string = options.vary+":"+options.varx if twod_mode else \
+                  sample['var']
     draw_string = draw_string + ">>"+"hist"+"_"+str(count)
-
-    if options.cut == "" or options.cut == None:
-      cut_string = "1"
-    else:
-      cut_string = options.cut
+    cut_string = "1" if (options.cut=="" or options.cut==None) else options.cut
     if options.mcweight and not options.smallrun == None:
       cut_string = "("+cut_string+")*(mcXS*"+str(lumi)+"/min(mcN,"+options.smallrun+"))"
     elif options.mcweight and options.smallrun == None:
       cut_string = "("+cut_string+")*(mcXS*"+str(lumi)+"/mcN)"
-
+    # TTree.Draw()
     if options.nentries == -1:
       chain.Draw(draw_string, cut_string, "goff")
     else:
       chain.Draw(draw_string, cut_string, "goff", options.nentries)
-
     entry.append(hist)
     if not(xs == -1.0 or N == -1.0):
       hist.Scale(xs*lumi/N)
@@ -317,40 +350,25 @@ for sample in samples:
   
 # Print Summary
 count = 1
-if not doublevar_mode:
-  for sample in samples:
-    hist = sample['summed_hist']
-    print "Entries " + str(count) + "   : ", int(hist.GetEntries())
-    if not twod_mode:
-      if not int(hist.GetBinContent(0)) == 0:
-        print "Underflow " + str(count) + " - ", int(hist.GetBinContent(0))
-      if not int(hist.GetBinContent(bins+1)) == 0:
-        print "Overflow " + str(count) + "  - ", int(hist.GetBinContent(bins+1))
-    count += 1
-else:
-  for sample in samples:
-    hist1 = sample['summed_hist1']
-    hist2 = sample['summed_hist2']
-    print "Entries var1 " + str(count) + "   : ", int(hist1.GetEntries())
-    print "Entries var2 " + str(count) + "   : ", int(hist2.GetEntries())
-    if not int(hist1.GetBinContent(0)) == 0:
-      print "Underflow var1 " + str(count) + " - ", int(hist1.GetBinContent(0))
-    if not int(hist2.GetBinContent(0)) == 0:
-      print "Underflow var2 " + str(count) + " - ", int(hist2.GetBinContent(0))
-    if not int(hist1.GetBinContent(bins+1)) == 0:
-      print "Overflow var1 " + str(count) + "  - ", int(hist1.GetBinContent(bins+1))
-    if not int(hist2.GetBinContent(bins+1)) == 0:
-      print "Overflow var2 " + str(count) + "  - ", int(hist2.GetBinContent(bins+1))
-    count += 1
+for sample in samples:
+  hist = sample['summed_hist']
+  print("Entries " + str(count) + "  : ", int(hist.GetEntries()), end='')
+  if not twod_mode:
+    if not int(hist.GetBinContent(0)) == 0:
+      print(" : Underflow " + " - ", int(hist.GetBinContent(0)), end='')
+    if not int(hist.GetBinContent(bins+1)) == 0:
+      print(" : Overflow " + " - ", int(hist.GetBinContent(bins+1)), end='')
+  print("")
+  count += 1
 
 if options.noplot:
   time_end = time.time()
-  print "Elapsed Time: ", (time_end - time_begin)
+  print("Elapsed Time: ", (time_end - time_begin))
   sys.exit()
 
 if not options.save == None:
   outfilename = options.save
-  print "Writing histogram(s) to file " + outfilename + ".root..."
+  print("Writing histogram(s) to file " + outfilename + ".root...")
   outputfile = ROOT.TFile(outfilename+'.root',"recreate")
   outputfile.cd()
   for sample in samples:
@@ -360,11 +378,11 @@ if not options.save == None:
   outputfile.Close()
 
   time_end = time.time()
-  print "Elapsed Time: ", (time_end - time_begin)
+  print("Elapsed Time: ", (time_end - time_begin))
   sys.exit()
   
 if not options.quiet:
-  print "Plotting..."
+  print("Plotting...")
 c = ROOT.TCanvas()
 c.cd()
 if options.logz:
@@ -376,16 +394,11 @@ if options.logx:
 colorcount = 1
 for sample in samples:
   hist = sample['summed_hist']
-  if doublevar_mode:
-    hist = sample['summed_hist1']
   # Color
   if sample['color'] == None:
     hist.SetLineColor(colorcount)
     hist.SetMarkerColor(colorcount)
-    if options.stacked or options.sidebyside:
-      hist.SetFillColor(colorcount)
-    else:
-      hist.SetFillColor(0)
+    hist.SetFillColor(colorcount if (options.stacked or options.sidebyside) else 0)
     colorcount+=1
   else:
     exec('hist.SetLineColor(' + sample['color'] + ')')
@@ -394,7 +407,6 @@ for sample in samples:
       exec('hist.SetFillColor(' + sample['color'] + ')')
     else:
       hist.SetFillColor(0)
-  hist.SetFillColor(0)
   # Width
   hist.SetLineWidth(1)
   # Stats
@@ -410,9 +422,6 @@ for sample in samples:
       hist.Scale(100.0/hist.Integral())
 
 if options.stacked or options.sidebyside:
-  if doublevar_mode:
-    print "double variable mode incompatible with --stacked and --sidebyside"
-    sys.exit()
   hs = ROOT.THStack('hs','')
   for sample in samples:
     hist = sample['summed_hist']
@@ -426,17 +435,10 @@ if options.stacked or options.sidebyside:
 # Maximum
 maximum = 0
 for sample in samples:
-  if doublevar_mode:
-    hist1 = sample['summed_hist1']
-    hist2 = sample['summed_hist2']
-    maximum = max(maximum, hist1.GetMaximum(), hist2.GetMaximum())
-  else:
-    hist = sample['summed_hist']
-    maximum = max(maximum, hist.GetMaximum())
+  hist = sample['summed_hist']
+  maximum = max(maximum, hist.GetMaximum())
 for sample in samples:
   hist = sample['summed_hist']
-  if doublevar_mode:
-    hist = sample['summed_hist1']
   if options.logy:
     hist.SetMaximum(maximum*4)
   else:
@@ -446,8 +448,6 @@ for sample in samples:
 # Labels
 for sample in samples:
   hist = sample['summed_hist']
-  if doublevar_mode:
-    hist = sample['summed_hist1']
   title = ''
   xaxis = ''
   yaxis = ''
@@ -455,26 +455,21 @@ for sample in samples:
   if not options.title == None:
     title = options.title
   else:
-    if not twod_mode and not doublevar_mode:
+    if not twod_mode and not multivar_mode:
       title = options.var
-    elif not twod_mode and doublevar_mode:
-      title = options.var1 + " and " + options.var2 
+    elif not twod_mode and multivar_mode:
+      title = sample['path']
     else:
-      if options.cut == '':
+      if options.cut == None:
         title = options.varx + " vs " + options.vary
       else:
         title = options.cut
   if not twod_mode:
     # X axis
-    if doublevar_mode:
-      xaxis = options.var1 + " and " + options.var2 + " w/ " + options.cut
+    if multivar_mode:
+      xaxis = ""
     else:
-      xaxis = options.var + " w/ " + options.cut
-    if options.cut == '':
-      if doublevar_mode:
-        xaxis = options.var1 + " and " + options.var2
-      else:
-        xaxis = options.var
+      xaxis = options.var + " w/ " + options.cut if options.cut==None else options.var
     if not options.xaxis == None:
       xaxis = options.xaxis
     # Y axis
@@ -508,58 +503,43 @@ if options.save == None:
   if twod_mode:
     ROOT.gStyle.SetPalette(55)
   if options.stacked or options.sidebyside:
-    c.Modified()
-  else:  
+    if options.stacked:
+      hs.Draw('hist')
+    elif options.sidebyside:
+      hs.Draw('hist nostackb')
+  else:
     for sample in samples:
-      if doublevar_mode:
-        hist1 = sample['summed_hist1']
-        hist2 = sample['summed_hist2']
-        if options.noline:
-          draw_option = 'same'
-        else:
-          draw_option = 'hist same'
-        if sample['error'] or options.errors:
-          draw_option += ' e'
-        hist1.Draw(draw_option)
-        hist2.Draw(draw_option) 
+      hist = sample['summed_hist']
+      if options.noline:
+        draw_option = 'same'
       else:
-        hist = sample['summed_hist']
-        if options.noline:
-          draw_option = 'same'
-        else:
-          draw_option = 'hist same'
-        if twod_mode:
-          draw_option += ' Colz'
-        if sample['error'] or options.errors:
-          draw_option += ' e'
-        hist.Draw(draw_option)
+        draw_option = 'hist same'
+      if twod_mode:
+        draw_option += ' Colz'
+      if sample['error'] or options.errors:
+        draw_option += ' e'
+      hist.Draw(draw_option)
   # Legend
   leg = ROOT.TLegend(0.55, 0.80, 0.9, 0.9)
   for sample in samples:
     hist = sample['summed_hist']
-    if doublevar_mode:
-      hist = sample['summed_hist1']
     if sample['label'] == None:
       leg.AddEntry(hist, sample['path'], "l")
     else:
       leg.AddEntry(hist, sample['label'], "l")  
   if not options.legoff:
     leg.Draw("same")
+  c.Modified()
 
 if not options.saveplot == None:
-  print "Writing plot to file " + options.saveplot + "..."
+  print("Writing plot to file " + options.saveplot + "...")
   filename = options.saveplot
   c.SaveAs(filename)
 
-if not options.quiet:
-  time_end = time.time()
-  print "Elapsed Time: ", (time_end - time_begin)
+time_end = time.time()
+print("Elapsed Time: ", (time_end - time_begin))
 
 if not options.saveplot == None:
-  sys.exit()
-
-if options.quiet:
-  raw_input()
   sys.exit()
 
 # After plot Commands
@@ -569,9 +549,8 @@ for sample in samples:
 
 cmd = "start"
 while not cmd == "":
-  print "\nPress [Enter] to finish, type 'options' to see options:"
   # parse input
-  inp = raw_input()
+  inp = raw_input("[Enter] to finish, 'options' to see options: ")
   i = string.find(inp,' ')
   if i==-1:
     cmd = inp
@@ -581,7 +560,10 @@ while not cmd == "":
     opt = inp[i+1:len(inp)]
 
   # setup
-  hist = samples[0]['summed_hist']
+  if options.stacked or options.sidebyside:
+    hist = hs
+  else:
+    hist = samples[0]['summed_hist']
 
   # begin commands
   if cmd == "save" or cmd == "saveas":
@@ -604,13 +586,13 @@ while not cmd == "":
       c.Modified()
   elif cmd == "fit":
     if opt=="":
-      print "Must supply second argument to", cmd
+      print("Must supply second argument to", cmd)
       continue
     hist.Fit(opt)
     c.Modified()
   elif cmd == "vertical":
     if opt=="":
-      print "Must supply second argument to", cmd
+      print("Must supply second argument to", cmd)
       continue
     pos = float(opt)
     vert_line = ROOT.TLine(pos, 0, pos, hist.GetMaximum())
@@ -619,7 +601,7 @@ while not cmd == "":
     #  leg.Draw("same")
   elif cmd == "horizontal":
     if opt=="":
-      print "Must supply second argument to", cmd
+      print("Must supply second argument to", cmd)
       continue
     pos = float(opt)
     horz_line = ROOT.TLine(0, pos, high, pos)
@@ -627,12 +609,12 @@ while not cmd == "":
     #if not options.legoff:
     #  leg.Draw("same")
   elif cmd == "options":
-    print "save FILENAME    saves current canvas, optionally with supplied name\n" +\
+    print("save FILENAME    saves current canvas, optionally with supplied name\n" +\
           "saveas           alias for save\n" +\
           "fit FIT          fits with supplied fitting function, only fits sample1\n" +\
           "vertical NUM     draws a vertical line at xvalue=NUM\n" +\
           "horizontal NUM   draws a horizontal line at yvalue=NUM\n" +\
           "title NEW_TITLE  changes plot title to NEW_TITLE\n" +\
-          ""
+          "")
   elif not cmd == "":
-    print cmd,"not a valid command"
+    print("not a valid command")
