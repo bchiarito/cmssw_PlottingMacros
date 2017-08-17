@@ -22,7 +22,7 @@ parser.add_option('-c', '--cut', type='string', action='store', default='', dest
 parser.add_option('--noplot', action='store_true', default=False, dest='noplot', help='do not plot anything, just gives cutflow')
 parser.add_option('--save', '--saveas', type='string',action='store', dest='save', metavar='ROOTFILE.root', help='')
 parser.add_option('--saveplot', type='string',action='store', dest='saveplot', metavar='FILE.ext', help='')
-parser.add_option('-q','--quiet', action='store_true', default=True, dest='quiet', help='less output')
+parser.add_option('-q','--quiet', action='store_true', default=False, dest='quiet', help='less output')
 parser.add_option('--verb', '--verbose', action='store_false', dest='quiet', help='more output')
 parser.add_option('-n', '--num', type='int', action='store', default=-1, dest='nentries', metavar='MAX_ENTRIES', help='')
 parser.add_option('--tree', '--trees', type='string', action='store', dest='treename', default='diphotonAnalyzer/fTree2', metavar='PATH_TO_TREE', help='')
@@ -34,6 +34,9 @@ multivar_options.add_option('--var2', type='string', action='store', dest='var2'
 multivar_options.add_option('--var3', type='string', action='store', dest='var3', help=SUPPRESS_HELP)
 multivar_options.add_option('--var4', type='string', action='store', dest='var4', help=SUPPRESS_HELP)
 multivar_options.add_option('--var5', type='string', action='store', dest='var5', help=SUPPRESS_HELP)
+multivar_options.add_option('--var6', type='string', action='store', dest='var6', help=SUPPRESS_HELP)
+multivar_options.add_option('--var7', type='string', action='store', dest='var7', help=SUPPRESS_HELP)
+multivar_options.add_option('--var8', type='string', action='store', dest='var8', help=SUPPRESS_HELP)
 
 # 2D options
 twod_options = OptionGroup(parser, '2D Plot Options', 'Setting these puts plotter in 2D mode')
@@ -48,6 +51,7 @@ visual_options.add_option('--title', type='string', action='store', dest='title'
 visual_options.add_option('--xaxis', type='string', action='store', dest='xaxis', help='xaxis label')
 visual_options.add_option('--yaxis', type='string', action='store', dest='yaxis', help='yaxis label')
 visual_options.add_option('--legoff', action='store_true', default=False, dest='legoff', help='turns off the legend')
+visual_options.add_option('--legleft', action='store_true', default=False, dest='legleft', help='legend on upper left instead of upper right')
 visual_options.add_option('--stacked', action='store_true', default=False, dest='stacked', help='stacked histograms using THStack')
 visual_options.add_option('--sidebyside', action='store_true', default=False, dest='sidebyside', help='stacked histograms using THStack and Draw("nostackb")')
 visual_options.add_option('--noline', action='store_true', default=False, dest='noline', help='do not connect histogram with line')
@@ -60,6 +64,8 @@ visual_options.add_option('--mcweight', action='store_true', default=False, dest
 visual_options.add_option('--smallrun', action='store', dest='smallrun', help='correct mcN if small run')
 visual_options.add_option('--lumi', type='float', action='store', dest='lumi', default=1.0, help='integrated luminosity to scale to (pb^1)')
 visual_options.add_option('--2016lumi', action='store_true', default=False, dest='lumi_set_to_2016', help='set integreated luminiosity to 2016 total')
+visual_options.add_option('--vertical', type='float', action='store', dest='vertical', metavar='COORDINATE', help='draw a vertical line')
+visual_options.add_option('--horizontal', type='float', action='store', dest='horizontal', metavar='COORDINATE', help='draw a vertical line')
 
 # Individual sample options
 sample_options = OptionGroup(parser, 'Individual Sample Options', 'Set individual sample options with --treeN --errorN --legN --colorN.')
@@ -68,21 +74,33 @@ sample_options.add_option('--tree2', type='string', action='store', dest='treena
 sample_options.add_option('--tree3', type='string', action='store', dest='treename3', help=SUPPRESS_HELP)
 sample_options.add_option('--tree4', type='string', action='store', dest='treename4', help=SUPPRESS_HELP)
 sample_options.add_option('--tree5', type='string', action='store', dest='treename5', help=SUPPRESS_HELP)
+sample_options.add_option('--tree6', type='string', action='store', dest='treename6', help=SUPPRESS_HELP)
+sample_options.add_option('--tree7', type='string', action='store', dest='treename7', help=SUPPRESS_HELP)
+sample_options.add_option('--tree8', type='string', action='store', dest='treename8', help=SUPPRESS_HELP)
 sample_options.add_option('--error1', action='store_true', dest='error1', help=SUPPRESS_HELP)
 sample_options.add_option('--error2', action='store_true', dest='error2', help=SUPPRESS_HELP)
 sample_options.add_option('--error3', action='store_true', dest='error3', help=SUPPRESS_HELP)
 sample_options.add_option('--error4', action='store_true', dest='error4', help=SUPPRESS_HELP)
 sample_options.add_option('--error5', action='store_true', dest='error5', help=SUPPRESS_HELP)
+sample_options.add_option('--error6', action='store_true', dest='error6', help=SUPPRESS_HELP)
+sample_options.add_option('--error7', action='store_true', dest='error7', help=SUPPRESS_HELP)
+sample_options.add_option('--error8', action='store_true', dest='error8', help=SUPPRESS_HELP)
 sample_options.add_option('--leg', '--leg1', type='string', action='store', dest='legend1', help=SUPPRESS_HELP)
 sample_options.add_option('--leg2', type='string', action='store', dest='legend2', help=SUPPRESS_HELP)
 sample_options.add_option('--leg3', type='string', action='store', dest='legend3', help=SUPPRESS_HELP)
 sample_options.add_option('--leg4', type='string', action='store', dest='legend4', help=SUPPRESS_HELP)
 sample_options.add_option('--leg5', type='string', action='store', dest='legend5', help=SUPPRESS_HELP)
+sample_options.add_option('--leg6', type='string', action='store', dest='legend6', help=SUPPRESS_HELP)
+sample_options.add_option('--leg7', type='string', action='store', dest='legend7', help=SUPPRESS_HELP)
+sample_options.add_option('--leg8', type='string', action='store', dest='legend8', help=SUPPRESS_HELP)
 sample_options.add_option('--color', '--color1', type='string', action='store', dest='color1', help=SUPPRESS_HELP)
 sample_options.add_option('--color2', type='string', action='store', dest='color2', help=SUPPRESS_HELP)
 sample_options.add_option('--color3', type='string', action='store', dest='color3', help=SUPPRESS_HELP)
 sample_options.add_option('--color4', type='string', action='store', dest='color4', help=SUPPRESS_HELP)
 sample_options.add_option('--color5', type='string', action='store', dest='color5', help=SUPPRESS_HELP)
+sample_options.add_option('--color6', type='string', action='store', dest='color6', help=SUPPRESS_HELP)
+sample_options.add_option('--color7', type='string', action='store', dest='color7', help=SUPPRESS_HELP)
+sample_options.add_option('--color8', type='string', action='store', dest='color8', help=SUPPRESS_HELP)
 
 parser.add_option_group(visual_options)
 parser.add_option_group(twod_options)
@@ -95,9 +113,9 @@ sys.argv = []
 # import colors
 from ROOT import kRed
 from ROOT import kWhite
-from ROOT import kBlack 
-from ROOT import kGray 
-from ROOT import kRed 
+from ROOT import kBlack
+from ROOT import kGray
+from ROOT import kRed
 from ROOT import kGreen 
 from ROOT import kBlue 
 from ROOT import kYellow 
@@ -116,7 +134,10 @@ if (not options.treename1==None) or \
    (not options.treename2==None) or \
    (not options.treename3==None) or \
    (not options.treename4==None) or \
-   (not options.treename5==None):
+   (not options.treename5==None) or \
+   (not options.treename6==None) or \
+   (not options.treename7==None) or \
+   (not options.treename8==None):
   ind_treenames = True
 
 ind_errors = False
@@ -124,7 +145,10 @@ if (not options.error1==None) or \
    (not options.error2==None) or \
    (not options.error3==None) or \
    (not options.error4==None) or \
-   (not options.error5==None):
+   (not options.error5==None) or \
+   (not options.error6==None) or \
+   (not options.error7==None) or \
+   (not options.error8==None):
   ind_errors = True
 
 twod_mode = False
@@ -142,7 +166,10 @@ if (not options.var1==None) or \
    (not options.var2==None) or \
    (not options.var3==None) or \
    (not options.var4==None) or \
-   (not options.var5==None):
+   (not options.var5==None) or \
+   (not options.var6==None) or \
+   (not options.var7==None) or \
+   (not options.var8==None):
   multivar_mode = True
 
 if multivar_mode and twod_mode:
@@ -189,6 +216,9 @@ else:
   variables.append([options.var3, options.legend3, options.color3])
   variables.append([options.var4, options.legend4, options.color4])
   variables.append([options.var5, options.legend5, options.color5])
+  variables.append([options.var6, options.legend6, options.color6])
+  variables.append([options.var7, options.legend7, options.color7])
+  variables.append([options.var8, options.legend8, options.color8])
   for var in variables:
     variable = {}
     variable['path'] = args[0]
@@ -520,7 +550,10 @@ if options.save == None:
         draw_option += ' e'
       hist.Draw(draw_option)
   # Legend
-  leg = ROOT.TLegend(0.55, 0.80, 0.9, 0.9)
+  if not options.legleft:
+    leg = ROOT.TLegend(0.55, 0.9-(0.028*len(samples)), 0.9, 0.9)
+  else:
+    leg = ROOT.TLegend(0.1, 0.9-(0.028*len(samples)), 0.45, 0.9)
   for sample in samples:
     hist = sample['summed_hist']
     if sample['label'] == None:
@@ -530,22 +563,46 @@ if options.save == None:
   if not options.legoff:
     leg.Draw("same")
   c.Modified()
-
-if not options.saveplot == None:
-  print("Writing plot to file " + options.saveplot + "...")
-  filename = options.saveplot
-  c.SaveAs(filename)
+# optional lines
+if not options.vertical == None:
+  pos = options.vertical
+  maxi = samples[0]['summed_hist'] if not (options.stacked or options.sidebyside) else hs
+  vert_line = ROOT.TLine(pos, 0, pos, maxi)
+  vert_line.Draw("same")
+if not options.horizontal == None:
+  pos = options.horizontal
+  maxi = samples[0]['summed_hist'] if not (options.stacked or options.sidebyside) else hs
+  horz_line = ROOT.TLine(0, pos, maxi, pos)
+  horz_line.Draw("same")
 
 time_end = time.time()
 print("Elapsed Time: ", (time_end - time_begin))
 
 if not options.saveplot == None:
+  print("Writing plot to file " + options.saveplot + "...")
+  filename = options.saveplot
+  c.SaveAs(filename)
   sys.exit()
 
 # After plot Commands
-hists = []
-for sample in samples:
-  samples[0]['summed_hist']
+draws = []
+if options.stacked:
+  draws.append([hs, 'hist same'])
+elif options.sidebyside:
+  draws.append([hs, 'hist same nostackb'])
+else:
+  for sample in samples:
+    if twod_mode:
+      draws.append([sample['summed_hist'],'same Colz'])
+    else:
+      draws.append([sample['summed_hist'],'same'])
+if not options.legoff:
+  draws.append([leg, 'same'])
+
+if options.stacked or options.sidebyside:
+  hist = hs
+else:
+  hist = samples[0]['summed_hist']
 
 cmd = "start"
 while not cmd == "":
@@ -558,12 +615,6 @@ while not cmd == "":
   else:
     cmd = inp[0:i]
     opt = inp[i+1:len(inp)]
-
-  # setup
-  if options.stacked or options.sidebyside:
-    hist = hs
-  else:
-    hist = samples[0]['summed_hist']
 
   # begin commands
   if cmd == "save" or cmd == "saveas":
@@ -579,11 +630,10 @@ while not cmd == "":
       sys.stdout.write(' ')
       sys.stdout.flush()
       new_title = raw_input("Enter title for plot: ")
-      hist.SetTitle(new_title)
-      c.Modified()
     else:  
-      hist.SetTitle(opt)
-      c.Modified()
+      new_title = opt
+    hist.SetTitle(new_title)
+    c.Modified()
   elif cmd == "fit":
     if opt=="":
       print("Must supply second argument to", cmd)
@@ -597,8 +647,7 @@ while not cmd == "":
     pos = float(opt)
     vert_line = ROOT.TLine(pos, 0, pos, hist.GetMaximum())
     vert_line.Draw("same")
-    #if not options.legoff:
-    #  leg.Draw("same")
+    draws.append(vert_line)
   elif cmd == "horizontal":
     if opt=="":
       print("Must supply second argument to", cmd)
@@ -606,8 +655,7 @@ while not cmd == "":
     pos = float(opt)
     horz_line = ROOT.TLine(0, pos, high, pos)
     horz_line.Draw("same")
-    #if not options.legoff:
-    #  leg.Draw("same")
+    draws.append(horz_line)
   elif cmd == "options":
     print("save FILENAME    saves current canvas, optionally with supplied name\n" +\
           "saveas           alias for save\n" +\
@@ -617,4 +665,4 @@ while not cmd == "":
           "title NEW_TITLE  changes plot title to NEW_TITLE\n" +\
           "")
   elif not cmd == "":
-    print("not a valid command")
+    print("Not a valid command------------------------X")
