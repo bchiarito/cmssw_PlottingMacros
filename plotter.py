@@ -256,7 +256,7 @@ for sample in samples:
       print("It appears", path, "is a text file of inputs")
     ISinputfile = True
   else:
-    print("Do not recognize", path, ", must end with /, .root, or .dat")
+    print("Can not recognize input", path, ", must end with /, .root, or .dat")
     sys.exit()
 
   if ISrootfile:
@@ -551,9 +551,9 @@ if options.save == None:
       hist.Draw(draw_option)
   # Legend
   if not options.legleft:
-    leg = ROOT.TLegend(0.55, 0.9-(0.028*len(samples)), 0.9, 0.9)
+    leg = ROOT.TLegend(0.55, 0.9-(0.03*len(samples)), 0.9, 0.9)
   else:
-    leg = ROOT.TLegend(0.1, 0.9-(0.028*len(samples)), 0.45, 0.9)
+    leg = ROOT.TLegend(0.1, 0.9-(0.03*len(samples)), 0.45, 0.9)
   for sample in samples:
     hist = sample['summed_hist']
     if sample['label'] == None:
@@ -625,6 +625,19 @@ while not cmd == "":
       c.SaveAs(filename)
     else:
       c.SaveAs(opt)
+  elif cmd == "savehist":
+    if opt=="":
+      sys.stdout.write(' ')
+      sys.stdout.flush()
+      filename = raw_input("Enter filename: ")
+      rootfile = ROOT.TFile(filename, "CREATE")
+      rootfile.cd()
+    else:
+      rootfile = ROOT.TFile(opt, "CREATE")
+      rootfile.cd()
+    for sample in samples:
+      sample['summed_hist'].Write()
+    rootfile.Close()
   elif cmd == "title":
     if opt=="":
       sys.stdout.write(' ')
@@ -640,6 +653,10 @@ while not cmd == "":
       continue
     hist.Fit(opt)
     c.Modified()
+    for draw in draws:
+      draw[0].Draw(draw[1])
+    if not options.legoff:
+      leg.Draw("same")
   elif cmd == "vertical":
     if opt=="":
       print("Must supply second argument to", cmd)
@@ -647,6 +664,8 @@ while not cmd == "":
     pos = float(opt)
     vert_line = ROOT.TLine(pos, 0, pos, hist.GetMaximum())
     vert_line.Draw("same")
+    if not options.legoff:
+      leg.Draw("same")
     draws.append(vert_line)
   elif cmd == "horizontal":
     if opt=="":
@@ -655,14 +674,17 @@ while not cmd == "":
     pos = float(opt)
     horz_line = ROOT.TLine(0, pos, high, pos)
     horz_line.Draw("same")
+    if not options.legoff:
+      leg.Draw("same")
     draws.append(horz_line)
   elif cmd == "options":
-    print("save FILENAME    saves current canvas, optionally with supplied name\n" +\
-          "saveas           alias for save\n" +\
-          "fit FIT          fits with supplied fitting function, only fits sample1\n" +\
-          "vertical NUM     draws a vertical line at xvalue=NUM\n" +\
-          "horizontal NUM   draws a horizontal line at yvalue=NUM\n" +\
-          "title NEW_TITLE  changes plot title to NEW_TITLE\n" +\
+    print("save FILENAME     saves current canvas, optionally with supplied name\n" +\
+          "saveas            alias for save\n" +\
+          "savehist FILENAME saves histograms into file" +\
+          "fit FIT           fits with supplied fitting function, only fits sample1\n" +\
+          "vertical NUM      draws a vertical line at xvalue=NUM\n" +\
+          "horizontal NUM    draws a horizontal line at yvalue=NUM\n" +\
+          "title NEW_TITLE   changes plot title to NEW_TITLE\n" +\
           "")
   elif not cmd == "":
     print("Not a valid command------------------------X")
