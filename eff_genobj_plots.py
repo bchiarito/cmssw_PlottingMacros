@@ -32,7 +32,7 @@ objs = []
 count = 0
 for fi in files:
   obj = fi.Get('eff_genobj_'+var)
-  'obj.SetLineColor(kPink+count)'
+  obj.SetLineColor(kPink+count)
   '''if count == 0:
     obj.SetLineColor(kBlue+4)
     obj.SetMarkerStyle(5)
@@ -42,16 +42,17 @@ for fi in files:
     obj.SetLineColor(kPink+2)
   if count == 3:
     obj.SetLineColor(kPink)''' 
-  if count == 0:
-    obj.SetLineColor(kBlue)
-  elif count == 4:
-    obj.SetLineColor(kRed)
+  #if count == 0:
+  #  obj.SetLineColor(kBlue)
+  #elif count == 4:
+  #  obj.SetLineColor(kRed)
   #elif count == 0:
   #  obj.SetLineColor(kGray+2)
   #else:
   #  obj.SetLineColor(kGray)
-  else:
-    obj.SetLineColor(kBlack)
+  #else:
+  #  obj.SetLineColor(kBlack)
+  
   count += 1
   objs.append(obj)
     

@@ -88,21 +88,21 @@ for event in chain:
     print 'Processing {0:10.0f}/{1:10.0f} : {2:5.2f} %'.format(count, total, percentDone )
   count += 1
 
-  for i in range(len(event.GenEta_candDR)):
+  for i in range(len(event.GenOmega_objDR)):
     genetas_total += 1
-    if event.GenEta_candDR[i] < 0.1:
+    if event.GenOmega_candobjDR[i] < 0.1:
       genetas_matchedToCand += 1
-    if event.GenEta_passedCandDR[i] < 0.1:
+    if event.GenOmega_objDR[i] < 0.1:
       genetas_matchedToPass += 1
-    if event.GenEta_jetDR[i] < 0.1:
+    if event.GenOmega_jetDR[i] < 0.1:
       genetas_matchedToJet += 1
-    eff_genobj_pt_denom.Fill(event.GenEta_pt[i])
-    eff_genobj_phi_denom.Fill(event.GenEta_phi[i])
-    eff_genobj_eta_denom.Fill(event.GenEta_eta[i])
-    if event.GenEta_candDR[i] < 0.1:
-      eff_genobj_pt_numer.Fill(event.GenEta_pt[i]) 
-      eff_genobj_phi_numer.Fill(event.GenEta_phi[i]) 
-      eff_genobj_eta_numer.Fill(event.GenEta_eta[i]) 
+    eff_genobj_pt_denom.Fill(event.GenOmega_pt[i])
+    eff_genobj_phi_denom.Fill(event.GenOmega_phi[i])
+    eff_genobj_eta_denom.Fill(event.GenOmega_eta[i])
+    if event.GenOmega_candobjDR[i] < 0.1:
+      eff_genobj_pt_numer.Fill(event.GenOmega_pt[i]) 
+      eff_genobj_phi_numer.Fill(event.GenOmega_phi[i]) 
+      eff_genobj_eta_numer.Fill(event.GenOmega_eta[i]) 
    
   # reco object basis
   event_tightmatched = 0.0
@@ -146,12 +146,12 @@ for event in chain:
 
 
 # print cutflow
-print ""
-print "-Per Generator Object basis-"
-print "fraction of Gen a0s matched to cand  twoprong:", genetas_matchedToCand / genetas_total
-print "fraction of Gen a0s matched to tight twoprong:", genetas_matchedToPass / genetas_total
-print "fraction of Gen a0s matched to ak4 jet       :", genetas_matchedToJet / genetas_total
-print ""
+#print ""
+#print "-Per Generator Object basis-"
+#print "fraction of Gen a0s matched to cand  twoprong:", genetas_matchedToCand / genetas_total
+#print "fraction of Gen a0s matched to tight twoprong:", genetas_matchedToPass / genetas_total
+#print "fraction of Gen a0s matched to ak4 jet       :", genetas_matchedToJet / genetas_total
+#print ""
 print "-Per RECO Object basis-"
 print "fraction of tight TwoProngs matched to Gen a0:", tightcands_matched / tightcands_total
 #print "fraction of cand  TwoProngs matched to Gen a0:", loosecands_matched / loosecands_total
