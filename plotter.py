@@ -442,11 +442,13 @@ for sample in samples:
   # Stats
   hist.SetStats(0)
   # Scale
-  if sample['error']:
-    hist.Sumw2()
-  else:
-    hist.SetMarkerSize(1)
-    hist.SetMarkerStyle(2)
+  #if sample['error']:
+  #  print("test")
+  #  hist.Sumw2()
+  #  print("test2")
+  #else:
+  #  hist.SetMarkerSize(1)
+  #  hist.SetMarkerStyle(2)
   if options.scale:
     if not hist.Integral() == 0:
       hist.Scale(100.0/hist.Integral())
@@ -546,7 +548,7 @@ if options.save == None:
         draw_option = 'hist same'
       if twod_mode:
         draw_option += ' Colz'
-      if sample['error'] or options.errors:
+      if sample['error']:
         draw_option += ' e'
       hist.Draw(draw_option)
   # Legend
