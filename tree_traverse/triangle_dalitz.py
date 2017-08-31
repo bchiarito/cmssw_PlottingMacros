@@ -26,7 +26,7 @@ parser.add_option('--logz', action='store_true', default=False, dest='logz', hel
 parser.add_option('--lumi', dest='lumi', default=1.0,help='integrated lumi in pb^-1')
 parser.add_option('--2016lumi', action='store_true', default=False, dest='lumi_set_to_2016', help='')
 
-parser.add_option('--tight', dest="tight", action='store_true',default=True)
+parser.add_option('--tight', dest="tight", action='store_true', default=True)
 parser.add_option('--cand', dest="tight", action='store_false')
 
 parser.add_option('--leading',dest="use_leading", action='store_true')
@@ -149,7 +149,9 @@ hist_ds = TH1F('ds', 'sum distance squared', 90,0,1.8)
 
 pvl = TH2F('pvl' ,'photon vs larger', 100,0,1, 100,0,1)
 pvs = TH2F('pvs' ,'photon vs smaller', 100,0,1, 100,0,1)
-full_pt = TH2F('full_pt' ,'pT asymmetry', 100,0,1, 100,0,1)
+
+double_pt = TH2F('double_pt' ,'pT asymmetry', 100,0,1, 100,0,1)
+triple_pt = TH2F('triple_pt' ,'pT asymmetry', 100,0,1, 100,0,1)
 
 for entry in range(len(entries)):
   chain = entries[entry][0]
@@ -376,6 +378,19 @@ for entry in range(len(entries)):
         pt1 = pt_track1 / norm
         pt2 = pt_track2 / norm
 
+        high = max(ptg, pt1, pt2)
+        low = min(ptg, pt1, pt2)
+        if pt1 < high and pt1 > low:
+          mid = pt1
+        if pt2 < high and pt2 > low:
+          mid = pt2
+        if ptg < high and ptg > low:
+          mid = ptg
+
+        hvm.Fill(mid, high, xs*lumi/N)
+        hvl.Fill(low, high, xs*lumi/N)
+        mvl.Fill(low, mid, xs*lumi/N)
+
         pvl.Fill(max(pt1, pt2), ptg, xs*lumi/N)
         pvs.Fill(min(pt1, pt2), ptg, xs*lumi/N)
 
@@ -387,8 +402,11 @@ elif triplever:
   full.Add(hvl)
   full.Add(mvl)
 elif ptver:
-  full_pt.Add(pvl)
-  full_pt.Add(pvs)
+  double_pt.Add(pvl)
+  double_pt.Add(pvs)
+  triple_pt.Add(hvm)
+  triple_pt.Add(hvl)
+  triple_pt.Add(mvl)
 
 time_end = time.time()
 print "Elapsed Time: ", (time_end - time_begin)
@@ -412,12 +430,12 @@ if options.plot:
       full.SetTitle(options.title)
     full.Draw('Colz')
   elif ptver:
-    full_pt.GetYaxis().SetTitle('normalized photon pt')
-    full_pt.GetXaxis().SetTitle('normalized smaller track pt, larger track pt')
-    full_pt.SetStats(0)
+    double_pt.GetYaxis().SetTitle('normalized photon pt')
+    double_pt.GetXaxis().SetTitle('normalized smaller track pt, larger track pt')
+    double_pt.SetStats(0)
     if not options.title == None:
-      full_pt.SetTitle(options.title)
-    full_pt.Draw('Colz')
+      double_pt.SetTitle(options.title)
+    double_pt.Draw('Colz')
 
   if not options.saveplot == None:
     c.SaveAs(options.saveplot)
