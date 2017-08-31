@@ -25,6 +25,7 @@ parser.add_option('--logz', action='store_true', default=False, dest='logz', hel
 
 parser.add_option('--lumi', dest='lumi', default=1.0,help='integrated lumi in pb^-1')
 parser.add_option('--2016lumi', action='store_true', default=False, dest='lumi_set_to_2016', help='')
+parser.add_option('--mcweight', action='store_true', default=False, dest='mcweight', help='')
 
 parser.add_option('--tight', dest="tight", action='store_true', default=True)
 parser.add_option('--cand', dest="tight", action='store_false')
@@ -172,6 +173,12 @@ for entry in range(len(entries)):
       else:
         print 'Processing {0:10.0f}/{1:10.0f} : {2:5.2f} %'.format(count, total, percentDone )
     count += 1
+
+    if options.mcweight:
+      xs = event.mcXS
+      N = event.mcN
+      if not options.smallrun == None:
+        N = min(N, int(options.smallrun))
 
     if options.tight and not ptver:
       for i in range(len(event.TwoProng_pt)):
