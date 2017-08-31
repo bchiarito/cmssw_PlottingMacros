@@ -86,6 +86,7 @@ if (not options.dir) and (not options.dat):
   chain.Add(options.file)
   entries.append([chain, 1.0, 1.0])
 elif options.dir:
+  chain = TChain(options.treename)
   rootfiles = []
   for root, dirnames, filenames in os.walk(options.file):
     for filename in fnmatch.filter(filenames, '*.root'):
