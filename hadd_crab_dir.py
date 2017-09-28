@@ -2,6 +2,7 @@ import sys
 import os
 from subprocess import call
 from optparse import OptionParser
+import time
 
 time_begin = time.time()
 
@@ -52,7 +53,7 @@ if response == "y":
     call(command, shell=True)
 
 if options.onefile and options.weightfile == "":
-  hadd_command = "hadd "+path[0:len(path)-1]+".root "
+  hadd_command = "hadd "+path[0:len(path)]+".root "
   for rootfile in rootfiles:
     hadd_command += rootfile+" "
   print "\n" + hadd_command
@@ -72,7 +73,7 @@ if options.onefile and options.weightfile == "":
         os.remove(rootfile)
 
 if options.weightfile != "":
-  merge_command = "mergeTFileServiceHistograms --output-file " + path[0:len(path)-1] + ".root --input-files "
+  merge_command = "mergeTFileServiceHistograms --output-file " + path[0:len(path)] + ".root --input-files "
   for rootfile in rootfiles:
     merge_command += rootfile+" "
   weights_file = open(options.weightfile)
