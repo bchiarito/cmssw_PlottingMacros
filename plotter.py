@@ -682,7 +682,7 @@ while not cmd == "":
   elif cmd == "options":
     print("save FILENAME     saves current canvas, optionally with supplied name\n" +\
           "saveas            alias for save\n" +\
-          "savehist FILENAME saves histograms into file" +\
+          "savehist FILENAME saves histograms into file\n" +\
           "fit FIT           fits with supplied fitting function, only fits sample1\n" +\
           "vertical NUM      draws a vertical line at xvalue=NUM\n" +\
           "horizontal NUM    draws a horizontal line at yvalue=NUM\n" +\
