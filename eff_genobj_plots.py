@@ -29,10 +29,12 @@ for i in range(len(args)):
 var = "pt"
 
 objs = []
-count = 0
+count = 1
 for fi in files:
   obj = fi.Get('eff_genobj_'+var)
-  obj.SetLineColor(kPink+count)
+  if count == 7:
+    count += 1
+  obj.SetLineColor(count)
   '''if count == 0:
     obj.SetLineColor(kBlue+4)
     obj.SetMarkerStyle(5)
@@ -52,10 +54,8 @@ for fi in files:
   #  obj.SetLineColor(kGray)
   #else:
   #  obj.SetLineColor(kBlack)
-  
   count += 1
   objs.append(obj)
-    
 
 c = TCanvas()
 c.cd()
