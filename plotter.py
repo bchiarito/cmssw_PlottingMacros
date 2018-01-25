@@ -552,6 +552,11 @@ if options.save == None:
         draw_option += ' e'
       hist.Draw(draw_option)
   # Legend
+  legendtype = ""
+  if options.stacked or options.sidebyside:
+    legendtype = "f"
+  else:
+    legendtype = "l"
   if not options.legleft:
     leg = ROOT.TLegend(0.55, 0.9-(0.03*len(samples)), 0.9, 0.9)
   else:
@@ -559,9 +564,9 @@ if options.save == None:
   for sample in samples:
     hist = sample['summed_hist']
     if sample['label'] == None:
-      leg.AddEntry(hist, sample['path'], "l")
+      leg.AddEntry(hist, sample['path'], legendtype)
     else:
-      leg.AddEntry(hist, sample['label'], "l")  
+      leg.AddEntry(hist, sample['label'], legendtype)  
   if not options.legoff:
     leg.Draw("same")
   c.Modified()
