@@ -19,13 +19,14 @@ parser = OptionParser(usage=usage)
 parser.add_option('-v', '--var', type='string', action='store', dest='var', help='variable in TTree to plot')
 parser.add_option('-b', '--bin', '--bins', type='string', metavar='NUM,LOW,HIGH', action='store', default='100,0,100', dest='binning', help='')
 parser.add_option('-c', '--cut', type='string', action='store', default='', dest='cut', metavar='CUT_STRING', help='')
+parser.add_option('--tree', '--trees', type='string', action='store', dest='treename', default='diphotonAnalyzer/fTree2', metavar='PATH_TO_TREE', help='')
 parser.add_option('--noplot', action='store_true', default=False, dest='noplot', help='do not plot anything, just gives cutflow')
 parser.add_option('--savehist', type='string',action='store', dest='save', metavar='ROOTFILE.root', help='saves histograms')
 parser.add_option('--save', '--saveas', type='string',action='store', dest='saveplot', metavar='FILE.ext', help='saves canvas')
 parser.add_option('-q','--quiet', action='store_true', default=False, dest='quiet', help='less output')
 parser.add_option('--verb', '--verbose', action='store_false', dest='quiet', help='more output')
 parser.add_option('-n', '--num', type='int', action='store', default=-1, dest='nentries', metavar='MAX_ENTRIES', help='')
-parser.add_option('--tree', '--trees', type='string', action='store', dest='treename', default='diphotonAnalyzer/fTree2', metavar='PATH_TO_TREE', help='')
+parser.add_option('--events', action='store_true', default=False, dest='printevents', help='print events that pass cut')
 
 # multivar options
 multivar_options = OptionGroup(parser, 'Multi-Variable Options', 'Setting --var1 --var2 ... --varN puts plotter in mutli-variable mode')
@@ -176,7 +177,7 @@ if multivar_mode and twod_mode:
   print("Multi-variable mode and 2D mode are not compatible")
   sys.exit()
 
-if not multivar_mode and not twod_mode and options.var == None:
+if not multivar_mode and not twod_mode and not options.printevents and options.var == None:
   print("Must supply the name of the variable to be plotted with --var")
   sys.exit()
 
@@ -324,6 +325,31 @@ for sample in samples:
         print(line)
       sample['entries'].append([chain, xs, N])
      
+# Print matching events
+if options.printevents:
+  num_selected_events = 0
+  num_selected_events_dumped = 0
+  continue_dumping_events = True
+  for entry in sample['entries']:
+    chain = entry[0]
+    selected_tree = chain.CopyTree(options.cut)
+    num_selected_events += selected_tree.GetEntries()
+    for event in selected_tree:
+      if continue_dumping_events:
+        print("", "run ", event.runNum, " lumi ", event.lumiNum, " event", event.eventNum)
+        num_selected_events_dumped += 1
+        if num_selected_events_dumped % 20 == 0:
+          inp = raw_input("[Enter] to continue printing events, 'stop' to stop: ")
+          if inp == 'stop':
+            continue_dumping_events = False
+      else:
+        break
+  print("Events matching cut: ", num_selected_events)
+  time_end = time.time()
+  print("Elapsed Time: ", "%.1f" % (time_end - time_begin), "sec")
+  sys.exit() 
+    
+# Draw into histograms from Chain
 if not options.quiet:
   print("Drawing into histogram...")
 
@@ -332,7 +358,6 @@ i2 = string.rindex(options.binning,',')
 bins = int(options.binning[0:i1])
 low = float(options.binning[i1+1:i2])
 high = float(options.binning[i2+1:len(options.binning)])
-
 if twod_mode:
   i1x = string.index(options.binningx,',')
   i2x = string.rindex(options.binningx,',')
@@ -367,7 +392,6 @@ for sample in samples:
       cut_string = "("+cut_string+")*(mcXS*"+str(lumi)+"/min(mcN,"+options.smallrun+"))"
     elif options.mcweight and options.smallrun == None:
       cut_string = "("+cut_string+")*(mcXS*"+str(lumi)+"/mcN)"
-    # TTree.Draw()
     if options.nentries == -1:
       chain.Draw(draw_string, cut_string, "goff")
     else:
