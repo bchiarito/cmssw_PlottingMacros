@@ -26,7 +26,7 @@ parser.add_option('--save', '--saveas', type='string',action='store', dest='save
 parser.add_option('-q','--quiet', action='store_true', default=False, dest='quiet', help='less output')
 parser.add_option('--verb', '--verbose', action='store_false', dest='quiet', help='more output')
 parser.add_option('-n', '--num', type='int', action='store', default=-1, dest='nentries', metavar='MAX_ENTRIES', help='')
-parser.add_option('--events', action='store_true', default=False, dest='printevents', help='print events that pass cut')
+parser.add_option('--printevents', action='store_true', default=False, dest='printevents', help='print events that pass cut')
 
 # multivar options
 multivar_options = OptionGroup(parser, 'Multi-Variable Options', 'Setting --var1 --var2 ... --varN puts plotter in mutli-variable mode')
