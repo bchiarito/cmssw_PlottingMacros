@@ -24,7 +24,7 @@ parser.add_option('--noplot', action='store_true', default=False, dest='noplot',
 parser.add_option('--savehist', type='string',action='store', dest='save', metavar='ROOTFILE.root', help='saves histograms')
 parser.add_option('--save', '--saveas', type='string',action='store', dest='saveplot', metavar='FILE.ext', help='saves canvas')
 parser.add_option('-q','--quiet', action='store_true', default=False, dest='quiet', help='less output')
-parser.add_option('--verb', '--verbose', action='store_false', dest='quiet', help='more output')
+parser.add_option('--verb', '--verbose', action='store_true', dest='verbose', help='more output')
 parser.add_option('-n', '--num', type='int', action='store', default=-1, dest='nentries', metavar='MAX_ENTRIES', help='')
 parser.add_option('--printevents', action='store_true', default=False, dest='printevents', help='print events that pass cut')
 
@@ -181,11 +181,24 @@ if twod_mode and (options.var==None or options.vary==None or options.binning==No
   print("Must supply options --varx, --vary, --binsx, --binsy for use with 2D plotting mode")
   sys.exit()
 
+if options.quiet and options.verbose:
+  print("Output levels --quiet and --verbose cannot both be set")
+  sys.exit()
+
+# debug level  
+debug = 1
+if options.quiet:
+  debug = 0
+if options.verbose:
+  debug = 2
+
+# lumi
 if options.lumi_set_to_2016:
   lumi = 41010.0
 else:
   lumi = options.lumi
 
+# collection of samples
 samples = []
 if not multivar_mode:
   for i in range(len(args)):
@@ -241,15 +254,15 @@ for sample in samples:
   ISdirectory = False
   ISinputfile = False
   if fnmatch.fnmatch(path, "*.root"):
-    if not options.quiet:
+    if debug >= 2:
       print("It appears", path, "is a rootfile")
     ISrootfile = True
   elif fnmatch.fnmatch(path, "*/"):
-    if not options.quiet:
+    if debug >= 2:
       print("It appears", path, "is a directory to traverse")
     ISdirectory = True
   elif fnmatch.fnmatch(path, "*.dat"):
-    if not options.quiet:
+    if debug >= 2:
       print("It appears", path, "is a text file of inputs")
     ISinputfile = True
   else:
@@ -340,13 +353,15 @@ if options.printevents:
             continue_dumping_events = False
       else:
         break
-  print("Events matching cut: ", num_selected_events)
+  if debug>=1:
+    print("Events matching cut: ", num_selected_events)
   time_end = time.time()
-  print("Elapsed Time: ", "%.1f" % (time_end - time_begin), "sec")
+  if debug>=1:
+    print("Elapsed Time: ", "%.1f" % (time_end - time_begin), "sec")
   sys.exit() 
     
 # Draw into histograms from Chain
-if not options.quiet:
+if debug>=2:
   print("Drawing into histogram...")
 
 i1 = string.index(options.binning,',')
@@ -402,23 +417,29 @@ for sample in samples:
 count = 1
 for sample in samples:
   hist = sample['summed_hist']
-  print("Entries " + str(count) + "  : ", int(hist.GetEntries()), end='')
+  if debug>=1:
+    print("Entries " + str(count) + "  : ", int(hist.GetEntries()), end='')
   if not twod_mode:
     if not int(hist.GetBinContent(0)) == 0:
-      print(" : Underflow " + " - ", int(hist.GetBinContent(0)), end='')
+      if debug>=1:
+        print(" : Underflow " + " - ", int(hist.GetBinContent(0)), end='')
     if not int(hist.GetBinContent(bins+1)) == 0:
-      print(" : Overflow " + " - ", int(hist.GetBinContent(bins+1)), end='')
-  print("")
+      if debug>=1:
+        print(" : Overflow " + " - ", int(hist.GetBinContent(bins+1)), end='')
+  if debug>=1:
+    print("")
   count += 1
 
 if options.noplot:
   time_end = time.time()
-  print("Elapsed Time: ", (time_end - time_begin))
+  if debug>=1:
+    print("Elapsed Time: ", (time_end - time_begin))
   sys.exit()
 
 if not options.save == None:
   outfilename = options.save
-  print("Writing histogram(s) to file " + outfilename + ".root...")
+  if debug>=2:
+    print("Writing histogram(s) to file " + outfilename + ".root...")
   outputfile = ROOT.TFile(outfilename+'.root',"recreate")
   outputfile.cd()
   for sample in samples:
@@ -428,10 +449,11 @@ if not options.save == None:
   outputfile.Close()
 
   time_end = time.time()
-  print("Elapsed Time: ", (time_end - time_begin))
+  if debug>=1:
+    print("Elapsed Time: ", (time_end - time_begin))
   sys.exit()
   
-if not options.quiet:
+if debug>=2:
   print("Plotting...")
 c = ROOT.TCanvas()
 c.cd()
@@ -462,13 +484,6 @@ for sample in samples:
   # Stats
   hist.SetStats(0)
   # Scale
-  #if sample['error']:
-  #  print("test")
-  #  hist.Sumw2()
-  #  print("test2")
-  #else:
-  #  hist.SetMarkerSize(1)
-  #  hist.SetMarkerStyle(2)
   if options.scale:
     if not hist.Integral() == 0:
       hist.Scale(100.0/hist.Integral())
@@ -603,9 +618,11 @@ if not options.horizontal == None:
   horz_line.Draw("same")
 
 time_end = time.time()
-print("Elapsed Time: ", (time_end - time_begin))
+if debug>=1:
+  print("Elapsed Time: ", (time_end - time_begin))
 
 if not options.saveplot == None:
+  if debug>=2:
   print("Writing plot to file " + options.saveplot + "...")
   filename = options.saveplot
   c.SaveAs(filename)
