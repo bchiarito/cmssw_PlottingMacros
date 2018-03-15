@@ -16,8 +16,8 @@ usage = "Usage: %prog [options] sample1 sample2 sample3 ... -v VAR -b BINNING -c
 parser = OptionParser(usage=usage)
 
 # Basic options
-parser.add_option('-v', '--var', type='string', action='store', dest='var', help='variable in TTree to plot')
-parser.add_option('-b', '--bin', '--bins', type='string', metavar='NUM,LOW,HIGH', action='store', default='100,0,100', dest='binning', help='')
+parser.add_option('-v', '--var', '--varx', type='string', action='store', dest='var', help='variable in TTree to plot')
+parser.add_option('-b', '--bin', '--bins', '--binsx', '--binx', type='string', metavar='NUM,LOW,HIGH', action='store', default='100,0,100', dest='binning', help='')
 parser.add_option('-c', '--cut', type='string', action='store', default='', dest='cut', metavar='CUT_STRING', help='')
 parser.add_option('--tree', '--trees', type='string', action='store', dest='treename', default='diphotonAnalyzer/fTree2', metavar='PATH_TO_TREE', help='')
 parser.add_option('--noplot', action='store_true', default=False, dest='noplot', help='do not plot anything, just gives cutflow')
@@ -41,9 +41,7 @@ multivar_options.add_option('--var8', type='string', action='store', dest='var8'
 
 # 2D options
 twod_options = OptionGroup(parser, '2D Plot Options', 'Setting these puts plotter in 2D mode')
-twod_options.add_option('--varx', type='string', action='store', dest='varx', help='')
 twod_options.add_option('--vary', type='string', action='store', dest='vary', help='')
-twod_options.add_option('--binx', '--binsx', type='string', action='store', dest='binningx', help='')
 twod_options.add_option('--biny', '--binsy', type='string', action='store', dest='binningy', help='')
 
 # Visual options
@@ -153,9 +151,7 @@ if (not options.error1==None) or \
   ind_errors = True
 
 twod_mode = False
-if (not options.varx==None) or \
-   (not options.vary==None) or \
-   (not options.binningx==None) or \
+if (not options.vary==None) or \
    (not options.binningy==None):
   twod_mode = True
 
@@ -181,7 +177,7 @@ if not multivar_mode and not twod_mode and not options.printevents and options.v
   print("Must supply the name of the variable to be plotted with --var")
   sys.exit()
 
-if twod_mode and (options.varx==None or options.vary==None or options.binningx==None or options.binningy==None):
+if twod_mode and (options.var==None or options.vary==None or options.binning==None or options.binningy==None):
   print("Must supply options --varx, --vary, --binsx, --binsy for use with 2D plotting mode")
   sys.exit()
 
@@ -359,11 +355,11 @@ bins = int(options.binning[0:i1])
 low = float(options.binning[i1+1:i2])
 high = float(options.binning[i2+1:len(options.binning)])
 if twod_mode:
-  i1x = string.index(options.binningx,',')
-  i2x = string.rindex(options.binningx,',')
-  binsx = int(options.binningx[0:i1x])
-  lowx = float(options.binningx[i1x+1:i2x])
-  highx = float(options.binningx[i2x+1:len(options.binningx)])
+  i1x = string.index(options.binning,',')
+  i2x = string.rindex(options.binning,',')
+  binsx = int(options.binning[0:i1x])
+  lowx = float(options.binning[i1x+1:i2x])
+  highx = float(options.binning[i2x+1:len(options.binning)])
 
   i1y = string.index(options.binningy,',')
   i2y = string.rindex(options.binningy,',')
@@ -384,7 +380,7 @@ for sample in samples:
     count += 1
     hist = ROOT.TH2F("hist"+"_"+str(count), "hist", binsx, lowx, highx, binsy, lowy, highy) if twod_mode else \
            ROOT.TH1F("hist"+"_"+str(count), "hist", bins, low, high)
-    draw_string = options.vary+":"+options.varx if twod_mode else \
+    draw_string = options.vary+":"+options.var if twod_mode else \
                   sample['var']
     draw_string = draw_string + ">>"+"hist"+"_"+str(count)
     cut_string = "1" if (options.cut=="" or options.cut==None) else options.cut
@@ -517,7 +513,7 @@ for sample in samples:
       title = sample['path']
     else:
       if options.cut == None:
-        title = options.varx + " vs " + options.vary
+        title = options.var + " vs " + options.vary
       else:
         title = options.cut
   if not twod_mode:
@@ -540,7 +536,7 @@ for sample in samples:
     if not options.xaxis == None:
       xaxis = options.xaxis
     else:
-      xaxis = options.varx
+      xaxis = options.var
     # Y axis
     if not options.yaxis == None:
       yaxis = options.yaxis
