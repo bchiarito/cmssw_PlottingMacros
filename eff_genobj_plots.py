@@ -9,6 +9,7 @@ parser.add_option('--leg3',action='store',default='',dest='leg3')
 parser.add_option('--leg4',action='store',default='',dest='leg4')
 parser.add_option('--title',action='store',default='',dest='title')
 parser.add_option('--save',action='store',default='',dest='save')
+parser.add_option('--var',action='store',default='pt',dest='var')
 (options,args) = parser.parse_args()
 
 files = []
@@ -26,7 +27,7 @@ for i in range(len(args)):
   else:
     names.append(args[i])
 
-var = "pt"
+var = options.var
 
 objs = []
 count = 1
@@ -34,6 +35,8 @@ for fi in files:
   obj = fi.Get('eff_genobj_'+var)
   if count == 7:
     count += 1
+  if count == 1:
+    obj.SetMarkerStyle(5)
   obj.SetLineColor(count)
   '''if count == 0:
     obj.SetLineColor(kBlue+4)
@@ -69,15 +72,15 @@ for i in range(len(objs)):
     obj.SetMaximum(2)
     obj.SetMinimum(0.01)
   else:
-    obj.SetMaximum(1.1)
+    obj.SetMaximum(1.0)
     obj.SetMinimum(0.0)
   leg.AddEntry(obj, names[i], "l")
   if options.title == "":
-    obj.SetTitle("Gen obj within R=0.1 to RECO obj")
+    obj.SetTitle("\mathrm{Efficiency\,for\,RECO\,obj\,within}\,\Delta R=0.1")
   else:
     obj.SetTitle(options.title)
   obj.GetYaxis().SetTitle("Efficiency")
-  obj.GetXaxis().SetTitle(var)
+  obj.GetXaxis().SetTitle(var + " of GEN obj")
   obj.SetStats(0)
   obj.Draw("Same")
 leg.Draw("Same")
