@@ -417,7 +417,7 @@ for sample in samples:
 
 if options.noplot:
   time_end = time.time()
-  print("Elapsed Time: ", (time_end - time_begin))
+  print("Elapsed Time: ", "%.1f" % (time_end - time_begin), "sec")
   sys.exit()
 
 if not options.save == None:
@@ -432,7 +432,7 @@ if not options.save == None:
   outputfile.Close()
 
   time_end = time.time()
-  print("Elapsed Time: ", (time_end - time_begin))
+  print("Elapsed Time: ", "%.1f" % (time_end - time_begin), "sec")
   sys.exit()
   
 if not options.quiet:
@@ -464,6 +464,8 @@ for sample in samples:
   # Width
   hist.SetLineWidth(1)
   # Stats
+  #ROOT.gStyle.SetOptStat(110000)
+  #hist.SetStats(1)
   hist.SetStats(0)
   # Scale
   #if sample['error']:
@@ -607,7 +609,7 @@ if not options.horizontal == None:
   horz_line.Draw("same")
 
 time_end = time.time()
-print("Elapsed Time: ", (time_end - time_begin))
+print("Elapsed Time: ", "%.1f" % (time_end - time_begin), "sec")
 
 if not options.saveplot == None:
   print("Writing plot to file " + options.saveplot + "...")
