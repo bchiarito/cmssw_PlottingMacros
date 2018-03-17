@@ -625,7 +625,7 @@ if debug>=1:
 
 if not options.saveplot == None:
   if debug>=2:
-  print("Writing plot to file " + options.saveplot + "...")
+    print("Writing plot to file " + options.saveplot + "...")
   filename = options.saveplot
   c.SaveAs(filename)
   sys.exit()
