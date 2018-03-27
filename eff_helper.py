@@ -3,6 +3,13 @@ import math
 import sys
 from optparse import *
 
+# call as:
+# python <script.py> <var> <directory>
+# 
+# <var> = eta,pt,phi,npv,rho
+# <directory> will be traversed for ttrees
+# output is efficiency to reconstruct gen taus of fn of <var>
+
 # helper function
 def compute_eff_error_bars(eff, numer, denom):
     eff.Add(numer)
@@ -33,19 +40,19 @@ from subprocess import call
 cut_numer = ""
 if sys.argv[1]=='eta':
   label="\eta"
-  var = "GenTau_eta"
+  var = "GenTau_eta[0]"
   bins = "30,-6,6"
-  cut_denom = "GenTau_objDR<0.2 && nTwoProngs>0" if not options.cand else "GenTau_candobjDR<0.2 && nTwoProngCands>0"
+  cut_denom = "GenTau_objDR[0]<0.2 && nTwoProngs>0" if not options.cand else "GenTau_candobjDR[0]<0.2 && nTwoProngCands>0"
 elif sys.argv[1]=='pt':
   label="p_{T}"
-  var = "GenTau_pt"
+  var = "GenTau_pt[0]"
   bins = "80,0,400"
-  cut_denom = "GenTau_objDR<0.2 && nTwoProngs>0" if not options.cand else "GenTau_candobjDR<0.2 && nTwoProngCands>0"
+  cut_denom = "GenTau_objDR<0.2 && nTwoProngs>0" if not options.cand else "GenTau_candobjDR[0]<0.2 && nTwoProngCands>0"
 elif sys.argv[1]=='phi':
   label="\phi"
-  var = "GenTau_phi"
+  var = "GenTau_phi[0]"
   bins = "30,-6,6"
-  cut_denom = "GenTau_objDR<0.2 && nTwoProngs>0" if not options.cand else "GenTau_candobjDR<0.2 && nTwoProngCands>0"
+  cut_denom = "GenTau_objDR[0]<0.2 && nTwoProngs>0" if not options.cand else "GenTau_candobjDR[0]<0.2 && nTwoProngCands>0"
 elif sys.argv[1]=='npv':
   label="nPV"
   var = "nPV"
