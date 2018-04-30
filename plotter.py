@@ -16,13 +16,13 @@ usage = "Usage: %prog [options] sample1 sample2 sample3 ... -v VAR -b BINNING -c
 parser = OptionParser(usage=usage)
 
 # Basic options
-parser.add_option('-v', '--var', '--varx', type='string', action='store', dest='var', help='variable in TTree to plot')
+parser.add_option('-v', '--var', '--varx', type='string', action='store', dest='var', help='')
 parser.add_option('-b', '--bin', '--bins', '--binsx', '--binx', type='string', metavar='NUM,LOW,HIGH', action='store', default='100,0,100', dest='binning', help='')
 parser.add_option('-c', '--cut', type='string', action='store', default='', dest='cut', metavar='CUT_STRING', help='')
 parser.add_option('--tree', '--trees', type='string', action='store', dest='treename', default='diphotonAnalyzer/fTree2', metavar='PATH_TO_TREE', help='')
 parser.add_option('--noplot', action='store_true', default=False, dest='noplot', help='do not plot anything, just gives cutflow')
-parser.add_option('--savehist', type='string',action='store', dest='save', metavar='ROOTFILE.root', help='saves histograms')
-parser.add_option('--save', '--saveas', type='string',action='store', dest='saveplot', metavar='FILE.ext', help='saves canvas')
+parser.add_option('--savehist', type='string',action='store', dest='save', metavar='FILE.root', help='saves histograms')
+parser.add_option('--save', type='string',action='store', dest='saveplot', metavar='FILE.ext', help='saves canvas')
 parser.add_option('-q','--quiet', action='store_true', default=False, dest='quiet', help='less output')
 parser.add_option('--verb', '--verbose', action='store_true', dest='verbose', help='more output')
 parser.add_option('-n', '--num', type='int', action='store', default=-1, dest='nentries', metavar='MAX_ENTRIES', help='')
@@ -40,7 +40,7 @@ multivar_options.add_option('--var7', type='string', action='store', dest='var7'
 multivar_options.add_option('--var8', type='string', action='store', dest='var8', help=SUPPRESS_HELP)
 
 # 2D options
-twod_options = OptionGroup(parser, '2D Plot Options', 'Setting these puts plotter in 2D mode')
+twod_options = OptionGroup(parser, '2D Plot Options', '')
 twod_options.add_option('--vary', type='string', action='store', dest='vary', help='')
 twod_options.add_option('--biny', '--binsy', type='string', action='store', dest='binningy', help='')
 
@@ -60,11 +60,11 @@ visual_options.add_option('--logy', action='store_true', default=False, dest='lo
 visual_options.add_option('--logx', action='store_true', default=False, dest='logx', help='log scale on x')
 visual_options.add_option('--scaled', action='store_true', default=False, dest='scale', help='scale to integral = 100')
 visual_options.add_option('--mcweight', action='store_true', default=False, dest='mcweight', help='weight entries by XS and Ngen')
-visual_options.add_option('--smallrun', action='store', dest='smallrun', help='correct mcN if small run')
+visual_options.add_option('--smallrun', action='store', dest='smallrun', metavar='N', help='correct mcN if small run')
 visual_options.add_option('--lumi', type='float', action='store', dest='lumi', default=1.0, help='integrated luminosity to scale to (pb^1)')
 visual_options.add_option('--2016lumi', action='store_true', default=False, dest='lumi_set_to_2016', help='set integreated luminiosity to 2016 total')
-visual_options.add_option('--vertical', type='float', action='store', dest='vertical', metavar='COORDINATE', help='draw a vertical line')
-visual_options.add_option('--horizontal', type='float', action='store', dest='horizontal', metavar='COORDINATE', help='draw a vertical line')
+visual_options.add_option('--vertical', type='float', action='store', dest='vertical', metavar='COOR', help='draw a vertical line')
+visual_options.add_option('--horizontal', type='float', action='store', dest='horizontal', metavar='COOR', help='draw a horizontal line')
 
 # Individual sample options
 sample_options = OptionGroup(parser, 'Individual Sample Options', 'Set individual sample options with --treeN --errorN --legN --colorN.')
