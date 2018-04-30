@@ -100,6 +100,22 @@ sample_options.add_option('--color5', type='string', action='store', dest='color
 sample_options.add_option('--color6', type='string', action='store', dest='color6', help=SUPPRESS_HELP)
 sample_options.add_option('--color7', type='string', action='store', dest='color7', help=SUPPRESS_HELP)
 sample_options.add_option('--color8', type='string', action='store', dest='color8', help=SUPPRESS_HELP)
+sample_options.add_option('--xs1', type='float', action='store', dest='xs1', help=SUPPRESS_HELP)
+sample_options.add_option('--xs2', type='float', action='store', dest='xs2', help=SUPPRESS_HELP)
+sample_options.add_option('--xs3', type='float', action='store', dest='xs3', help=SUPPRESS_HELP)
+sample_options.add_option('--xs4', type='float', action='store', dest='xs4', help=SUPPRESS_HELP)
+sample_options.add_option('--xs5', type='float', action='store', dest='xs5', help=SUPPRESS_HELP)
+sample_options.add_option('--xs6', type='float', action='store', dest='xs6', help=SUPPRESS_HELP)
+sample_options.add_option('--xs7', type='float', action='store', dest='xs7', help=SUPPRESS_HELP)
+sample_options.add_option('--xs8', type='float', action='store', dest='xs8', help=SUPPRESS_HELP)
+sample_options.add_option('--num1', type='float', action='store', dest='num1', help=SUPPRESS_HELP)
+sample_options.add_option('--num2', type='float', action='store', dest='num2', help=SUPPRESS_HELP)
+sample_options.add_option('--num3', type='float', action='store', dest='num3', help=SUPPRESS_HELP)
+sample_options.add_option('--num4', type='float', action='store', dest='num4', help=SUPPRESS_HELP)
+sample_options.add_option('--num5', type='float', action='store', dest='num5', help=SUPPRESS_HELP)
+sample_options.add_option('--num6', type='float', action='store', dest='num6', help=SUPPRESS_HELP)
+sample_options.add_option('--num7', type='float', action='store', dest='num7', help=SUPPRESS_HELP)
+sample_options.add_option('--num8', type='float', action='store', dest='num8', help=SUPPRESS_HELP)
 
 parser.add_option_group(visual_options)
 parser.add_option_group(twod_options)
@@ -221,14 +237,14 @@ else:
     print("Can only use one sample if plotting multiple variables (with --var1, --var2, etc)")
     sys.exit()
   variables = []
-  variables.append([options.var1, options.legend1, options.color1])
-  variables.append([options.var2, options.legend2, options.color2])
-  variables.append([options.var3, options.legend3, options.color3])
-  variables.append([options.var4, options.legend4, options.color4])
-  variables.append([options.var5, options.legend5, options.color5])
-  variables.append([options.var6, options.legend6, options.color6])
-  variables.append([options.var7, options.legend7, options.color7])
-  variables.append([options.var8, options.legend8, options.color8])
+  variables.append([options.var1, options.legend1, options.color1, options.xs1, options.num1])
+  variables.append([options.var2, options.legend2, options.color2, options.xs2, options.num2])
+  variables.append([options.var3, options.legend3, options.color3, options.xs3, options.num3])
+  variables.append([options.var4, options.legend4, options.color4, options.xs4, options.num4])
+  variables.append([options.var5, options.legend5, options.color5, options.xs5, options.num5])
+  variables.append([options.var6, options.legend6, options.color6, options.xs6, options.num6])
+  variables.append([options.var7, options.legend7, options.color7, options.xs7, options.num7])
+  variables.append([options.var8, options.legend8, options.color8, options.xs8, options.num8])
   for var in variables:
     variable = {}
     variable['path'] = args[0]
@@ -240,6 +256,14 @@ else:
       variable['label'] = var[0]
     variable['color'] = var[2]
     variable['var'] = var[0]
+    if not var[3] == None:
+      variable['xs'] = var[3]
+    else:
+      variable['xs'] = -1.0
+    if not var[4] == None:
+      variable['N'] = var[4]
+    else:
+      variable['N'] = -1.0
     if not var[0] == None:
       samples.append(variable)
 
@@ -392,6 +416,10 @@ for sample in samples:
     chain = entry[0]
     xs = entry[1]
     N = entry[2]
+    # if xs and N not specified from .dat input, try to take from command line options
+    if (xs == -1.0 and N == -1.0):
+      xs = sample['xs']
+      N = sample['N']
     count += 1
     hist = ROOT.TH2F("hist"+"_"+str(count), "hist", binsx, lowx, highx, binsy, lowy, highy) if twod_mode else \
            ROOT.TH1F("hist"+"_"+str(count), "hist", bins, low, high)
