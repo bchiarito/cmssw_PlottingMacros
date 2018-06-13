@@ -12,20 +12,20 @@ from optparse import OptionGroup
 from optparse import SUPPRESS_HELP
 
 time_begin = time.time()
-usage = "Usage: %prog [options] sample1 sample2 sample3 ... -v VAR -b BINNING -c CUT"
+usage = "Usage 1 (multiple samples): %prog [options] sample1 sample2 ... -v VAR -b BINNING -c CUT\n       Usage 2 (multiple variables): %prog [options] sample --var1 VAR1 --var2 VAR2 ... -b BINNING -c CUT\n       Usage 3 (mutliple samples from txt file input): %prog [options] samples.plot -v VAR -b BINNING -c CUT\nA sample arugment must be a root file, a directory which will be scanned for rootfiles, or a .dat file.\nTo see the required format of .dat and .plot files, use X command."
 parser = OptionParser(usage=usage)
 
 # Basic options
 parser.add_option('-v', '--var', '--varx', type='string', action='store', dest='var', help='')
 parser.add_option('-b', '--bin', '--bins', '--binsx', '--binx', type='string', metavar='NUM,LOW,HIGH', action='store', default='100,0,100', dest='binning', help='')
 parser.add_option('-c', '--cut', type='string', action='store', default='', dest='cut', metavar='CUT_STRING', help='')
-parser.add_option('--tree', '--trees', type='string', action='store', dest='treename', default='diphotonAnalyzer/fTree2', metavar='PATH_TO_TREE', help='')
+parser.add_option('--tree', type='string', action='store', dest='treename', default='diphotonAnalyzer/fTree2', metavar='PATH', help='path to tree in rootfiles')
 parser.add_option('--noplot', action='store_true', default=False, dest='noplot', help='do not plot anything, just gives cutflow')
 parser.add_option('--savehist', type='string',action='store', dest='save', metavar='FILE.root', help='saves histograms')
 parser.add_option('--save', type='string',action='store', dest='saveplot', metavar='FILE.ext', help='saves canvas')
 parser.add_option('-q','--quiet', action='store_true', default=False, dest='quiet', help='less output')
 parser.add_option('--verb', '--verbose', action='store_true', dest='verbose', help='more output')
-parser.add_option('-n', '--num', type='int', action='store', default=-1, dest='nentries', metavar='MAX_ENTRIES', help='')
+parser.add_option('-n', '--num', type='int', action='store', default=-1, dest='nentries', metavar='MAX', help='max entries')
 parser.add_option('--printevents', action='store_true', default=False, dest='printevents', help='print events that pass cut')
 
 # multivar options
@@ -100,22 +100,22 @@ sample_options.add_option('--color5', type='string', action='store', dest='color
 sample_options.add_option('--color6', type='string', action='store', dest='color6', help=SUPPRESS_HELP)
 sample_options.add_option('--color7', type='string', action='store', dest='color7', help=SUPPRESS_HELP)
 sample_options.add_option('--color8', type='string', action='store', dest='color8', help=SUPPRESS_HELP)
-sample_options.add_option('--xs1', type='float', action='store', dest='xs1', help=SUPPRESS_HELP)
-sample_options.add_option('--xs2', type='float', action='store', dest='xs2', help=SUPPRESS_HELP)
-sample_options.add_option('--xs3', type='float', action='store', dest='xs3', help=SUPPRESS_HELP)
-sample_options.add_option('--xs4', type='float', action='store', dest='xs4', help=SUPPRESS_HELP)
-sample_options.add_option('--xs5', type='float', action='store', dest='xs5', help=SUPPRESS_HELP)
-sample_options.add_option('--xs6', type='float', action='store', dest='xs6', help=SUPPRESS_HELP)
-sample_options.add_option('--xs7', type='float', action='store', dest='xs7', help=SUPPRESS_HELP)
-sample_options.add_option('--xs8', type='float', action='store', dest='xs8', help=SUPPRESS_HELP)
-sample_options.add_option('--num1', type='float', action='store', dest='num1', help=SUPPRESS_HELP)
-sample_options.add_option('--num2', type='float', action='store', dest='num2', help=SUPPRESS_HELP)
-sample_options.add_option('--num3', type='float', action='store', dest='num3', help=SUPPRESS_HELP)
-sample_options.add_option('--num4', type='float', action='store', dest='num4', help=SUPPRESS_HELP)
-sample_options.add_option('--num5', type='float', action='store', dest='num5', help=SUPPRESS_HELP)
-sample_options.add_option('--num6', type='float', action='store', dest='num6', help=SUPPRESS_HELP)
-sample_options.add_option('--num7', type='float', action='store', dest='num7', help=SUPPRESS_HELP)
-sample_options.add_option('--num8', type='float', action='store', dest='num8', help=SUPPRESS_HELP)
+sample_options.add_option('--xs1', type='float', action='store', dest='xs1', default=-1.0, help=SUPPRESS_HELP)
+sample_options.add_option('--xs2', type='float', action='store', dest='xs2', default=-1.0, help=SUPPRESS_HELP)
+sample_options.add_option('--xs3', type='float', action='store', dest='xs3', default=-1.0, help=SUPPRESS_HELP)
+sample_options.add_option('--xs4', type='float', action='store', dest='xs4', default=-1.0, help=SUPPRESS_HELP)
+sample_options.add_option('--xs5', type='float', action='store', dest='xs5', default=-1.0, help=SUPPRESS_HELP)
+sample_options.add_option('--xs6', type='float', action='store', dest='xs6', default=-1.0, help=SUPPRESS_HELP)
+sample_options.add_option('--xs7', type='float', action='store', dest='xs7', default=-1.0, help=SUPPRESS_HELP)
+sample_options.add_option('--xs8', type='float', action='store', dest='xs8', default=-1.0, help=SUPPRESS_HELP)
+sample_options.add_option('--num1', type='float', action='store', dest='num1', default=-1.0, help=SUPPRESS_HELP)
+sample_options.add_option('--num2', type='float', action='store', dest='num2', default=-1.0, help=SUPPRESS_HELP)
+sample_options.add_option('--num3', type='float', action='store', dest='num3', default=-1.0, help=SUPPRESS_HELP)
+sample_options.add_option('--num4', type='float', action='store', dest='num4', default=-1.0, help=SUPPRESS_HELP)
+sample_options.add_option('--num5', type='float', action='store', dest='num5', default=-1.0, help=SUPPRESS_HELP)
+sample_options.add_option('--num6', type='float', action='store', dest='num6', default=-1.0, help=SUPPRESS_HELP)
+sample_options.add_option('--num7', type='float', action='store', dest='num7', default=-1.0, help=SUPPRESS_HELP)
+sample_options.add_option('--num8', type='float', action='store', dest='num8', default=-1.0, help=SUPPRESS_HELP)
 
 parser.add_option_group(visual_options)
 parser.add_option_group(twod_options)
@@ -216,7 +216,23 @@ else:
 
 # collection of samples
 samples = []
-if not multivar_mode:
+if (args[0])[-5:len(args[0])] == ".plot":
+  if debug >= 1:
+    print("Grabbing input samples from", args[0])
+  inputfile = open(args[0], 'r')
+  for line in inputfile:
+    line_list = line.split()
+    sample = {}
+    sample['tree'] = options.treename
+    sample['error'] = options.errors
+    sample['var'] = options.var
+    sample['path'] = line_list[0]
+    sample['label'] = line_list[1]
+    sample['xs'] = float(line_list[2])
+    sample['N'] = float(line_list[3])
+    sample['color'] = None
+    samples.append(sample)
+elif not multivar_mode:
   for i in range(len(args)):
     sample = {}
     sample['path'] = args[i]
@@ -231,6 +247,8 @@ if not multivar_mode:
     sample['label'] = eval("options.legend"+str(i+1))
     sample['color'] = eval("options.color"+str(i+1))
     sample['var'] = options.var
+    sample['xs'] = eval("options.xs"+str(i+1))
+    sample['N'] = eval("options.num"+str(i+1))
     samples.append(sample)
 else:
   if len(args) > 1:
@@ -256,6 +274,7 @@ else:
       variable['label'] = var[0]
     variable['color'] = var[2]
     variable['var'] = var[0]
+    variable['test'] = '123'
     if not var[3] == None:
       variable['xs'] = var[3]
     else:
@@ -303,7 +322,8 @@ for sample in samples:
     rootfiles = []
     for root, dirnames, filenames in os.walk(path):
       for filename in fnmatch.filter(filenames, '*.root'):
-        rootfiles.append(os.path.join(root, filename))
+        if (root[-6:len(root)] != 'failed'):
+          rootfiles.append(os.path.join(root, filename))
     for rootfile in rootfiles:
       chain.Add(rootfile)
     sample['entries'] = [[chain, -1.0, -1.0]]
