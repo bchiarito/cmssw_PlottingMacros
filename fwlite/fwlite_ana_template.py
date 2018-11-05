@@ -18,12 +18,20 @@ outputfilename = "histos.root"
 outputfile = ROOT.TFile(outputfilename, "recreate")
 
 # Loop over events
-total = 0
+time_begin = time.time()
+time_checkpoint = time.time()
+count = 0
+total = chain.GetEntries()
+print_threshold = 0
+print_increment = 10
 print "Total Events: " + str(events.size())
 for event in events:
-  total = total + 1
-  if (total % 500) == 0 or total == 1:
-    print " Processing event " + str(total) + "..."
+  # feedback to stdout
+  percentDone = float(count+1) / float(total) * 100.0
+  if percentDone > print_threshold:
+    print('{0:10.1f} sec :'.format(time.time() - time_checkpoint), 'Processing {0:10.0f}/{1:10.0f} : {2:5.2f} %'.format(count+1, total, percentDone))
+    time_checkpoint = time.time()
+    print_threshold += print_increment
 
   # Get Event info
   event.getByLabel(ak4label, ak4handle)
