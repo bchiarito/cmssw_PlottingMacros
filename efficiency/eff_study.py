@@ -26,7 +26,7 @@ parser = OptionParser()
 usage = "Usage: %prog TwoProngNtuplizer.root --signal/tau --tight/cand\n\nRun on ttree of twoprong ntuplizer, makes rootfile with eff as f'n of pt/eta/phi/npv/rho"
 parser = OptionParser(usage=usage)
 parser.add_option('--out', dest='out', default="output_eff.root", help='output file')
-parser.add_option('--tree', dest='treename', default="diphotonAnalyzer/fTree2", help='name of tree inside files')
+parser.add_option('--tree', dest='treename', default="twoprongNtuplizer/fTree2", help='name of tree inside files')
 parser.add_option('--signal', action='store_true', default=False, dest='signal', help='file is signal or bkg to signal')
 parser.add_option('--tau', action='store_true', default=False, dest='tau', help='file is tau or bkg to tau')
 parser.add_option('--tight', action='store_true', default=True, dest='tight', help='')
@@ -36,7 +36,7 @@ parser.add_option('--cand', action='store_false', dest='tight', help='')
 sys.argv = []
 from ROOT import *
 
-out_file = TFile(options.out, 'recreate')
+out_file = TFile('eff_' + options.out + '.root', 'recreate')
 if options.signal and options.tau:
   print "cannot choose both --signal and --tight"
   sys.exit()
