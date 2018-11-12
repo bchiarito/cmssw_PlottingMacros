@@ -12,14 +12,14 @@ from optparse import OptionGroup
 from optparse import SUPPRESS_HELP
 
 time_begin = time.time()
-usage = "Usage 1 (multiple samples): %prog [options] sample1 sample2 ... -v VAR -b BINNING -c CUT\n       Usage 2 (multiple variables): %prog [options] sample --var1 VAR1 --var2 VAR2 ... -b BINNING -c CUT\n       Usage 3 (mutliple samples from txt file input): %prog [options] samples.plot -v VAR -b BINNING -c CUT\nA sample arugment must be a root file, a directory which will be scanned for rootfiles, or a .dat file.\nTo see the required format of .dat and .plot files, use X command."
+usage = "Usage 1 (multiple samples): %prog [options] sample1 sample2 ... -v VAR -b BINNING -c CUT\n       Usage 2 (multiple variables): %prog [options] sample --var1 VAR1 --var2 VAR2 ... -b BINNING -c CUT\n       Usage 3 (mutliple samples from txt file input): %prog [options] samples.plot -v VAR -b BINNING -c CUT\nA sample arugment must be a root file, a directory which will be scanned for rootfiles, or a .dat file.\nTo see the required format of .dat and .plot files, use <unfinised> command."
 parser = OptionParser(usage=usage)
 
 # Basic options
 parser.add_option('-v', '--var', '--varx', type='string', action='store', dest='var', help='')
 parser.add_option('-b', '--bin', '--bins', '--binsx', '--binx', type='string', metavar='NUM,LOW,HIGH', action='store', default='100,0,100', dest='binning', help='')
 parser.add_option('-c', '--cut', type='string', action='store', default='', dest='cut', metavar='CUT_STRING', help='')
-parser.add_option('--tree', type='string', action='store', dest='treename', default='diphotonAnalyzer/fTree2', metavar='PATH', help='path to tree in rootfiles')
+parser.add_option('--tree', type='string', action='store', dest='treename', default='twoprongNtuplizer/fTree2', metavar='PATH', help='path to tree in rootfiles')
 parser.add_option('--noplot', action='store_true', default=False, dest='noplot', help='do not plot anything, just gives cutflow')
 parser.add_option('--savehist', type='string',action='store', dest='save', metavar='FILE.root', help='saves histograms')
 parser.add_option('--save', type='string',action='store', dest='saveplot', metavar='FILE.ext', help='saves canvas')
@@ -339,14 +339,17 @@ for sample in samples:
         xs = -1.0
         N = -1.0
         treename = sample['tree']
+      if len(line_list) == 2:
+        path_to_file = line_list[0]
+        xs = -1.0
+        N = float(line_list[1])
+        treename = sample['tree']
       if len(line_list) == 3:
         path_to_file = line_list[0]
         xs = float(line_list[1])
         N = float(line_list[2])
         if not options.nentries == -1:
           N = min(N, options.nentries)
-        if not options.smallrun == None:
-          N = min(N, int(options.smallrun))
         treename = sample['tree']
       if len(line_list) == 4:
         path_to_file = line_list[0]
@@ -354,10 +357,8 @@ for sample in samples:
         N = float(line_list[2])
         if not options.nentries == -1:
           N = min(N, options.nentries)
-        if not options.smallrun == None:
-          N = min(N, int(options.smallrun))
         treename = line_list[3]
-      if len(line_list) == 2 or len(line_list) == 0 or len(line_list) > 4:
+      if len(line_list) == 0 or len(line_list) > 4:
         print("couldn't parse this line from input file", path)
         print(line)
         continue
@@ -448,11 +449,12 @@ for sample in samples:
     draw_string = draw_string + ">>"+"hist"+"_"+str(count)
     cut_string = "1" if (options.cut=="" or options.cut==None) else options.cut
     if options.mcweight and not options.smallrun == None:
-      cut_string = "("+cut_string+")*(mcXS*"+str(lumi)+"/min(mcN,"+options.smallrun+"))"
+      cut_string = "("+cut_string+")*(mcXS*"+str(lumi)+"/"+str(int(options.smallrun))+")"
     elif options.mcweight and options.smallrun == None:
       cut_string = "("+cut_string+")*(mcXS*"+str(lumi)+"/mcN)"
     if options.nentries == -1:
       chain.Draw(draw_string, cut_string, "goff")
+      print(draw_string, cut_string)
     else:
       chain.Draw(draw_string, cut_string, "goff", options.nentries)
     entry.append(hist)
@@ -643,9 +645,9 @@ if options.save == None:
   else:
     legendtype = "l"
   if not options.legleft:
-    leg = ROOT.TLegend(0.55, 0.9-(0.03*len(samples)), 0.9, 0.9)
+    leg = ROOT.TLegend(0.55, 0.9-(0.06*len(samples)), 0.9, 0.9)
   else:
-    leg = ROOT.TLegend(0.1, 0.9-(0.03*len(samples)), 0.45, 0.9)
+    leg = ROOT.TLegend(0.1, 0.9-(0.06*len(samples)), 0.45, 0.9)
   for sample in samples:
     hist = sample['summed_hist']
     if sample['label'] == None:
