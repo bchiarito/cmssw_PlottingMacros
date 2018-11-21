@@ -3,14 +3,23 @@ lumi2016 = 37196
 BR_dysig = 0.07511
 BR_dybkg = 1 - BR_dysig
 
-dy = 4956
+dy = 4964
 dy_ngen = 145803217
 
-dy10 = 16260
+dy10 = 18610
 dy10_ngen = 35291566
 
-wjets = 50320
+wjets = 61526
 wjets_ngen = 86731806
+
+ww = 45.74
+ww_ngen = 5176114
+
+wz1l3nu = 3.05
+wz1l3nu_ngen = 1703772
+
+wz1l2q = 10.71
+wz1l2q_ngen = 24221923
 
 top = 123.3
 top_ngen = 67240808
@@ -18,10 +27,10 @@ top_ngen = 67240808
 antitop = 74.41
 antitop_ngen = 38811017
 
-tW = 38.09
+tW = 35.6
 tW_ngen = int((6952830+6933094)/2.0)
 
-ttbar = 509.4
+ttbar = 831.76
 ttbar_ngen = 10139950
 
 qcd15to30 = 1820000000
