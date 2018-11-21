@@ -23,9 +23,9 @@ string base_path = "/cms/chiarito/eos/twoprong/ztagandprobe/Nov17_trees/"; // en
 TChain * chain = new TChain(treename.c_str());
 string path = "";
 vector<string> paths;
-Long64_t MAX_ENTRIES = -1;
+Long64_t MAX_ENTRIES = 100;
 string output = "";
-string pre = "output_reg_nov17_"; // end in '_'
+string pre = "output_test_"; // end in '_'
 string post = ".root";
 
 void analysis_all()
@@ -148,13 +148,23 @@ void analysis_all()
   paths.clear();
   chain->Reset();
 
-  /*paths.push_back("BKG/WWTo1L1Nu2Q_13TeV_amcatnloFXFX_madspin_pythia8/");
-  paths.push_back("BKG/WZTo1L1Nu2Q_13TeV_amcatnloFXFX_madspin_pythia8/");
-  paths.push_back("BKG/WZTo1L3Nu_13TeV_amcatnloFXFX_madspin_pythia8/");
-  output = "WWWZ";
+  paths.push_back("BKG/WWTo1L1Nu2Q_13TeV_amcatnloFXFX_madspin_pythia8/");
+  output = "WW";
   make_histos(paths, output);
   paths.clear();
-  chain->Reset();*/
+  chain->Reset();
+
+  paths.push_back("BKG/WZTo1L3Nu_13TeV_amcatnloFXFX_madspin_pythia8/");
+  output = "WZ1L3Nu";
+  make_histos(paths, output);
+  paths.clear();
+  chain->Reset();
+
+  paths.push_back("BKG/WZTo1L1Nu2Q_13TeV_amcatnloFXFX_madspin_pythia8/");
+  output = "WZ1L2Q";
+  make_histos(paths, output);
+  paths.clear();
+  chain->Reset();
 
   paths.push_back("BKG/ST_t-channel_antitop_4f_inclusiveDecays_13TeV-powhegV2-madspin-pythia8_TuneCUETP8M1/");
   output = "STbar";
