@@ -19,9 +19,9 @@ void MyLooper::CustomLoop(const char * outputfilename = "output.root", Long64_t 
    double philow = -3.5;
    double phihigh = 3.5;
    int phibins = 35;
-   double ptlow = 0
-   double pthigh = 500
-   int ptbins = 100
+   double ptlow = 0;
+   double pthigh = 500;
+   int ptbins = 100;
    // event wide
    TH1F * hist_HT_full = new TH1F("hist_HT_full", "hist_HT_full", 200, 0, 2000);
    TH1F * hist_HT = new TH1F("hist_HT", "hist_HT", 200, 0, 2000);
@@ -132,8 +132,8 @@ void MyLooper::CustomLoop(const char * outputfilename = "output.root", Long64_t 
       hist_rho->Fill(rho);
       hist_nTagMuons->Fill(nTagMuons);
       hist_nProbeTaus->Fill(nProbeTaus);
-      hist_nTwoProngs->Fill(nTwoProngs)
-      hist_nPatTaus->Fill(nTaus)
+      hist_nTwoProngs->Fill(nTwoProngs);
+      hist_nPatTaus->Fill(nTaus);
       
       TLorentzVector Zvis_pattau;
       TLorentzVector Zvis_taujet;
