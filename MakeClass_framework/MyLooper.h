@@ -7,11 +7,11 @@
 #include "vector"
 
 // the base class
-#include "MyClass.C"
+#include "MyClassDATA.C"
 
-class MyLooper : public MyClass {
+class MyLooper : public MyClassDATA {
 public :
-   MyLooper(TTree* tree) : MyClass(tree)
+   MyLooper(TTree* tree) : MyClassDATA(tree)
    {
    }
 

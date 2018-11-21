@@ -1,3 +1,4 @@
+from __future__ import division
 import ROOT
 import cross_sections as xs
 
@@ -11,7 +12,42 @@ def extract_histos(rootfile):
     histos.append(hist)
   return histos
 
-filename_prefix = "output_"
+def total_weight(hist):
+  return hist.Integral() + hist.GetBinContent(hist.GetNbinsX()+1) + hist.GetBinContent(0)
+
+def entries(hist):
+  return hist.GetEntries()
+
+filename_prefix = "output_reg_nov17_" # ends with '_'
+pdf_filename = "summary_"+filename_prefix+"hists.pdf"
+
+# cosmetics
+save = True
+only_one = False
+data_color = ROOT.kBlack
+dysig_color = ROOT.kMagenta
+dybkg_color = ROOT.kRed
+wjets_color = ROOT.kOrange-9
+ttbar_color = ROOT.kGreen
+top_color = ROOT.kGreen+1
+qcd_color = ROOT.kGray
+data_label = "SingleMuon"
+dysig_label = "DY signal"
+dybkg_label = "DY bkg"
+wjets_label = "Wjets"
+ttbar_label = "ttbar"
+top_label = "t+tW"
+qcd_label = "QCD"
+x1 = 0.7
+x2 = 0.89
+y1 = 0.7
+y2 = 0.89
+reversed_histos = []
+reversed_histos.append('Zvis_taujet_mass')
+reversed_histos.append('Zvis_pattau_mass')
+reversed_histos.append('Zvis_twoprong_mass')
+reversed_histos.append('Zvis_pattau_mass_fail')
+reversed_histos.append('Zvis_twoprong_mass_fail')
 
 # extract histos into memory
 data = ROOT.TFile(filename_prefix+"DATA.root")
@@ -28,6 +64,12 @@ wjets = ROOT.TFile(filename_prefix+"WJets.root")
 wjets_hists = extract_histos(wjets)
 ttbar = ROOT.TFile(filename_prefix+"TT.root")
 ttbar_hists = extract_histos(ttbar)
+top = ROOT.TFile(filename_prefix+"ST.root")
+top_hists = extract_histos(top)
+antitop = ROOT.TFile(filename_prefix+"STbar.root")
+antitop_hists = extract_histos(antitop)
+tW = ROOT.TFile(filename_prefix+"tW.root")
+tW_hists = extract_histos(tW)
 qcd1000to1400 = ROOT.TFile(filename_prefix+"QCD_1000to1400.root")
 qcd1000to1400_hists = extract_histos(qcd1000to1400)
 qcd120to170 = ROOT.TFile(filename_prefix+"QCD_120to170.root")
@@ -57,31 +99,10 @@ qcd800to1000_hists = extract_histos(qcd800to1000)
 qcd80to120 = ROOT.TFile(filename_prefix+"QCD_80to120.root")
 qcd80to120_hists = extract_histos(qcd80to120)
 
-# cosmetics
-pdf_filename = "summary.pdf"
-save = False
-only_one = True
-logy = True
-data_color = ROOT.kBlack
-dysig_color = ROOT.kMagenta
-dybkg_color = ROOT.kRed
-wjets_color = ROOT.kOrange-9
-ttbar_color = ROOT.kGreen
-qcd_color = ROOT.kGray
-data_label = "SingleMuon"
-dysig_label = "DY signal"
-dybkg_label = "DY bkg"
-wjets_label = "Wjets"
-ttbar_label = "TTJets"
-qcd_label = "QCD"
-x1 = 0.7
-x2 = 0.89
-y1 = 0.7
-y2 = 0.89
-
 # draw loop
+logy = True
 c1 = ROOT.TCanvas()
-if logy: c1.SetLogy()
+c1.SetLogy()
 if save: c1.Print(pdf_filename+"[")
 for i in range(len(dysig_hists)):
   data_hist = data_hists[i]
@@ -91,6 +112,9 @@ for i in range(len(dysig_hists)):
   dybkg_hist = dybkg_hists[i]
   wjets_hist = wjets_hists[i]
   ttbar_hist = ttbar_hists[i]
+  top_hist = top_hists[i]
+  antitop_hist = antitop_hists[i]
+  tW_hist = tW_hists[i]
   qcd1000to1400_hist = qcd1000to1400_hists[i]
   qcd120to170_hist = qcd120to170_hists[i]
   qcd1400to1800_hist = qcd1400to1800_hists[i]
@@ -106,12 +130,15 @@ for i in range(len(dysig_hists)):
   qcd800to1000_hist = qcd800to1000_hists[i]
   qcd80to120_hist = qcd80to120_hists[i]
   # scale to xs
-  dy10sig_hist.Scale((xs.dy10 * xs.lumi2016 / xs.dy10_ngen) * xs.BR_dysig)
-  dysig_hist.Scale((xs.dy * xs.lumi2016 / xs.dy_ngen) * xs.BR_dysig)
-  dy10bkg_hist.Scale((xs.dy10 * xs.lumi2016 / xs.dy10_ngen) * xs.BR_dy10bkg)
-  dybkg_hist.Scale((xs.dy * xs.lumi2016 / xs.dy_ngen) * xs.BR_dybkg)
+  dy10sig_hist.Scale(xs.dy10 * xs.lumi2016 / xs.dy10_ngen)
+  dysig_hist.Scale(xs.dy * xs.lumi2016 / xs.dy_ngen)
+  dy10bkg_hist.Scale(xs.dy10 * xs.lumi2016 / xs.dy10_ngen)
+  dybkg_hist.Scale(xs.dy * xs.lumi2016 / xs.dy_ngen)
   wjets_hist.Scale(xs.wjets * xs.lumi2016 / xs.wjets_ngen)
   ttbar_hist.Scale(xs.ttbar * xs.lumi2016 / xs.ttbar_ngen)
+  top_hist.Scale(xs.top * xs.lumi2016 / xs.top_ngen)
+  antitop_hist.Scale(xs.antitop * xs.lumi2016 / xs.antitop_ngen)
+  tW_hist.Scale(xs.tW * xs.lumi2016 / xs.tW_ngen)
   qcd1000to1400_hist.Scale(xs.qcd1000to1400 * xs.lumi2016 / xs.qcd1000to1400_ngen)
   qcd120to170_hist.Scale(xs.qcd120to170 * xs.lumi2016 / xs.qcd120to170_ngen)
   qcd1400to1800_hist.Scale(xs.qcd1400to1800 * xs.lumi2016 / xs.qcd1400to1800_ngen)
@@ -144,6 +171,9 @@ for i in range(len(dysig_hists)):
   # add up dy
   dysig_hist.Add(dy10sig_hist)
   dybkg_hist.Add(dy10bkg_hist)
+  # add up top
+  top_hist.Add(antitop_hist)
+  top_hist.Add(tW_hist)
   # set cosmetics
   data_hist.SetLineColor(data_color)
   data_hist.Sumw2()
@@ -156,28 +186,44 @@ for i in range(len(dysig_hists)):
   wjets_hist.SetFillColor(wjets_color)
   ttbar_hist.SetLineColor(ttbar_color)
   ttbar_hist.SetFillColor(ttbar_color)
+  top_hist.SetLineColor(top_color)
+  top_hist.SetFillColor(top_color)
   qcd_hist.SetFillColor(qcd_color)
   qcd_hist.SetLineColor(qcd_color)
   # setup stack
-  mc_stack = ROOT.THStack('hs', (dysig_hist.GetName())[5:len(dysig_hist.GetName())] )
-  mc_stack.Add(dysig_hist)
-  mc_stack.Add(dybkg_hist)
-  mc_stack.Add(ttbar_hist)
-  mc_stack.Add(wjets_hist)
-  mc_stack.Add(qcd_hist)
+  title = (dysig_hist.GetName())[5:len(dysig_hist.GetName())]
+  mc_stack = ROOT.THStack('hs', title)
+  if title in reversed_histos:
+    logy = False
+    mc_stack.Add(qcd_hist)
+    mc_stack.Add(wjets_hist)
+    mc_stack.Add(ttbar_hist)
+    mc_stack.Add(top_hist)
+    mc_stack.Add(dybkg_hist)
+    mc_stack.Add(dysig_hist)
+  else:
+    logy = True
+    mc_stack.Add(dysig_hist)
+    mc_stack.Add(dybkg_hist)
+    mc_stack.Add(top_hist)
+    mc_stack.Add(ttbar_hist)
+    mc_stack.Add(wjets_hist)
+    mc_stack.Add(qcd_hist)
   # calc max
   ymax = max(data_hist.GetMaximum(), mc_stack.GetMaximum())
   ymin = mc_stack.GetMinimum('nostack')
   if logy:
     mc_stack.SetMaximum(ymax)
-    mc_stack.SetMinimum(ymin)
+    mc_stack.SetMinimum(max(ymin, 10**-1))
   else:
     mc_stack.SetMaximum(ymax * 1.15)
+    mc_stack.SetMinimum(0)
   # stats
   underflow_mc = 0
   underflow_mc += dysig_hist.GetBinContent(0)
   underflow_mc += dybkg_hist.GetBinContent(0)
   underflow_mc += ttbar_hist.GetBinContent(0)
+  underflow_mc += top_hist.GetBinContent(0)
   underflow_mc += wjets_hist.GetBinContent(0)
   underflow_mc +=  qcd_hist.GetBinContent(0)
   underflow_data = data_hist.GetBinContent(0)
@@ -185,36 +231,43 @@ for i in range(len(dysig_hists)):
   overflow_mc += dysig_hist.GetBinContent(dysig_hist.GetNbinsX()+1)
   overflow_mc += dybkg_hist.GetBinContent(dysig_hist.GetNbinsX()+1)
   overflow_mc += ttbar_hist.GetBinContent(dysig_hist.GetNbinsX()+1)
+  overflow_mc += top_hist.GetBinContent(dysig_hist.GetNbinsX()+1)
   overflow_mc += wjets_hist.GetBinContent(dysig_hist.GetNbinsX()+1)
   overflow_mc +=  qcd_hist.GetBinContent(dysig_hist.GetNbinsX()+1)
   overflow_data = data_hist.GetBinContent(dysig_hist.GetNbinsX()+1)
   total_mc = 0
-  total_mc = dysig_hist.Integral()
-  total_mc = dybkg_hist.Integral()
-  total_mc = ttbar_hist.Integral()
-  total_mc = wjets_hist.Integral()
-  total_mc =  qcd_hist.Integral()
+  total_mc += dysig_hist.Integral()
+  total_mc += dybkg_hist.Integral()
+  total_mc += ttbar_hist.Integral()
+  total_mc += top_hist.Integral()
+  total_mc += wjets_hist.Integral()
+  total_mc +=  qcd_hist.Integral()
   total_data = data_hist.Integral()
   # setup legend
   leg = ROOT.TLegend(x1, y1, x2, y2)
   leg.SetLineColor(ROOT.kWhite)
-  leg.AddEntry('', "Data events   : {0:.0f}".format(total_data), '')
-  leg.AddEntry('', "MC exp events : {0:.1f}".format(total_mc), '')
-  leg.AddEntry(data_hist, data_label, 'l')
-  leg.AddEntry(dysig_hist, dysig_label, 'f')
-  leg.AddEntry(dybkg_hist, dybkg_label, 'f')
-  leg.AddEntry(ttbar_hist, ttbar_label, 'f')
-  leg.AddEntry(wjets_hist, wjets_label, 'f')
-  leg.AddEntry(qcd_hist, qcd_label, 'f')
+  whole_count =    ' : {0:,.0f}'
+  count = ' : {0:,.1f} ({1:,.0f} entries)'
+  leg.AddEntry(data_hist, data_label+whole_count.format(total_weight(data_hist)), 'l')
+  leg.AddEntry('', "Total MC : {0:,.1f}".format(total_mc+underflow_mc+overflow_mc), '')
+  leg.AddEntry(dysig_hist, dysig_label+count.format(total_weight(dysig_hist), entries(dysig_hist)), 'f')
+  leg.AddEntry(dybkg_hist, dybkg_label+count.format(total_weight(dybkg_hist), entries(dybkg_hist)), 'f')
+  leg.AddEntry(ttbar_hist, ttbar_label+count.format(total_weight(ttbar_hist), entries(ttbar_hist)), 'f')
+  leg.AddEntry(top_hist, top_label+count.format(total_weight(top_hist), entries(top_hist)), 'f')
+  leg.AddEntry(wjets_hist, wjets_label+count.format(total_weight(wjets_hist), entries(wjets_hist)), 'f')
+  leg.AddEntry(qcd_hist, qcd_label+count.format(total_weight(qcd_hist), entries(qcd_hist)), 'f')
   if overflow_data>0 or overflow_mc>0:
-    leg.AddEntry('', "Overflow (data|MC) : {0:.0f}|{1:0.1f}".format(overflow_data, overflow_mc), '')
+    leg.AddEntry('', "Overflow(data|MC) : {0:,.0f}|{1:,.1f}".format(overflow_data, overflow_mc), '')
   if underflow_data>0 or underflow_mc>0:
-    leg.AddEntry('', "Underflow (data|MC) : {0:.0f}|{1:0.1f}".format(underflow_data, underflow_mc), '')
+    leg.AddEntry('', "Underflow(data|MC) : {0:,.0f}|{1:,.1f}".format(underflow_data, underflow_mc), '')
   # draw
   mc_stack.Draw()
   data_hist.Draw('e same')
   leg.Draw('same')
-  if save: c1.Print(pdf_filename);
+  c1.SetLogy(logy)
+  if save:
+    print mc_stack.GetTitle()
+    c1.Print(pdf_filename);
   if only_one: break
 
 if only_one: raw_input()

@@ -1,8 +1,8 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Tue Nov 13 19:38:06 2018 by ROOT version 6.06/01
+// Mon Nov 19 11:34:09 2018 by ROOT version 6.06/01
 // from TTree fTree2/ChargedDecayTree
-// found on file: /cms/chiarito/eos/twoprong/ztagandprobe/Nov12_trees/QCD/QCD_Pt_1000to1400_TuneCUETP8M1_13TeV_pythia8/TauPreSelection_ext1/181112_215200/0000/TwoProngNtuplizer_1.root
+// found on file: /cms/chiarito/eos/twoprong/ztagandprobe/Nov17_trees/QCD/QCD_Pt_1000to1400_TuneCUETP8M1_13TeV_pythia8/TauPreSelection/181118_031114/0000/TwoProngNtuplizer_1.root
 //////////////////////////////////////////////////////////
 
 #ifndef MyClassMC_h
@@ -13,6 +13,7 @@
 #include <TFile.h>
 
 // Header file for the classes stored in the TTree if any.
+#include "string"
 #include "vector"
 #include "vector"
 
@@ -29,6 +30,7 @@ public :
    Double_t        mcWProd;
    Int_t           HLT_Photon175;
    Int_t           HLT_Photon22_Iso;
+   string          *photonTrigger;
    Int_t           eventNum;
    Int_t           runNum;
    Int_t           lumiNum;
@@ -541,79 +543,93 @@ public :
    Double_t        RecoPhiInclusive_part2_mass;
    Double_t        RecoPhiInclusive_part2_energy;
    Double_t        RecoPhiInclusive_dR;
-   Bool_t          passZMuonTrigger;
-   Bool_t          passZTnP;
-   Bool_t          passZPre;
-   Bool_t          passZExtraMuon;
-   Bool_t          passZExtraElectron;
-   Bool_t          passZDiMuon;
-   Bool_t          passZBVeto;
-   Double_t        ZBVetoVal;
+   Bool_t          passMuonTrigger;
+   string          *muonTrigger;
    Int_t           nTagMuons;
    Int_t           nProbeTaus;
-   Double_t        TauPreDr;
-   Double_t        TauPreMT;
-   Double_t        TauPrePzeta;
-   vector<double>  *TagMuon_pt;
-   vector<double>  *TagMuon_eta;
-   vector<double>  *TagMuon_phi;
-   vector<double>  *TagMuon_mass;
-   vector<double>  *TagMuon_z;
-   vector<double>  *TagMuon_dz;
-   vector<double>  *TagMuon_iso;
-   vector<double>  *ProbeTau_pt;
-   vector<double>  *ProbeTau_eta;
-   vector<double>  *ProbeTau_phi;
-   vector<double>  *ProbeTau_mass;
-   vector<double>  *ProbeTau_genDR;
-   Double_t        ZvisibleMuonProbeTau_pt;
-   Double_t        ZvisibleMuonProbeTau_phi;
-   Double_t        ZvisibleMuonProbeTau_eta;
-   Double_t        ZvisibleMuonProbeTau_mass;
-   Double_t        ZvisibleMuonProbeTau_energy;
-   Double_t        ZvisibleMuonProbeTau_part1_pt;
-   Double_t        ZvisibleMuonProbeTau_part1_eta;
-   Double_t        ZvisibleMuonProbeTau_part1_phi;
-   Double_t        ZvisibleMuonProbeTau_part1_mass;
-   Double_t        ZvisibleMuonProbeTau_part1_energy;
-   Double_t        ZvisibleMuonProbeTau_part2_pt;
-   Double_t        ZvisibleMuonProbeTau_part2_eta;
-   Double_t        ZvisibleMuonProbeTau_part2_phi;
-   Double_t        ZvisibleMuonProbeTau_part2_mass;
-   Double_t        ZvisibleMuonProbeTau_part2_energy;
-   Double_t        ZvisibleMuonProbeTau_dR;
-   Double_t        ZvisibleMuonPatTau_pt;
-   Double_t        ZvisibleMuonPatTau_phi;
-   Double_t        ZvisibleMuonPatTau_eta;
-   Double_t        ZvisibleMuonPatTau_mass;
-   Double_t        ZvisibleMuonPatTau_energy;
-   Double_t        ZvisibleMuonPatTau_part1_pt;
-   Double_t        ZvisibleMuonPatTau_part1_eta;
-   Double_t        ZvisibleMuonPatTau_part1_phi;
-   Double_t        ZvisibleMuonPatTau_part1_mass;
-   Double_t        ZvisibleMuonPatTau_part1_energy;
-   Double_t        ZvisibleMuonPatTau_part2_pt;
-   Double_t        ZvisibleMuonPatTau_part2_eta;
-   Double_t        ZvisibleMuonPatTau_part2_phi;
-   Double_t        ZvisibleMuonPatTau_part2_mass;
-   Double_t        ZvisibleMuonPatTau_part2_energy;
-   Double_t        ZvisibleMuonPatTau_dR;
-   Double_t        ZvisibleMuonTwoProng_pt;
-   Double_t        ZvisibleMuonTwoProng_phi;
-   Double_t        ZvisibleMuonTwoProng_eta;
-   Double_t        ZvisibleMuonTwoProng_mass;
-   Double_t        ZvisibleMuonTwoProng_energy;
-   Double_t        ZvisibleMuonTwoProng_part1_pt;
-   Double_t        ZvisibleMuonTwoProng_part1_eta;
-   Double_t        ZvisibleMuonTwoProng_part1_phi;
-   Double_t        ZvisibleMuonTwoProng_part1_mass;
-   Double_t        ZvisibleMuonTwoProng_part1_energy;
-   Double_t        ZvisibleMuonTwoProng_part2_pt;
-   Double_t        ZvisibleMuonTwoProng_part2_eta;
-   Double_t        ZvisibleMuonTwoProng_part2_phi;
-   Double_t        ZvisibleMuonTwoProng_part2_mass;
-   Double_t        ZvisibleMuonTwoProng_part2_energy;
-   Double_t        ZvisibleMuonTwoProng_dR;
+   Bool_t          passPzeta;
+   Bool_t          passMT;
+   Bool_t          passExtraElectronVeto;
+   Bool_t          passExtraMuonVeto;
+   Bool_t          passDiMuonVeto;
+   Bool_t          passExtraLeptonVeto;
+   Bool_t          passBtagVeto;
+   Double_t        MT;
+   Double_t        Pzeta;
+   Double_t        highestBtag;
+   Bool_t          passMuonTauPair;
+   Double_t        TagMuon_pt;
+   Double_t        TagMuon_eta;
+   Double_t        TagMuon_phi;
+   Double_t        TagMuon_mass;
+   Double_t        TagMuon_z;
+   Double_t        TagMuon_dz;
+   Double_t        TagMuon_iso;
+   Double_t        ProbeTau_pt;
+   Double_t        ProbeTau_eta;
+   Double_t        ProbeTau_phi;
+   Double_t        ProbeTau_mass;
+   Double_t        ProbeTau_genDR;
+   Bool_t          probePassTauID;
+   Double_t        ProbeTau_tauID_pt;
+   Double_t        ProbeTau_tauID_eta;
+   Double_t        ProbeTau_tauID_phi;
+   Double_t        ProbeTau_tauID_mass;
+   Double_t        ProbeTau_tauID_probeDR;
+   Bool_t          probePassTwoProng;
+   Double_t        ProbeTau_twoprong_pt;
+   Double_t        ProbeTau_twoprong_eta;
+   Double_t        ProbeTau_twoprong_phi;
+   Double_t        ProbeTau_twoprong_mass;
+   Double_t        ProbeTau_twoprong_probeDR;
+   Double_t        MuonProbe_pt;
+   Double_t        MuonProbe_phi;
+   Double_t        MuonProbe_eta;
+   Double_t        MuonProbe_mass;
+   Double_t        MuonProbe_energy;
+   Double_t        MuonProbe_part1_pt;
+   Double_t        MuonProbe_part1_eta;
+   Double_t        MuonProbe_part1_phi;
+   Double_t        MuonProbe_part1_mass;
+   Double_t        MuonProbe_part1_energy;
+   Double_t        MuonProbe_part2_pt;
+   Double_t        MuonProbe_part2_eta;
+   Double_t        MuonProbe_part2_phi;
+   Double_t        MuonProbe_part2_mass;
+   Double_t        MuonProbe_part2_energy;
+   Double_t        MuonProbe_dR;
+   Double_t        MuonTauID_pt;
+   Double_t        MuonTauID_phi;
+   Double_t        MuonTauID_eta;
+   Double_t        MuonTauID_mass;
+   Double_t        MuonTauID_energy;
+   Double_t        MuonTauID_part1_pt;
+   Double_t        MuonTauID_part1_eta;
+   Double_t        MuonTauID_part1_phi;
+   Double_t        MuonTauID_part1_mass;
+   Double_t        MuonTauID_part1_energy;
+   Double_t        MuonTauID_part2_pt;
+   Double_t        MuonTauID_part2_eta;
+   Double_t        MuonTauID_part2_phi;
+   Double_t        MuonTauID_part2_mass;
+   Double_t        MuonTauID_part2_energy;
+   Double_t        MuonTauID_dR;
+   Double_t        MuonTwoProng_pt;
+   Double_t        MuonTwoProng_phi;
+   Double_t        MuonTwoProng_eta;
+   Double_t        MuonTwoProng_mass;
+   Double_t        MuonTwoProng_energy;
+   Double_t        MuonTwoProng_part1_pt;
+   Double_t        MuonTwoProng_part1_eta;
+   Double_t        MuonTwoProng_part1_phi;
+   Double_t        MuonTwoProng_part1_mass;
+   Double_t        MuonTwoProng_part1_energy;
+   Double_t        MuonTwoProng_part2_pt;
+   Double_t        MuonTwoProng_part2_eta;
+   Double_t        MuonTwoProng_part2_phi;
+   Double_t        MuonTwoProng_part2_mass;
+   Double_t        MuonTwoProng_part2_energy;
+   Double_t        MuonTwoProng_dR;
 
    // List of branches
    TBranch        *b_pthat;   //!
@@ -621,6 +637,7 @@ public :
    TBranch        *b_mcWProd;   //!
    TBranch        *b_HLT_Photon175;   //!
    TBranch        *b_HLT_Photon22_Iso;   //!
+   TBranch        *b_photonTrigger;   //!
    TBranch        *b_eventNum;   //!
    TBranch        *b_runNum;   //!
    TBranch        *b_lumiNum;   //!
@@ -767,19 +784,21 @@ public :
    TBranch        *b_RecoPhiDiTwoProng;   //!
    TBranch        *b_RecoPhiPhotonTwoProng;   //!
    TBranch        *b_RecoPhiInclusive;   //!
-   TBranch        *b_passZMuonTrigger;   //!
-   TBranch        *b_passZTnP;   //!
-   TBranch        *b_passZPre;   //!
-   TBranch        *b_passZExtraMuon;   //!
-   TBranch        *b_passZExtraElectron;   //!
-   TBranch        *b_passZDiMuon;   //!
-   TBranch        *b_passZBVeto;   //!
-   TBranch        *b_ZBVetoVal;   //!
+   TBranch        *b_passMuonTrigger;   //!
+   TBranch        *b_muonTrigger;   //!
    TBranch        *b_nTagMuons;   //!
    TBranch        *b_nProbeTaus;   //!
-   TBranch        *b_TauPreDr;   //!
-   TBranch        *b_TauPreMt;   //!
-   TBranch        *b_TauPrePzeta;   //!
+   TBranch        *b_passPzeta;   //!
+   TBranch        *b_passMT;   //!
+   TBranch        *b_passExtraElectronVeto;   //!
+   TBranch        *b_passExtraMuonVeto;   //!
+   TBranch        *b_passDiMuonVeto;   //!
+   TBranch        *b_passExtraLeptonVeto;   //!
+   TBranch        *b_passBtagVeto;   //!
+   TBranch        *b_MT;   //!
+   TBranch        *b_Pzeta;   //!
+   TBranch        *b_highestBtag;   //!
+   TBranch        *b_passMuonTauPair;   //!
    TBranch        *b_TagMuon_pt;   //!
    TBranch        *b_TagMuon_eta;   //!
    TBranch        *b_TagMuon_phi;   //!
@@ -792,9 +811,21 @@ public :
    TBranch        *b_ProbeTau_phi;   //!
    TBranch        *b_ProbeTau_mass;   //!
    TBranch        *b_ProbeTau_genDR;   //!
-   TBranch        *b_ZvisibleMuonProbeTau;   //!
-   TBranch        *b_ZvisibleMuonPatTau;   //!
-   TBranch        *b_ZvisibleMuonTwoProng;   //!
+   TBranch        *b_probePassTauID;   //!
+   TBranch        *b_ProbeTau_tauID_pt;   //!
+   TBranch        *b_ProbeTau_tauID_eta;   //!
+   TBranch        *b_ProbeTau_tauID_phi;   //!
+   TBranch        *b_ProbeTau_tauID_mass;   //!
+   TBranch        *b_ProbeTau_tauID_probeDR;   //!
+   TBranch        *b_probePassTwoProng;   //!
+   TBranch        *b_ProbeTau_twoprong_pt;   //!
+   TBranch        *b_ProbeTau_twoprong_eta;   //!
+   TBranch        *b_ProbeTau_twoprong_phi;   //!
+   TBranch        *b_ProbeTau_twoprong_mass;   //!
+   TBranch        *b_ProbeTau_twoprong_probeDR;   //!
+   TBranch        *b_MuonProbe;   //!
+   TBranch        *b_MuonTauID;   //!
+   TBranch        *b_MuonTwoProng;   //!
 
    MyClassMC(TTree *tree=0);
    virtual ~MyClassMC();
@@ -815,11 +846,11 @@ MyClassMC::MyClassMC(TTree *tree) : fChain(0)
 // if parameter tree is not specified (or zero), connect the file
 // used to generate this class and read the Tree.
    if (tree == 0) {
-      TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("/cms/chiarito/eos/twoprong/ztagandprobe/Nov12_trees/QCD/QCD_Pt_1000to1400_TuneCUETP8M1_13TeV_pythia8/TauPreSelection_ext1/181112_215200/0000/TwoProngNtuplizer_1.root");
+      TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("/cms/chiarito/eos/twoprong/ztagandprobe/Nov17_trees/QCD/QCD_Pt_1000to1400_TuneCUETP8M1_13TeV_pythia8/TauPreSelection/181118_031114/0000/TwoProngNtuplizer_1.root");
       if (!f || !f->IsOpen()) {
-         f = new TFile("/cms/chiarito/eos/twoprong/ztagandprobe/Nov12_trees/QCD/QCD_Pt_1000to1400_TuneCUETP8M1_13TeV_pythia8/TauPreSelection_ext1/181112_215200/0000/TwoProngNtuplizer_1.root");
+         f = new TFile("/cms/chiarito/eos/twoprong/ztagandprobe/Nov17_trees/QCD/QCD_Pt_1000to1400_TuneCUETP8M1_13TeV_pythia8/TauPreSelection/181118_031114/0000/TwoProngNtuplizer_1.root");
       }
-      TDirectory * dir = (TDirectory*)f->Get("/cms/chiarito/eos/twoprong/ztagandprobe/Nov12_trees/QCD/QCD_Pt_1000to1400_TuneCUETP8M1_13TeV_pythia8/TauPreSelection_ext1/181112_215200/0000/TwoProngNtuplizer_1.root:/twoprongNtuplizer");
+      TDirectory * dir = (TDirectory*)f->Get("/cms/chiarito/eos/twoprong/ztagandprobe/Nov17_trees/QCD/QCD_Pt_1000to1400_TuneCUETP8M1_13TeV_pythia8/TauPreSelection/181118_031114/0000/TwoProngNtuplizer_1.root:/twoprongNtuplizer");
       dir->GetObject("fTree2",tree);
 
    }
@@ -862,6 +893,7 @@ void MyClassMC::Init(TTree *tree)
    // (once per file to be processed).
 
    // Set object pointer
+   photonTrigger = 0;
    Electron_pt = 0;
    Electron_eta = 0;
    Electron_phi = 0;
@@ -980,18 +1012,7 @@ void MyClassMC::Init(TTree *tree)
    TwoProng_CHpos_p3 = 0;
    TwoProng_CHneg_p3 = 0;
    TwoProng_photon_p3 = 0;
-   TagMuon_pt = 0;
-   TagMuon_eta = 0;
-   TagMuon_phi = 0;
-   TagMuon_mass = 0;
-   TagMuon_z = 0;
-   TagMuon_dz = 0;
-   TagMuon_iso = 0;
-   ProbeTau_pt = 0;
-   ProbeTau_eta = 0;
-   ProbeTau_phi = 0;
-   ProbeTau_mass = 0;
-   ProbeTau_genDR = 0;
+   muonTrigger = 0;
    // Set branch addresses and branch pointers
    if (!tree) return;
    fChain = tree;
@@ -1003,6 +1024,7 @@ void MyClassMC::Init(TTree *tree)
    fChain->SetBranchAddress("mcWProd", &mcWProd, &b_mcWProd);
    fChain->SetBranchAddress("HLT_Photon175", &HLT_Photon175, &b_HLT_Photon175);
    fChain->SetBranchAddress("HLT_Photon22_Iso", &HLT_Photon22_Iso, &b_HLT_Photon22_Iso);
+   fChain->SetBranchAddress("photonTrigger", &photonTrigger, &b_photonTrigger);
    fChain->SetBranchAddress("eventNum", &eventNum, &b_eventNum);
    fChain->SetBranchAddress("runNum", &runNum, &b_runNum);
    fChain->SetBranchAddress("lumiNum", &lumiNum, &b_lumiNum);
@@ -1149,19 +1171,21 @@ void MyClassMC::Init(TTree *tree)
    fChain->SetBranchAddress("RecoPhiDiTwoProng", &RecoPhiDiTwoProng_pt, &b_RecoPhiDiTwoProng);
    fChain->SetBranchAddress("RecoPhiPhotonTwoProng", &RecoPhiPhotonTwoProng_pt, &b_RecoPhiPhotonTwoProng);
    fChain->SetBranchAddress("RecoPhiInclusive", &RecoPhiInclusive_pt, &b_RecoPhiInclusive);
-   fChain->SetBranchAddress("passZMuonTrigger", &passZMuonTrigger, &b_passZMuonTrigger);
-   fChain->SetBranchAddress("passZTnP", &passZTnP, &b_passZTnP);
-   fChain->SetBranchAddress("passZPre", &passZPre, &b_passZPre);
-   fChain->SetBranchAddress("passZExtraMuon", &passZExtraMuon, &b_passZExtraMuon);
-   fChain->SetBranchAddress("passZExtraElectron", &passZExtraElectron, &b_passZExtraElectron);
-   fChain->SetBranchAddress("passZDiMuon", &passZDiMuon, &b_passZDiMuon);
-   fChain->SetBranchAddress("passZBVeto", &passZBVeto, &b_passZBVeto);
-   fChain->SetBranchAddress("ZBVetoVal", &ZBVetoVal, &b_ZBVetoVal);
+   fChain->SetBranchAddress("passMuonTrigger", &passMuonTrigger, &b_passMuonTrigger);
+   fChain->SetBranchAddress("muonTrigger", &muonTrigger, &b_muonTrigger);
    fChain->SetBranchAddress("nTagMuons", &nTagMuons, &b_nTagMuons);
    fChain->SetBranchAddress("nProbeTaus", &nProbeTaus, &b_nProbeTaus);
-   fChain->SetBranchAddress("TauPreDr", &TauPreDr, &b_TauPreDr);
-   fChain->SetBranchAddress("TauPreMT", &TauPreMT, &b_TauPreMt);
-   fChain->SetBranchAddress("TauPrePzeta", &TauPrePzeta, &b_TauPrePzeta);
+   fChain->SetBranchAddress("passPzeta", &passPzeta, &b_passPzeta);
+   fChain->SetBranchAddress("passMT", &passMT, &b_passMT);
+   fChain->SetBranchAddress("passExtraElectronVeto", &passExtraElectronVeto, &b_passExtraElectronVeto);
+   fChain->SetBranchAddress("passExtraMuonVeto", &passExtraMuonVeto, &b_passExtraMuonVeto);
+   fChain->SetBranchAddress("passDiMuonVeto", &passDiMuonVeto, &b_passDiMuonVeto);
+   fChain->SetBranchAddress("passExtraLeptonVeto", &passExtraLeptonVeto, &b_passExtraLeptonVeto);
+   fChain->SetBranchAddress("passBtagVeto", &passBtagVeto, &b_passBtagVeto);
+   fChain->SetBranchAddress("MT", &MT, &b_MT);
+   fChain->SetBranchAddress("Pzeta", &Pzeta, &b_Pzeta);
+   fChain->SetBranchAddress("highestBtag", &highestBtag, &b_highestBtag);
+   fChain->SetBranchAddress("passMuonTauPair", &passMuonTauPair, &b_passMuonTauPair);
    fChain->SetBranchAddress("TagMuon_pt", &TagMuon_pt, &b_TagMuon_pt);
    fChain->SetBranchAddress("TagMuon_eta", &TagMuon_eta, &b_TagMuon_eta);
    fChain->SetBranchAddress("TagMuon_phi", &TagMuon_phi, &b_TagMuon_phi);
@@ -1174,9 +1198,21 @@ void MyClassMC::Init(TTree *tree)
    fChain->SetBranchAddress("ProbeTau_phi", &ProbeTau_phi, &b_ProbeTau_phi);
    fChain->SetBranchAddress("ProbeTau_mass", &ProbeTau_mass, &b_ProbeTau_mass);
    fChain->SetBranchAddress("ProbeTau_genDR", &ProbeTau_genDR, &b_ProbeTau_genDR);
-   fChain->SetBranchAddress("ZvisibleMuonProbeTau", &ZvisibleMuonProbeTau_pt, &b_ZvisibleMuonProbeTau);
-   fChain->SetBranchAddress("ZvisibleMuonPatTau", &ZvisibleMuonPatTau_pt, &b_ZvisibleMuonPatTau);
-   fChain->SetBranchAddress("ZvisibleMuonTwoProng", &ZvisibleMuonTwoProng_pt, &b_ZvisibleMuonTwoProng);
+   fChain->SetBranchAddress("probePassTauID", &probePassTauID, &b_probePassTauID);
+   fChain->SetBranchAddress("ProbeTau_tauID_pt", &ProbeTau_tauID_pt, &b_ProbeTau_tauID_pt);
+   fChain->SetBranchAddress("ProbeTau_tauID_eta", &ProbeTau_tauID_eta, &b_ProbeTau_tauID_eta);
+   fChain->SetBranchAddress("ProbeTau_tauID_phi", &ProbeTau_tauID_phi, &b_ProbeTau_tauID_phi);
+   fChain->SetBranchAddress("ProbeTau_tauID_mass", &ProbeTau_tauID_mass, &b_ProbeTau_tauID_mass);
+   fChain->SetBranchAddress("ProbeTau_tauID_probeDR", &ProbeTau_tauID_probeDR, &b_ProbeTau_tauID_probeDR);
+   fChain->SetBranchAddress("probePassTwoProng", &probePassTwoProng, &b_probePassTwoProng);
+   fChain->SetBranchAddress("ProbeTau_twoprong_pt", &ProbeTau_twoprong_pt, &b_ProbeTau_twoprong_pt);
+   fChain->SetBranchAddress("ProbeTau_twoprong_eta", &ProbeTau_twoprong_eta, &b_ProbeTau_twoprong_eta);
+   fChain->SetBranchAddress("ProbeTau_twoprong_phi", &ProbeTau_twoprong_phi, &b_ProbeTau_twoprong_phi);
+   fChain->SetBranchAddress("ProbeTau_twoprong_mass", &ProbeTau_twoprong_mass, &b_ProbeTau_twoprong_mass);
+   fChain->SetBranchAddress("ProbeTau_twoprong_probeDR", &ProbeTau_twoprong_probeDR, &b_ProbeTau_twoprong_probeDR);
+   fChain->SetBranchAddress("MuonProbe", &MuonProbe_pt, &b_MuonProbe);
+   fChain->SetBranchAddress("MuonTauID", &MuonTauID_pt, &b_MuonTauID);
+   fChain->SetBranchAddress("MuonTwoProng", &MuonTwoProng_pt, &b_MuonTwoProng);
    Notify();
 }
 

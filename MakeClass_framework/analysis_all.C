@@ -19,13 +19,13 @@ void ProcessEntity(struct dirent* entity);
 // globals
 string treename = "twoprongNtuplizer/fTree2";
 //string treename = "twoprongModNtuplizer/fTree2";
-string base_path = "/cms/chiarito/eos/twoprong/ztagandprobe/Nov12_trees/";
+string base_path = "/cms/chiarito/eos/twoprong/ztagandprobe/Nov17_trees/"; // end in '/'
 TChain * chain = new TChain(treename.c_str());
 string path = "";
 vector<string> paths;
 Long64_t MAX_ENTRIES = -1;
 string output = "";
-string pre = "output_reg_";
+string pre = "output_reg_nov17_"; // end in '_'
 string post = ".root";
 
 void analysis_all()
@@ -148,6 +148,33 @@ void analysis_all()
   paths.clear();
   chain->Reset();
 
+  /*paths.push_back("BKG/WWTo1L1Nu2Q_13TeV_amcatnloFXFX_madspin_pythia8/");
+  paths.push_back("BKG/WZTo1L1Nu2Q_13TeV_amcatnloFXFX_madspin_pythia8/");
+  paths.push_back("BKG/WZTo1L3Nu_13TeV_amcatnloFXFX_madspin_pythia8/");
+  output = "WWWZ";
+  make_histos(paths, output);
+  paths.clear();
+  chain->Reset();*/
+
+  paths.push_back("BKG/ST_t-channel_antitop_4f_inclusiveDecays_13TeV-powhegV2-madspin-pythia8_TuneCUETP8M1/");
+  output = "STbar";
+  make_histos(paths, output);
+  paths.clear();
+  chain->Reset();
+
+  paths.push_back("BKG/ST_t-channel_top_4f_inclusiveDecays_13TeV-powhegV2-madspin-pythia8_TuneCUETP8M1/");
+  output = "ST";
+  make_histos(paths, output);
+  paths.clear();
+  chain->Reset();
+
+  paths.push_back("BKG/ST_tW_antitop_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1/");
+  paths.push_back("BKG/ST_tW_top_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1/");
+  output = "tW";
+  make_histos(paths, output);
+  paths.clear();
+  chain->Reset();
+
   paths.push_back("BKG/TTJets_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/");
   output = "TT";
   make_histos(paths, output);
@@ -181,7 +208,7 @@ void analysis_all()
   */
   chrono::high_resolution_clock::time_point time_end = chrono::high_resolution_clock::now();
   auto run_time = chrono::duration_cast<chrono::seconds>( time_end - time_start ).count();
-  cout << "\nOverall processing took " << run_time << " seconds" << endl;  
+  cout << "\nFinished producing " << pre+"X"+post << " files, overall processing took " << run_time << " seconds" << endl;
 }
 
 void make_histos(vector<string> paths, string output)

@@ -12,6 +12,15 @@ dy10_ngen = 35291566
 wjets = 50320
 wjets_ngen = 86731806
 
+top = 123.3
+top_ngen = 67240808
+
+antitop = 74.41
+antitop_ngen = 38811017
+
+tW = 38.09
+tW_ngen = int((6952830+6933094)/2.0)
+
 ttbar = 509.4
 ttbar_ngen = 10139950
 
