@@ -3,7 +3,7 @@ lumi2016 = 37196
 BR_dysig = 0.07511
 BR_dybkg = 1 - BR_dysig
 
-dy = 4964
+dy = 5765.7
 dy_ngen = 145803217
 
 dy10 = 18610
@@ -21,10 +21,10 @@ wz1l3nu_ngen = 1703772
 wz1l2q = 10.71
 wz1l2q_ngen = 24221923
 
-top = 123.3
+top = 136.02
 top_ngen = 67240808
 
-antitop = 74.41
+antitop = 80.95
 antitop_ngen = 38811017
 
 tW = 35.6
