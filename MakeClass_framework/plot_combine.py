@@ -18,12 +18,12 @@ def total_weight(hist):
 def entries(hist):
   return hist.GetEntries()
 
-filename_prefix = "output_test_" # ends with '_'
-pdf_filename = "summary_"+filename_prefix+"hists.pdf"
+filename_prefix = "output_mod_nov17_" # ends with '_'
+pdf_filename = "summary_newxs_"+filename_prefix+"hists.pdf"
 
 # cosmetics
-save = False
-only_one = True
+save = True
+only_one = False
 data_color = ROOT.kBlack
 dysig_color = ROOT.kMagenta
 dybkg_color = ROOT.kRed
@@ -215,13 +215,13 @@ for i in range(len(dysig_hists)):
   mc_stack = ROOT.THStack('hs', title)
   if title in reversed_histos:
     logy = False
-    mc_stack.Add(qcd_hist)
     mc_stack.Add(wwwz_hist)
     mc_stack.Add(wjets_hist)
     mc_stack.Add(ttbar_hist)
     mc_stack.Add(top_hist)
     mc_stack.Add(dybkg_hist)
     mc_stack.Add(dysig_hist)
+    mc_stack.Add(qcd_hist)
   else:
     logy = True
     mc_stack.Add(dysig_hist)
