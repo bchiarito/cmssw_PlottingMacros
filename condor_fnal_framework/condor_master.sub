@@ -1,0 +1,57 @@
+executable            = condor_execute.sh
+input                 = 
+arguments             = $(TAG)
+initialdir            = condor_log
+transfer_input_files  = ../xrdcp_dict.txt,../xrdcp_files.py,../analysis_all.C,../MyLooper.C,../MyLooper.h,../MyClassDATA.h,../MyClassDATA.C
+should_transfer_files = YES
++JobFlavour           = "longlunch"
+Notification          = never
+x509userproxy         = $ENV(X509_USER_PROXY)
+transfer_output_files = output_test_all.root
+transfer_output_remaps = "output_test_all.root = output_$(TAG).root"
+
+output                = $(Cluster)_$(TAG)_out.txt
+error                 = $(Cluster)_$(TAG)_out.txt
+log                   = $(Cluster)_log.txt
+
+queue TAG in (
+  DATA
+  DYsig
+  DY10sig
+  DY1sig
+  DY2sig
+  DY3sig
+  DY4sig
+  DYbkg
+  DY10bkg
+  DY1bkg
+  DY2bkg
+  DY3bkg
+  DY4bkg
+  TT
+  STtop
+  STantitop
+  tW
+  WJets
+  W1Jets
+  W2Jets
+  W3Jets
+  W4Jets
+  WW
+  WZ1L
+  WZ3Nu
+  QCD_1000to1400
+  QCD_120to170
+  QCD_1400to1800
+  QCD_15to30
+  QCD_170to300
+  QCD_1800to2400
+  QCD_2400to3200
+  QCD_300to470
+  QCD_30to50
+  QCD_470to600
+  QCD_50to80
+  QCD_600to800
+  QCD_800to1000
+  QCD_80to120
+)
