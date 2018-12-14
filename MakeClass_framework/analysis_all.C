@@ -16,16 +16,17 @@ void ProcessDirectory(std::string directory);
 void ProcessFile(std::string file);
 void ProcessEntity(struct dirent* entity);
 
-// globals
+// configuration globals
 string treename = "twoprongNtuplizer/fTree2";
 //string treename = "twoprongModNtuplizer/fTree2";
-string base_path = "/cms/chiarito/eos/twoprong/ztagandprobe/Nov17_trees/"; // end in '/'
+string base_path = "/eos/uscms/store/user/bchiari1/twoprong/ztagandprobe/Nov29_trees/regpre/"; // end in '/'
+string pre = "output_test_"; // end in '_'
+Long64_t MAX_ENTRIES = 100;
+// other globals
 TChain * chain = new TChain(treename.c_str());
 string path = "";
 vector<string> paths;
-Long64_t MAX_ENTRIES = 100;
 string output = "";
-string pre = "output_test_"; // end in '_'
 string post = ".root";
 
 void analysis_all()
