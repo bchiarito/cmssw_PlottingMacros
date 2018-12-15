@@ -4,3 +4,5 @@ output_*.root
 *.d
 *.pcm
 xrdcp_dict.txt
+*_out.txt
+*_log.txt
