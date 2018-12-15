@@ -1,2 +1,5 @@
 output_*.root
 *.pyc
+*.so
+*.d
+*.pcm
