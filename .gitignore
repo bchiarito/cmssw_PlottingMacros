@@ -3,3 +3,4 @@ output_*.root
 *.so
 *.d
 *.pcm
+xrdcp_dict.txt
