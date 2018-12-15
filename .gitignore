@@ -6,3 +6,4 @@ output_*.root
 xrdcp_dict.txt
 *_out.txt
 *_log.txt
+*.pdf
