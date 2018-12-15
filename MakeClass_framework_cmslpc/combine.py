@@ -150,27 +150,23 @@ c1.SetLogy()
 if not options.test: c1.Print(pdf_filename+"[")
 for i in range(len(dysig_hists)):
   data_hist = data_hists[i]
-  dy10sig_hist = dy10sig_hists[i]
   dysig_hist = dysig_hists[i]
-
   dy1sig_hist = dy1sig_hists[i]
   dy2sig_hist = dy2sig_hists[i]
   dy3sig_hist = dy3sig_hists[i]
   dy4sig_hist = dy4sig_hists[i]
+  dy10sig_hist = dy10sig_hists[i]
+  dybkg_hist = dybkg_hists[i]
   dy1bkg_hist = dy1bkg_hists[i]
   dy2bkg_hist = dy2bkg_hists[i]
   dy3bkg_hist = dy3bkg_hists[i]
   dy4bkg_hist = dy4bkg_hists[i]
-
   dy10bkg_hist = dy10bkg_hists[i]
-  dybkg_hist = dybkg_hists[i]
   wjets_hist = wjets_hists[i]
-
   w1jets_hist = w1jets_hists[i]
   w2jets_hist = w2jets_hists[i]
   w3jets_hist = w3jets_hists[i]
   w4jets_hist = w4jets_hists[i]
-
   ww_hist = ww_hists[i]
   wz3nu_hist = wz3nu_hists[i]
   wz2q_hist = wz2q_hists[i]
@@ -195,7 +191,6 @@ for i in range(len(dysig_hists)):
   # scale to xs
   dy10sig_hist.Scale(xs.dy10 * xs.lumi2016 / xs.dy10_ngen)
   dysig_hist.Scale(xs.dy * xs.lumi2016 / xs.dy_ngen)
-
   dy1sig_hist.Scale(xs.dy1 * xs.lumi2016 / xs.dy1_ngen)
   dy2sig_hist.Scale(xs.dy2 * xs.lumi2016 / xs.dy2_ngen)
   dy3sig_hist.Scale(xs.dy2 * xs.lumi2016 / xs.dy2_ngen)
@@ -204,16 +199,13 @@ for i in range(len(dysig_hists)):
   dy2bkg_hist.Scale(xs.dy2 * xs.lumi2016 / xs.dy2_ngen)
   dy3bkg_hist.Scale(xs.dy2 * xs.lumi2016 / xs.dy2_ngen)
   dy4bkg_hist.Scale(xs.dy2 * xs.lumi2016 / xs.dy2_ngen)
-
   dy10bkg_hist.Scale(xs.dy10 * xs.lumi2016 / xs.dy10_ngen)
   dybkg_hist.Scale(xs.dy * xs.lumi2016 / xs.dy_ngen)
   wjets_hist.Scale(xs.wjets * xs.lumi2016 / xs.wjets_ngen)
-
   w1jets_hist.Scale(xs.w1jets * xs.lumi2016 / xs.w1jets_ngen)
   w2jets_hist.Scale(xs.w2jets * xs.lumi2016 / xs.w2jets_ngen)
   w3jets_hist.Scale(xs.w3jets * xs.lumi2016 / xs.w3jets_ngen)
   w4jets_hist.Scale(xs.w4jets * xs.lumi2016 / xs.w4jets_ngen)
-
   ww_hist.Scale(xs.ww * xs.lumi2016 / xs.ww_ngen)
   wz3nu_hist.Scale(xs.wz1l3nu * xs.lumi2016 / xs.wz1l3nu_ngen)
   wz2q_hist.Scale(xs.wz1l2q * xs.lumi2016 / xs.wz1l2q_ngen)
@@ -375,6 +367,7 @@ for i in range(len(dysig_hists)):
   if not options.test:
     print mc_stack.GetTitle()
     c1.Print(pdf_filename);
+    c1.SaveAs(mc_stack.GetTitle() + ".pdf")
   if options.test: break
 
 if options.test: raw_input()
