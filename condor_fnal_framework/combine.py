@@ -2,28 +2,19 @@ from __future__ import division
 import ROOT
 import cross_sections as xs
 
-def extract_histos(rootfile):
-  histos = []
-  keyList = rootfile.GetListOfKeys()
-  for key in keyList:
-    cl = ROOT.gROOT.GetClass(key.GetClassName())
-    if not cl.InheritsFrom("TH1"): continue
-    hist = key.ReadObj()
-    histos.append(hist)
-  return histos
+# help message
+from optparse import OptionParser
+usage = "python %prog <path_with_histos> [options]\n\n<path_with_histos> should be the relative path to a folder whose contents are rootfiles output_DYsig.root etc."
+parser = OptionParser(usage=usage)
+parser.add_option('--out', type='string', action='store', default='summary_hists.pdf', dest='out', help='the output filename')
+parser.add_option('--test', action='store_true', default=False, dest='test', help='instead of saving the output, draw one histogram and display it')
+(options, args) = parser.parse_args()
 
-def total_weight(hist):
-  return hist.Integral() + hist.GetBinContent(hist.GetNbinsX()+1) + hist.GetBinContent(0)
-
-def entries(hist):
-  return hist.GetEntries()
-
-filename_prefix = "condor_log/output_" # ends with '_'
-pdf_filename = "summary_"+"hists.pdf"
+# configuration
+filename_prefix = args[0] + "/output_"
+pdf_filename = options.out
 
 # cosmetics
-save = False
-only_one = True
 data_color = ROOT.kBlack
 dysig_color = ROOT.kMagenta
 dybkg_color = ROOT.kRed
@@ -50,6 +41,23 @@ reversed_histos.append('Zvis_pattau_mass')
 reversed_histos.append('Zvis_twoprong_mass')
 reversed_histos.append('Zvis_pattau_mass_fail')
 reversed_histos.append('Zvis_twoprong_mass_fail')
+
+# helper functions
+def extract_histos(rootfile):
+  histos = []
+  keyList = rootfile.GetListOfKeys()
+  for key in keyList:
+    cl = ROOT.gROOT.GetClass(key.GetClassName())
+    if not cl.InheritsFrom("TH1"): continue
+    hist = key.ReadObj()
+    histos.append(hist)
+  return histos
+
+def total_weight(hist):
+  return hist.Integral() + hist.GetBinContent(hist.GetNbinsX()+1) + hist.GetBinContent(0)
+
+def entries(hist):
+  return hist.GetEntries()
 
 # extract histos into memory
 data = ROOT.TFile(filename_prefix+"DATA.root")
@@ -139,7 +147,7 @@ qcd80to120_hists = extract_histos(qcd80to120)
 logy = True
 c1 = ROOT.TCanvas()
 c1.SetLogy()
-if save: c1.Print(pdf_filename+"[")
+if not options.test: c1.Print(pdf_filename+"[")
 for i in range(len(dysig_hists)):
   data_hist = data_hists[i]
   dy10sig_hist = dy10sig_hists[i]
@@ -364,10 +372,10 @@ for i in range(len(dysig_hists)):
   data_hist.Draw('e same')
   leg.Draw('same')
   c1.SetLogy(logy)
-  if save:
+  if not options.test:
     print mc_stack.GetTitle()
     c1.Print(pdf_filename);
-  if only_one: break
+  if options.test: break
 
-if only_one: raw_input()
-if save: c1.Print(pdf_filename+"]")
+if options.test: raw_input()
+if not options.test: c1.Print(pdf_filename+"]")
