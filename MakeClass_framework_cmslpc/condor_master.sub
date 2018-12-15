@@ -15,7 +15,13 @@ error                 = $(Cluster)_$(TAG)_out.txt
 log                   = $(Cluster)_log.txt
 
 queue TAG in (
-  DATA
+  DATA_RunB_ver2
+  DATA_RunC
+  DATA_RunD
+  DATA_RunE
+  DATA_RunF
+  DATA_RunG
+  DATA_RunH
   DYsig
   DY10sig
   DY1sig

@@ -4,7 +4,7 @@ import fnmatch
 import subprocess
 
 # usage:
-# python <script.py> /eos/uscms/store/user/bchiari1/twoprong/ztagandprobe/Nov29_trees/regpre/
+# python <script.py> /store/user/bchiari1/twoprong/ztagandprobe/Nov29_trees/regpre/
 
 def get_commands(dataset_paths):
   commands = []
@@ -34,8 +34,9 @@ def add_to_dict(fi, tag, paths):
 
 # setup  
 prefix = "root://cmsxrootd.fnal.gov//"
-base_path = sys.argv[1]
-store_user_base = base_path[11:len(base_path)]
+#base_path = sys.argv[1]
+#store_user_base = base_path[11:len(base_path)]
+store_user_base = sys.argv[1]
 
 # generate dictionary file
 dict_file = open('xrdcp_dict.txt', 'w')
@@ -122,8 +123,30 @@ tag = "DY4bkg"
 end_paths = ["DY/DY4JetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/DY4_50_bkg"]
 add_to_dict(dict_file, tag, end_paths)
 
-tag = "DATA"
-end_paths = ["DATA/SingleMuon/RunB_ver2", "DATA/SingleMuon/RunC", "DATA/SingleMuon/RunD", "DATA/SingleMuon/RunE", "DATA/SingleMuon/RunF", "DATA/SingleMuon/RunG", "DATA/SingleMuon/RunH"]
+#tag = "DATA"
+#end_paths = ["DATA/SingleMuon/RunB_ver2", "DATA/SingleMuon/RunC", "DATA/SingleMuon/RunD", "DATA/SingleMuon/RunE", "DATA/SingleMuon/RunF", "DATA/SingleMuon/RunG", "DATA/SingleMuon/RunH"]
+#add_to_dict(dict_file, tag, end_paths)
+
+tag = "DATA_RunB_ver2"
+end_paths = ["DATA/SingleMuon/RunB_ver2"]
+add_to_dict(dict_file, tag, end_paths)
+tag = "DATA_RunC"
+end_paths = ["DATA/SingleMuon/RunC"]
+add_to_dict(dict_file, tag, end_paths)
+tag = "DATA_RunD"
+end_paths = ["DATA/SingleMuon/RunD"]
+add_to_dict(dict_file, tag, end_paths)
+tag = "DATA_RunE"
+end_paths = ["DATA/SingleMuon/RunE"]
+add_to_dict(dict_file, tag, end_paths)
+tag = "DATA_RunF"
+end_paths = ["DATA/SingleMuon/RunF"]
+add_to_dict(dict_file, tag, end_paths)
+tag = "DATA_RunG"
+end_paths = ["DATA/SingleMuon/RunG"]
+add_to_dict(dict_file, tag, end_paths)
+tag = "DATA_RunH"
+end_paths = ["DATA/SingleMuon/RunH"]
 add_to_dict(dict_file, tag, end_paths)
 
 tag = "QCD_1000to1400"
