@@ -1,0 +1,11 @@
+$ python generate_xrdcp_dict.py </store/user/path/> ( eg /store/user/bchiari1/twoprong/ztagandprobe/Nov29_trees/regpre/ )
+
+$ ./condor_archive.sh <desired_name>
+or
+$ ./condor_clear.sh
+
+$ condor_submit condor_master.sub
+
+$ condor_wait -status condor_log/XXXXXX_log.txt
+
+$ python combine.py condor_log/
