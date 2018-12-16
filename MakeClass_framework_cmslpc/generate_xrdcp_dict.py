@@ -49,7 +49,7 @@ add_to_dict(dict_file, tag, end_paths)
 tag = "STantitop"
 end_paths = ["BKG/ST_t-channel_antitop_4f_inclusiveDecays_13TeV-powhegV2-madspin-pythia8_TuneCUETP8M1"]
 add_to_dict(dict_file, tag, end_paths)
-tag = "tWtop"
+tag = "tW"
 end_paths = ["BKG/ST_tW_top_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1",
              "BKG/ST_tW_antitop_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1"]
 add_to_dict(dict_file, tag, end_paths)
@@ -85,18 +85,7 @@ end_paths = ["BKG/WZTo1L3Nu_13TeV_amcatnloFXFX_madspin_pythia8/twoprongntuplizer
 add_to_dict(dict_file, tag, end_paths)
 
 tag = "DYsig"
-dataset_paths = ["DY/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/DY_50_ext1_signal",
-                 "DY/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/DY_50_ext2_signal"]
-add_to_dict(dict_file, tag, end_paths)
-tag = "DY10sig"
-dataset_paths = ["DY/DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/DY_10to50_bkg"]
-add_to_dict(dict_file, tag, end_paths)
-tag = "DY10bkg"
-dataset_paths= ["DY/DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/DY_10to50_signal"]
-add_to_dict(dict_file, tag, end_paths)
-tag = "DYbkg"
-end_paths = ["DY/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/DY_50_ext1_bkg",
-             "DY/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/DY_50_ext2_bkg"]
+end_paths = ["DY/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/DY_50_ext1_signal", "DY/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/DY_50_ext2_signal"]
 add_to_dict(dict_file, tag, end_paths)
 tag = "DY1sig"
 end_paths = ["DY/DY1JetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/DY1_50_signal"]
@@ -110,6 +99,13 @@ add_to_dict(dict_file, tag, end_paths)
 tag = "DY4sig"
 end_paths = ["DY/DY4JetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/DY4_50_signal"]
 add_to_dict(dict_file, tag, end_paths)
+tag = "DY10sig"
+end_paths = ["DY/DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/DY_10to50_signal"]
+add_to_dict(dict_file, tag, end_paths)
+
+tag = "DYbkg"
+end_paths = ["DY/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/DY_50_ext1_bkg", "DY/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/DY_50_ext2_bkg"]
+add_to_dict(dict_file, tag, end_paths)
 tag = "DY1bkg"
 end_paths = ["DY/DY1JetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/DY1_50_bkg"]
 add_to_dict(dict_file, tag, end_paths)
@@ -122,10 +118,9 @@ add_to_dict(dict_file, tag, end_paths)
 tag = "DY4bkg"
 end_paths = ["DY/DY4JetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/DY4_50_bkg"]
 add_to_dict(dict_file, tag, end_paths)
-
-#tag = "DATA"
-#end_paths = ["DATA/SingleMuon/RunB_ver2", "DATA/SingleMuon/RunC", "DATA/SingleMuon/RunD", "DATA/SingleMuon/RunE", "DATA/SingleMuon/RunF", "DATA/SingleMuon/RunG", "DATA/SingleMuon/RunH"]
-#add_to_dict(dict_file, tag, end_paths)
+tag = "DY10bkg"
+end_paths = ["DY/DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/DY_10to50_bkg"]
+add_to_dict(dict_file, tag, end_paths)
 
 tag = "DATA_RunB_ver2"
 end_paths = ["DATA/SingleMuon/RunB_ver2"]
