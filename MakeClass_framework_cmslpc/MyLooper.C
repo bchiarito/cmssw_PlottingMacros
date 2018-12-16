@@ -26,6 +26,7 @@ void MyLooper::CustomLoop(const char * outputfilename = "output.root", Long64_t 
    TH1F * hist_HT_full = new TH1F("hist_HT_full", "hist_HT_full", 200, 0, 2000);
    TH1F * hist_HT = new TH1F("hist_HT", "hist_HT", 200, 0, 2000);
    TH1F * hist_MET = new TH1F("hist_MET", "hist_MET", 100, 0, 1000);
+   TH1F * hist_METphi = new TH1F("hist_METphi", "hist_METphi", phibins, philow, phihigh);
    TH1F * hist_npv = new TH1F("hist_npv", "hist_npv", 100, 0, 100);
    TH1F * hist_rho = new TH1F("hist_rho", "hist_rho", 100, 0, 100);
    TH1F * hist_MTn1 = new TH1F("hist_MTn1", "hist_MTn1", 60, 0, 300);
@@ -37,7 +38,7 @@ void MyLooper::CustomLoop(const char * outputfilename = "output.root", Long64_t 
    TH1F * hist_nJets = new TH1F("hist_nJets", "hist_nJets", 40, 0, 40);
    TH1F * hist_LeadingJet_pt = new TH1F("hist_LeadingJet_pt", "hist_LeadingJet_pt", ptbins, ptlow, pthigh);
    TH1F * hist_LeadingJet_eta = new TH1F("hist_LeadingJet_eta", "hist_LeadingJet_eta", etabins, etalow, etahigh);
-   TH1F * hist_LeadingJet_phi = new TH1F("hist_LeadingJet_phi", "hist_LeadingJet_phi", phibins, etalow, etahigh);
+   TH1F * hist_LeadingJet_phi = new TH1F("hist_LeadingJet_phi", "hist_LeadingJet_phi", phibins, philow, phihigh);
 
    // tag muon
    TH1F * hist_nTagMuons = new TH1F("hist_nTagMuons", "hist_nTagMuons", 20, 0, 20);
@@ -57,15 +58,15 @@ void MyLooper::CustomLoop(const char * outputfilename = "output.root", Long64_t 
    TH1F * hist_Zvis_taujet_pt = new TH1F("hist_Zvis_taujet_pt", "hist_Zvis_taujet_pt", ptbins, ptlow, pthigh);
    TH1F * hist_Zvis_taujet_phi = new TH1F("hist_Zvis_taujet_phi", "hist_Zvis_taujet_phi", phibins, philow, phihigh);
    TH1F * hist_Zvis_taujet_eta = new TH1F("hist_Zvis_taujet_eta", "hist_Zvis_taujet_eta", etabins+40, etalow-4, etahigh+4);
-   TH1F * hist_Zvis_taujet_dr = new TH1F("hist_Zvis_taujet_dr", "hist_Zvis_taujet_dr", 100, 0, 10);
-   TH1F * hist_Zvis_taujet_dphi = new TH1F("hist_Zvis_taujet_dphi", "hist_Zvis_taujet_dphi", 100, 0, 10);
-   TH1F * hist_Zvis_taujet_deta = new TH1F("hist_Zvis_taujet_deta", "hist_Zvis_taujet_deta", 100, 0, 10);
+   TH1F * hist_Zvis_taujet_dr = new TH1F("hist_Zvis_taujet_dr", "hist_Zvis_taujet_dr", 60, 0, 6);
+   TH1F * hist_Zvis_taujet_dphi = new TH1F("hist_Zvis_taujet_dphi", "hist_Zvis_taujet_dphi", 32, 0, 3.2);
+   TH1F * hist_Zvis_taujet_deta = new TH1F("hist_Zvis_taujet_deta", "hist_Zvis_taujet_deta", 50, 0, 5);
 
    TH1F * hist_nProbePatTaus = new TH1F("hist_nProbePatTaus", "hist_nProbePatTaus", 20, 0, 20);
    TH1F * hist_ProbePatTau_pt = new TH1F("hist_ProbePatTau_pt", "hist_ProbePatTau_pt", ptbins, ptlow, pthigh);
    TH1F * hist_ProbePatTau_eta = new TH1F("hist_ProbePatTau_eta", "hist_ProbePatTau_eta", etabins, etalow, etahigh);
    TH1F * hist_ProbePatTau_phi = new TH1F("hist_ProbePatTau_phi", "hist_ProbePatTau_phi", phibins, philow, phihigh);
-   TH1F * hist_ProbePatTau_dr = new TH1F("hist_ProbePatTau_dr", "hist_ProbePatTau_dr", 100, 0, 1);
+   TH1F * hist_ProbePatTau_dr = new TH1F("hist_ProbePatTau_dr", "hist_ProbePatTau_dr", 60, 0, 6);
 
    TH1F * hist_Zvis_pattau_mass = new TH1F("hist_Zvis_pattau_mass", "hist_Zvis_pattau_mass", 20, 0, 200);
    TH1F * hist_Zvis_pattau_mass_fail = new TH1F("hist_Zvis_pattau_mass_fail", "hist_Zvis_pattau_mass_fail", 20, 0, 200);
@@ -77,7 +78,7 @@ void MyLooper::CustomLoop(const char * outputfilename = "output.root", Long64_t 
    TH1F * hist_ProbeTwoprong_pt = new TH1F("hist_ProbeTwoprong_pt", "hist_ProbeTwoprong_pt", ptbins, ptlow, pthigh);
    TH1F * hist_ProbeTwoprong_eta = new TH1F("hist_ProbeTwoprong_eta", "hist_ProbeTwoprong_eta", etabins, etalow, etahigh);
    TH1F * hist_ProbeTwoprong_phi = new TH1F("hist_ProbeTwoprong_phi", "hist_ProbeTwoprong_phi", phibins, philow, phihigh);
-   TH1F * hist_ProbeTwoprong_dr = new TH1F("hist_ProbeTwoprong_dr", "hist_ProbeTwoprong_dr", 100, 0, 1);
+   TH1F * hist_ProbeTwoprong_dr = new TH1F("hist_ProbeTwoprong_dr", "hist_ProbeTwoprong_dr", 60, 0, 6);
 
    TH1F * hist_Zvis_twoprong_mass = new TH1F("hist_Zvis_twoprong_mass", "hist_Zvis_twoprong_mass", 20, 0, 200);
    TH1F * hist_Zvis_twoprong_mass_fail = new TH1F("hist_Zvis_twoprong_mass_fail", "hist_Zvis_twoprong_mass_fail", 20, 0, 200);
@@ -127,6 +128,7 @@ void MyLooper::CustomLoop(const char * outputfilename = "output.root", Long64_t 
       // fill histograms
       hist_HT->Fill(HT);
       hist_MET->Fill(MET);
+      hist_METphi->Fill(MET_phi);
       hist_nJets->Fill(Jet_pt->size());
       hist_npv->Fill(nPV);
       hist_rho->Fill(rho);
@@ -165,7 +167,7 @@ void MyLooper::CustomLoop(const char * outputfilename = "output.root", Long64_t 
       hist_Zvis_taujet_phi->Fill(Zvis_taujet.Phi());
       hist_Zvis_taujet_eta->Fill(Zvis_taujet.Eta());
       hist_Zvis_taujet_dr->Fill( muon.DeltaR(taujet) );
-      hist_Zvis_taujet_dphi->Fill( muon.DeltaPhi(taujet)  );
+      hist_Zvis_taujet_dphi->Fill( fabs(muon.DeltaPhi(taujet))  );
       hist_Zvis_taujet_deta->Fill( fabs(muon.Eta() - taujet.Eta()));
 
       if(pattau_index != -1) {
