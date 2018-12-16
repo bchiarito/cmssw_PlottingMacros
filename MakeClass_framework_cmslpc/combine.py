@@ -60,8 +60,21 @@ def entries(hist):
   return hist.GetEntries()
 
 # extract histos into memory
-data = ROOT.TFile(filename_prefix+"DATA.root")
-data_hists = extract_histos(data)
+dataB = ROOT.TFile(filename_prefix+"DATA_RunB_ver2.root")
+dataB_hists = extract_histos(dataB)
+dataC = ROOT.TFile(filename_prefix+"DATA_RunC.root")
+dataC_hists = extract_histos(dataC)
+dataD = ROOT.TFile(filename_prefix+"DATA_RunD.root")
+dataD_hists = extract_histos(dataD)
+dataE = ROOT.TFile(filename_prefix+"DATA_RunE.root")
+dataE_hists = extract_histos(dataE)
+dataF = ROOT.TFile(filename_prefix+"DATA_RunF.root")
+dataF_hists = extract_histos(dataF)
+dataG = ROOT.TFile(filename_prefix+"DATA_RunG.root")
+dataG_hists = extract_histos(dataG)
+dataH = ROOT.TFile(filename_prefix+"DATA_RunH.root")
+dataH_hists = extract_histos(dataH)
+
 dy10sig = ROOT.TFile(filename_prefix+"DY10sig.root")
 dy10sig_hists = extract_histos(dy10sig)
 dysig = ROOT.TFile(filename_prefix+"DYsig.root")
@@ -149,7 +162,13 @@ c1 = ROOT.TCanvas()
 c1.SetLogy()
 if not options.test: c1.Print(pdf_filename+"[")
 for i in range(len(dysig_hists)):
-  data_hist = data_hists[i]
+  dataB_hist = dataB_hists[i]
+  dataC_hist = dataC_hists[i]
+  dataD_hist = dataD_hists[i]
+  dataE_hist = dataE_hists[i]
+  dataF_hist = dataF_hists[i]
+  dataG_hist = dataG_hists[i]
+  dataH_hist = dataH_hists[i]
   dysig_hist = dysig_hists[i]
   dy1sig_hist = dy1sig_hists[i]
   dy2sig_hist = dy2sig_hists[i]
@@ -227,6 +246,14 @@ for i in range(len(dysig_hists)):
   qcd600to800_hist.Scale(xs.qcd600to800 * xs.lumi2016 / xs.qcd600to800_ngen)
   qcd800to1000_hist.Scale(xs.qcd800to1000 * xs.lumi2016 / xs.qcd800to1000_ngen)
   qcd80to120_hist.Scale(xs.qcd80to120 * xs.lumi2016 / xs.qcd80to120_ngen)
+  # add up data
+  data_hist = dataB_hist.Clone()
+  data_hist.Add(dataC_hist)
+  data_hist.Add(dataD_hist)
+  data_hist.Add(dataE_hist)
+  data_hist.Add(dataF_hist)
+  data_hist.Add(dataG_hist)
+  data_hist.Add(dataH_hist)
   # add up qcd
   qcd_hist = qcd1000to1400_hist.Clone()
   qcd_hist.Add(qcd120to170_hist)
