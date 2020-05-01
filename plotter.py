@@ -12,7 +12,7 @@ from optparse import OptionGroup
 from optparse import SUPPRESS_HELP
 
 time_begin = time.time()
-usage = "Usage 1 (multiple samples): %prog [options] sample1 sample2 ... -v VAR -b BINNING -c CUT\n       Usage 2 (multiple variables): %prog [options] sample --var1 VAR1 --var2 VAR2 ... -b BINNING -c CUT\n       Usage 3 (mutliple samples from txt file input): %prog [options] samples.plot -v VAR -b BINNING -c CUT\nA sample arugment must be a root file, a directory which will be scanned for rootfiles, or a .dat file.\nTo see the required format of .dat and .plot files, use <unfinised> command."
+usage = "Usage 1 (multiple samples): %prog [options] sample1 sample2 ... -v VAR -b BINNING -c CUT\n       Usage 2 (multiple variables): %prog [options] sample --var1 VAR1 --var2 VAR2 ... -b BINNING -c CUT\n       Usage 3 (mutliple samples from txt file input): %prog [options] samples.plot -v VAR -b BINNING -c CUT\nA sample arugment must be a root file, a directory which will be scanned for rootfiles, or a .dat file.\nEach line of the .dat file must be --sample xs N--.\nTo see the required format of .plot files, use <unfinised> command."
 parser = OptionParser(usage=usage)
 
 # Basic options
@@ -43,6 +43,7 @@ multivar_options.add_option('--var8', type='string', action='store', dest='var8'
 twod_options = OptionGroup(parser, '2D Plot Options', '')
 twod_options.add_option('--vary', type='string', action='store', dest='vary', help='')
 twod_options.add_option('--biny', '--binsy', type='string', action='store', dest='binningy', help='')
+twod_options.add_option('--scatter', action='store_true', default=False, dest='scatter', help='make a scatter plot in 2D instead of a histogram')
 
 # Visual options
 visual_options = OptionGroup(parser, 'Visual Options', '')
@@ -63,8 +64,11 @@ visual_options.add_option('--mcweight', action='store_true', default=False, dest
 visual_options.add_option('--smallrun', action='store', dest='smallrun', metavar='N', help='correct mcN if small run')
 visual_options.add_option('--lumi', type='float', action='store', dest='lumi', default=1.0, help='integrated luminosity to scale to (pb^1)')
 visual_options.add_option('--2016lumi', action='store_true', default=False, dest='lumi_set_to_2016', help='set integreated luminiosity to 2016 total')
+visual_options.add_option('--2015lumi', action='store_true', default=False, dest='lumi_set_to_2015', help='set integreated luminiosity to 2015 total')
 visual_options.add_option('--vertical', type='float', action='store', dest='vertical', metavar='COOR', help='draw a vertical line')
 visual_options.add_option('--horizontal', type='float', action='store', dest='horizontal', metavar='COOR', help='draw a horizontal line')
+visual_options.add_option('--lega', type='string', action='store', dest='legenda', help=SUPPRESS_HELP)
+visual_options.add_option('--legb', type='string', action='store', dest='legendb', help=SUPPRESS_HELP)
 
 # Individual sample options
 sample_options = OptionGroup(parser, 'Individual Sample Options', 'Set individual sample options with --treeN --errorN --legN --colorN.')
@@ -209,7 +213,9 @@ if options.verbose:
   debug = 2
 
 # lumi
-if options.lumi_set_to_2016:
+if options.lumi_set_to_2015:
+  lumi = 2320.0
+elif options.lumi_set_to_2016:
   lumi = 41010.0
 else:
   lumi = options.lumi
@@ -457,19 +463,22 @@ for sample in samples:
       if debug>=2:
         print("Draw String: ", draw_string, cut_string)
     else:
-      chain.Draw(draw_string, cut_string, "goff", options.nentries)
+      n = chain.Draw(draw_string, cut_string, "goff", options.nentries)
     entry.append(hist)
     if not(xs == -1.0 or N == -1.0):
+      if debug>=2: print('scaling with', xs, lumi, N)
       hist.Scale(xs*lumi/N)
     hist_sum.Add(hist)
   sample['summed_hist'] = hist_sum
-  
+  if options.scatter:
+    sample['graph' = ROOT.TGraph(n, chain.GetV1(), chain.GetV2())
+ 
 # Print Summary
 count = 1
 for sample in samples:
   hist = sample['summed_hist']
   if debug>=1:
-    print("Entries " + str(count) + "  : ", int(hist.GetEntries()), end='')
+    print("Entries " + str(count) + "  : ", int(hist.GetEntries()), " , total : " + str(hist.Integral()), end='')
   if not twod_mode:
     if not int(hist.GetBinContent(0)) == 0:
       if debug>=1:
@@ -556,13 +565,16 @@ if options.stacked or options.sidebyside:
 
 # Maximum
 maximum = 0
+minimum = 1.0
 for sample in samples:
   hist = sample['summed_hist']
   maximum = max(maximum, hist.GetMaximum())
+  if not hist.GetMaximum() == 0: minimum = min(minimum, hist.GetMaximum())
 for sample in samples:
   hist = sample['summed_hist']
   if options.logy:
     hist.SetMaximum(maximum*4)
+    hist.SetMinimum(minimum/1000.0)
   else:
     hist.SetMaximum(maximum*1.15)
     hist.SetMinimum(0)
@@ -648,15 +660,22 @@ if options.save == None:
   else:
     legendtype = "l"
   if not options.legleft:
-    leg = ROOT.TLegend(0.55, 0.9-(0.06*len(samples)), 0.9, 0.9)
+    leg = ROOT.TLegend(0.55, 0.9-(0.05*len(samples)), 0.9, 0.9)
   else:
-    leg = ROOT.TLegend(0.1, 0.9-(0.06*len(samples)), 0.45, 0.9)
+    leg = ROOT.TLegend(0.1, 0.9-(0.05*len(samples)), 0.45, 0.9)
+  extra = False
   for sample in samples:
     hist = sample['summed_hist']
     if sample['label'] == None:
       leg.AddEntry(hist, sample['path'], legendtype)
     else:
       leg.AddEntry(hist, sample['label'], legendtype)  
+    if not extra:
+      if not options.legenda == None:
+        leg.AddEntry('', options.legenda, '')
+      if not options.legendb == None:
+        leg.AddEntry('', options.legendb, '')
+      extra = True
   if not options.legoff:
     leg.Draw("same")
   c.Modified()
@@ -776,14 +795,20 @@ while not cmd == "":
     if not options.legoff:
       leg.Draw("same")
     draws.append(horz_line)
+  elif cmd == "integrate":
+    low = opt.split()[0]
+    high = opt.split()[1]
+    print(low, high)
+    
   elif cmd == "options":
-    print("save FILENAME     saves current canvas, optionally with supplied name\n" +\
-          "saveas            alias for save\n" +\
-          "savehist FILENAME saves histograms into file\n" +\
-          "fit FIT           fits with supplied fitting function, only fits sample1\n" +\
-          "vertical NUM      draws a vertical line at xvalue=NUM\n" +\
-          "horizontal NUM    draws a horizontal line at yvalue=NUM\n" +\
-          "title NEW_TITLE   changes plot title to NEW_TITLE\n" +\
+    print("save FILENAME       saves current canvas, optionally with supplied name\n" +\
+          "saveas              alias for save\n" +\
+          "savehist FILENAME   saves histograms into file\n" +\
+          "fit FIT             fits with supplied fitting function, only fits sample1\n" +\
+          "vertical NUM        draws a vertical line at xvalue=NUM\n" +\
+          "horizontal NUM      draws a horizontal line at yvalue=NUM\n" +\
+          "title NEW_TITLE     changes plot title to NEW_TITLE\n" +\
+          "integrate LOW HIGH  integrate from low to high\n" +\
           "")
   elif not cmd == "":
     print("Not a valid command------------------------X")
