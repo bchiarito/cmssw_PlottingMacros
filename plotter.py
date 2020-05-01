@@ -43,6 +43,7 @@ multivar_options.add_option('--var8', type='string', action='store', dest='var8'
 twod_options = OptionGroup(parser, '2D Plot Options', '')
 twod_options.add_option('--vary', type='string', action='store', dest='vary', help='')
 twod_options.add_option('--biny', '--binsy', type='string', action='store', dest='binningy', help='')
+twod_options.add_option('--scatter', action='store_true', default=False, dest='scatter', help='make a scatter plot in 2D instead of a histogram')
 
 # Visual options
 visual_options = OptionGroup(parser, 'Visual Options', '')
@@ -453,16 +454,17 @@ for sample in samples:
     elif options.mcweight and options.smallrun == None:
       cut_string = "("+cut_string+")*(mcXS*"+str(lumi)+"/mcN)"
     if options.nentries == -1:
-      chain.Draw(draw_string, cut_string, "goff")
-      print(draw_string, cut_string)
+      n = chain.Draw(draw_string, cut_string, "goff")
     else:
-      chain.Draw(draw_string, cut_string, "goff", options.nentries)
+      n = chain.Draw(draw_string, cut_string, "goff", options.nentries)
     entry.append(hist)
     if not(xs == -1.0 or N == -1.0):
       hist.Scale(xs*lumi/N)
     hist_sum.Add(hist)
   sample['summed_hist'] = hist_sum
-  
+  if options.scatter:
+    sample['graph' = ROOT.TGraph(n, chain.GetV1(), chain.GetV2())
+ 
 # Print Summary
 count = 1
 for sample in samples:
