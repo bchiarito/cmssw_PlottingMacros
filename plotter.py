@@ -431,8 +431,8 @@ count = 0
 sumcount = 0
 for sample in samples:
   sumcount += 1
-  hist_sum = ROOT.TH2F("hist"+"_sum_"+str(sumcount), "hist", binsx, lowx, highx, binsy, lowy, highy) if twod_mode else \
-             ROOT.TH1F("hist"+"_sum_"+str(sumcount), "hist", bins, low, high)
+  hist_sum = ROOT.TH2D("hist"+"_sum_"+str(sumcount), "hist", binsx, lowx, highx, binsy, lowy, highy) if twod_mode else \
+             ROOT.TH1D("hist"+"_sum_"+str(sumcount), "hist", bins, low, high)
   for entry in sample['entries']:
     chain = entry[0]
     xs = entry[1]
@@ -442,8 +442,8 @@ for sample in samples:
       xs = sample['xs']
       N = sample['N']
     count += 1
-    hist = ROOT.TH2F("hist"+"_"+str(count), "hist", binsx, lowx, highx, binsy, lowy, highy) if twod_mode else \
-           ROOT.TH1F("hist"+"_"+str(count), "hist", bins, low, high)
+    hist = ROOT.TH2D("hist"+"_"+str(count), "hist", binsx, lowx, highx, binsy, lowy, highy) if twod_mode else \
+           ROOT.TH1D("hist"+"_"+str(count), "hist", bins, low, high)
     draw_string = options.vary+":"+options.var if twod_mode else \
                   sample['var']
     draw_string = draw_string + ">>"+"hist"+"_"+str(count)
@@ -454,7 +454,8 @@ for sample in samples:
       cut_string = "("+cut_string+")*(mcXS*"+str(lumi)+"/mcN)"
     if options.nentries == -1:
       chain.Draw(draw_string, cut_string, "goff")
-      print(draw_string, cut_string)
+      if debug>=2:
+        print("Draw String: ", draw_string, cut_string)
     else:
       chain.Draw(draw_string, cut_string, "goff", options.nentries)
     entry.append(hist)
@@ -477,6 +478,8 @@ for sample in samples:
       if debug>=1:
         print(" : Overflow " + " - ", int(hist.GetBinContent(bins+1)), end='')
   if debug>=1:
+    if options.noplot:
+      print("\nTotal Integral " + str(count) + "  : ", int(hist.Integral(0,hist.GetNbinsX()+1)), "| Uncer : " + str(hist.GetBinError(1)), end='')
     print("")
   count += 1
 
