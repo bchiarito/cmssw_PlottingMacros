@@ -27,6 +27,7 @@ parser.add_option('-q','--quiet', action='store_true', default=False, dest='quie
 parser.add_option('--verb', '--verbose', action='store_true', dest='verbose', help='more output')
 parser.add_option('-n', '--num', type='int', action='store', default=-1, dest='nentries', metavar='MAX', help='max entries')
 parser.add_option('--printevents', action='store_true', default=False, dest='printevents', help='print events that pass cut')
+parser.add_option('--stat', action='store_true', default=False, dest='stat', help='turn on statistics box')
 
 # multivar options
 multivar_options = OptionGroup(parser, 'Multi-Variable Options', 'Setting --var1 --var2 ... --varN puts plotter in mutli-variable mode')
@@ -399,7 +400,7 @@ if options.printevents:
         print("", "run ", event.runNum, " lumi ", event.lumiNum, " event", event.eventNum)
         num_selected_events_dumped += 1
         if num_selected_events_dumped % 20 == 0:
-          inp = raw_input("[Enter] to continue printing events, 'stop' to stop: ")
+          inp = input("[Enter] to continue printing events, 'stop' to stop: ")
           if inp == 'stop':
             continue_dumping_events = False
       else:
@@ -415,20 +416,19 @@ if options.printevents:
 if debug>=2:
   print("Drawing into histogram...")
 
-i1 = string.index(options.binning,',')
-i2 = string.rindex(options.binning,',')
+i1 = options.binning.index(',')
+i2 = options.binning.rindex(',')
 bins = int(options.binning[0:i1])
 low = float(options.binning[i1+1:i2])
 high = float(options.binning[i2+1:len(options.binning)])
 if twod_mode:
-  i1x = string.index(options.binning,',')
-  i2x = string.rindex(options.binning,',')
+  i1x = options.binning.index(',')
+  i2x = options.binning.rindex(',')
   binsx = int(options.binning[0:i1x])
   lowx = float(options.binning[i1x+1:i2x])
   highx = float(options.binning[i2x+1:len(options.binning)])
-
-  i1y = string.index(options.binningy,',')
-  i2y = string.rindex(options.binningy,',')
+  i1y = options.binningy.index(',')
+  i2y = options.binningy.rindex(',')
   binsy = int(options.binningy[0:i1y])
   lowy = float(options.binningy[i1y+1:i2y])
   highy = float(options.binningy[i2y+1:len(options.binningy)])
@@ -471,7 +471,7 @@ for sample in samples:
     hist_sum.Add(hist)
   sample['summed_hist'] = hist_sum
   if options.scatter:
-    sample['graph' = ROOT.TGraph(n, chain.GetV1(), chain.GetV2())
+    sample['graph'] = ROOT.TGraph(n, chain.GetV1(), chain.GetV2())
  
 # Print Summary
 count = 1
@@ -544,9 +544,9 @@ for sample in samples:
   # Width
   hist.SetLineWidth(1)
   # Stats
-  #ROOT.gStyle.SetOptStat(110000)
-  #hist.SetStats(1)
-  hist.SetStats(0)
+  ROOT.gStyle.SetOptStat(111110)
+  if options.stat: hist.SetStats(1)
+  else: hist.SetStats(0)
   # Scale
   if options.scale:
     if not hist.Integral() == 0:
@@ -725,8 +725,8 @@ else:
 cmd = "start"
 while not cmd == "":
   # parse input
-  inp = raw_input("[Enter] to finish, 'options' to see options: ")
-  i = string.find(inp,' ')
+  inp = input("[Enter] to finish, 'options' to see options: ")
+  i = inp.find(' ')
   if i==-1:
     cmd = inp
     opt = ""
@@ -739,7 +739,7 @@ while not cmd == "":
     if opt=="":
       sys.stdout.write(' ')
       sys.stdout.flush()
-      filename = raw_input("Enter filename: ")
+      filename = input("Enter filename: ")
       c.SaveAs(filename)
     else:
       c.SaveAs(opt)
@@ -747,7 +747,7 @@ while not cmd == "":
     if opt=="":
       sys.stdout.write(' ')
       sys.stdout.flush()
-      filename = raw_input("Enter filename: ")
+      filename = input("Enter filename: ")
       rootfile = ROOT.TFile(filename, "CREATE")
       rootfile.cd()
     else:
@@ -760,7 +760,7 @@ while not cmd == "":
     if opt=="":
       sys.stdout.write(' ')
       sys.stdout.flush()
-      new_title = raw_input("Enter title for plot: ")
+      new_title = input("Enter title for plot: ")
     else:  
       new_title = opt
     hist.SetTitle(new_title)
