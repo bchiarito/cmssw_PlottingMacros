@@ -6,10 +6,6 @@ import glob
 import fnmatch
 from optparse import OptionParser
 
-# run on ttree of twoprong ntuplizer
-# makes file with eff computed as f'n of eta,phi,pt,npv,rho
-# can then combine with secondary script to plots multiple effs together on same plot
-
 def compute_eff_error_bars(eff, numer, denom):
     eff.Add(numer)
     eff.Divide(denom)
@@ -27,8 +23,10 @@ usage = "Usage: %prog TwoProngNtuplizer.root --signal/tau --tight/cand\n\nRun on
 parser = OptionParser(usage=usage)
 parser.add_option('--out', dest='out', default="output_eff.root", help='output file')
 parser.add_option('--tree', dest='treename', default="twoprongNtuplizer/fTree2", help='name of tree inside files')
-parser.add_option('--signal', action='store_true', default=False, dest='signal', help='file is signal or bkg to signal')
-parser.add_option('--tau', action='store_true', default=False, dest='tau', help='file is tau or bkg to tau')
+
+parser.add_option('--signal', action='store_true', default=False, dest='signal', help='file is signal')
+parser.add_option('--tau', action='store_true', default=False, dest='tau', help='file is dy with hadronic tau')
+
 parser.add_option('--tight', action='store_true', default=True, dest='tight', help='')
 parser.add_option('--cand', action='store_false', dest='tight', help='')
 (options, args) = parser.parse_args()
@@ -38,7 +36,7 @@ from ROOT import *
 
 out_file = TFile('eff_' + options.out + '.root', 'recreate')
 if options.signal and options.tau:
-  print "cannot choose both --signal and --tight"
+  print "cannot choose both --signal and --tau"
   sys.exit()
 
 num_phi_bin = 15
