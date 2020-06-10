@@ -1,0 +1,26 @@
+TwoProngNtuplizer_old.root TwoProngNtuplizer_new.root TwoProngNtuplizer_new_difflegs.root --title "300 GeV Phi, 0.55 Gev Omega" --leg1 "old signal, 10k events" --leg2 "y0 > x0 x0, 100 events" --leg3 "y0 > x0 x1, 100 events" --scaled --errors
+-v -b --save
+
+GenPhi_pt 25,0,500 phi_pt.png
+GenPhi_eta 20,-6,6 phi_eta.png
+GenPhi_phi 20,-4,4 phi_phi.png
+GenPhi_mass 200,299,301 phi_mass.png
+GenPhi_vx 2000,-1,1 phi_vx.png
+GenPhi_vy 2000,-1,1 phi_vy.png
+GenPhi_vz 200,-10,10 phi_vz.png
+
+GenOmega_pt 25,0,500 omega_pt.png
+GenOmega_eta 20,-6,6 omega_eta.png
+GenOmega_phi 20,-4,4 omega_phi.png
+GenOmega_mass 200,0,2 omega_mass.png
+GenOmega_vx 2000,-1,1 omega_vx.png
+GenOmega_vy 2000,-1,1 omega_vy.png
+GenOmega_vz 200,-10,10 omega_vz.png
+GenOmega_vxy 1000,0,1 omega_vxy.png
+GenOmega_vdiff_PV 1000,0,1 omega_vdiff.png
+
+nJets 10,0,10 njets.png
+MET 60,0,300 met.png
+HT 30,0,600 ht.png
+
+TwoProng_mass 50,0,2 twoprong_mass.png
