@@ -471,7 +471,7 @@ for sample in samples:
     hist_sum.Add(hist)
   sample['summed_hist'] = hist_sum
   if options.scatter:
-    sample['graph' = ROOT.TGraph(n, chain.GetV1(), chain.GetV2())
+    sample['graph'] = ROOT.TGraph(n, chain.GetV1(), chain.GetV2())
  
 # Print Summary
 count = 1
