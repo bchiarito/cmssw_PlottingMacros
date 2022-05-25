@@ -19,7 +19,7 @@ parser = OptionParser(usage=usage)
 parser.add_option('-v', '--var', '--varx', type='string', action='store', dest='var', help='')
 parser.add_option('-b', '--bin', '--bins', '--binsx', '--binx', type='string', metavar='NUM,LOW,HIGH', action='store', default='100,0,100', dest='binning', help='')
 parser.add_option('-c', '--cut', type='string', action='store', default='', dest='cut', metavar='CUT_STRING', help='')
-parser.add_option('--tree', type='string', action='store', dest='treename', default='twoprongNtuplizer/fTree', metavar='PATH', help='path to tree in rootfiles')
+parser.add_option('--tree', type='string', action='store', dest='treename', default='Events', metavar='PATH', help='path to tree in rootfiles')
 parser.add_option('--noplot', action='store_true', default=False, dest='noplot', help='do not plot anything, just gives cutflow')
 parser.add_option('--savehist', type='string',action='store', dest='save', metavar='FILE.root', help='saves histograms')
 parser.add_option('--save', type='string',action='store', dest='saveplot', metavar='FILE.ext', help='saves canvas')
@@ -43,7 +43,8 @@ multivar_options.add_option('--var8', type='string', action='store', dest='var8'
 twod_options = OptionGroup(parser, '2D Plot Options', '')
 twod_options.add_option('--vary', type='string', action='store', dest='vary', help='')
 twod_options.add_option('--biny', '--binsy', type='string', action='store', dest='binningy', help='')
-twod_options.add_option('--scatter', action='store_true', default=False, dest='scatter', help='make a scatter plot in 2D instead of a histogram')
+#twod_options.add_option('--scatter', action='store_true', default=False, dest='scatter', help='make a scatter plot in 2D instead of a histogram')
+twod_options.add_option('--profile', default=False, action='store_true', dest='profile', help='make a profile plot instead of a 2D histogram')
 
 # Visual options
 visual_options = OptionGroup(parser, 'Visual Options', '')
@@ -175,8 +176,8 @@ if (not options.vary==None) or \
    (not options.binningy==None):
   twod_mode = True
 
-if twod_mode:
-  options.legoff = True
+#if twod_mode and not options.profile:
+#  options.legoff = True
 
 multivar_mode = False
 if (not options.var1==None) or \
@@ -437,8 +438,12 @@ count = 0
 sumcount = 0
 for sample in samples:
   sumcount += 1
-  hist_sum = ROOT.TH2D("hist"+"_sum_"+str(sumcount), "hist", binsx, lowx, highx, binsy, lowy, highy) if twod_mode else \
-             ROOT.TH1D("hist"+"_sum_"+str(sumcount), "hist", bins, low, high)
+  if not twod_mode:
+    hist_sum = ROOT.TH1D("hist"+"_sum_"+str(sumcount), "hist", bins, low, high)
+  elif options.profile:
+    hist_sum = ROOT.TProfile("hist"+"_sum_"+str(sumcount), "hist", bins, low, high, lowy, highy)
+  else:
+    hist_sum = ROOT.TH2D("hist"+"_sum_"+str(sumcount), "hist", binsx, lowx, highx, binsy, lowy, highy)
   for entry in sample['entries']:
     chain = entry[0]
     xs = entry[1]
@@ -448,30 +453,36 @@ for sample in samples:
       xs = sample['xs']
       N = sample['N']
     count += 1
-    hist = ROOT.TH2D("hist"+"_"+str(count), "hist", binsx, lowx, highx, binsy, lowy, highy) if twod_mode else \
-           ROOT.TH1D("hist"+"_"+str(count), "hist", bins, low, high)
+    if not twod_mode:
+      hist = ROOT.TH1D("hist"+"_"+str(count), "hist", bins, low, high)
+    elif options.profile:
+      hist = ROOT.TProfile("hist"+"_"+str(count), "hist", binsx, lowx, highx, lowy, highy)
+    else:
+      hist = ROOT.TH2D("hist"+"_"+str(count), "hist", binsx, lowx, highx, binsy, lowy, highy)
     draw_string = options.vary+":"+options.var if twod_mode else \
                   sample['var']
     draw_string = draw_string + ">>"+"hist"+"_"+str(count)
     cut_string = "1" if (options.cut=="" or options.cut==None) else options.cut
+    option_string = "goff"
+    if options.profile: option_string += " prof"
     if options.mcweight and not options.smallrun == None:
       cut_string = "("+cut_string+")*(mcXS*"+str(lumi)+"/"+str(int(options.smallrun))+")"
     elif options.mcweight and options.smallrun == None:
       cut_string = "("+cut_string+")*(mcXS*"+str(lumi)+"/mcN)"
     if options.nentries == -1:
-      chain.Draw(draw_string, cut_string, "goff")
+      chain.Draw(draw_string, cut_string, option_string)
       if debug>=2:
-        print("Draw String: ", draw_string, cut_string)
+        print("Draw String: ", draw_string, cut_string, option_string)
     else:
-      n = chain.Draw(draw_string, cut_string, "goff", options.nentries)
+      n = chain.Draw(draw_string, cut_string, option_string, options.nentries)
     entry.append(hist)
     if not(xs == -1.0 or N == -1.0):
       if debug>=2: print('scaling with', xs, lumi, N)
       hist.Scale(xs*lumi/N)
     hist_sum.Add(hist)
   sample['summed_hist'] = hist_sum
-  if options.scatter:
-    sample['graph'] = ROOT.TGraph(n, chain.GetV1(), chain.GetV2())
+  #if options.scatter:
+  #  sample['graph'] = ROOT.TGraph(n, chain.GetV1(), chain.GetV2())
  
 # Print Summary
 count = 1
@@ -594,7 +605,7 @@ for sample in samples:
     elif not twod_mode and multivar_mode:
       title = sample['path']
     else:
-      if options.cut == None:
+      if options.cut == None or options.cut == '':
         title = options.var + " vs " + options.vary
       else:
         title = options.cut
@@ -650,19 +661,21 @@ if options.save == None:
         draw_option = 'hist same'
       if twod_mode:
         draw_option += ' Colz'
+      if twod_mode and options.profile:
+        draw_option = ''
       if sample['error']:
         draw_option += ' e'
       hist.Draw(draw_option)
   # Legend
   legendtype = ""
-  if options.stacked or options.sidebyside:
+  if options.stacked or options.sidebyside or twod_mode:
     legendtype = "f"
   else:
     legendtype = "l"
   if not options.legleft:
-    leg = ROOT.TLegend(0.55, 0.9-(0.05*len(samples)), 0.9, 0.9)
+    leg = ROOT.TLegend(0.7, 0.9-(0.06*len(samples)), 0.9, 0.9)
   else:
-    leg = ROOT.TLegend(0.1, 0.9-(0.05*len(samples)), 0.45, 0.9)
+    leg = ROOT.TLegend(0.1, 0.9-(0.1*len(samples)), 0.35, 0.9)
   extra = False
   for sample in samples:
     hist = sample['summed_hist']
