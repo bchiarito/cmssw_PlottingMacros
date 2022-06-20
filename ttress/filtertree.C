@@ -1,62 +1,45 @@
 #include <string>
-#include <vector>
 #include <iostream>
 #include <dirent.h> // for traversing a directory
 #include <chrono> // for timing
 #include "TChain.h"
-#include "MyLooper.C+O" // the name of the MakeClass() .C file
-using std::vector;
 using std::string;
 using std::cout;
 using std::endl;
 
+// PARAMETERS
+string treename = "twoprongNtuplizer/fTree2";
+string path = "/cms/chiarito/eos/twoprong/prelim/Nov5/qcd2015/"; // must end with '/'
+
 // forward declare helper functions
-void make_histos(string);
 void ProcessDirectory(std::string directory);
 void ProcessFile(std::string file);
 void ProcessEntity(struct dirent* entity);
 
 // globals
-string treename = "twoprongNtuplizer/fTree2";
-//string treename = "twoprongModNtuplizer/fTree2";
 TChain * chain = new TChain(treename.c_str());
-string path = "./";
-vector<string> paths;
-Long64_t MAX_ENTRIES = -1;
-string output = "";
-string pre = "output_test_"; // end in '_'
-string post = ".root";
 
-void analysis_all()
+void filtertree()
 {
-  chrono::high_resolution_clock::time_point time_start = chrono::high_resolution_clock::now();
-
-  output = "all";
-  make_histos(output);
-
-  chrono::high_resolution_clock::time_point time_end = chrono::high_resolution_clock::now();
-  auto run_time = chrono::duration_cast<chrono::seconds>( time_end - time_start ).count();
-  cout << "\nFinished producing " << pre+"X"+post << " files, overall processing took " << run_time << " seconds" << endl;
-}
-
-void make_histos(string output)
-{
+  // make a chain with all rootfiles in a directory
+  cout << "Running on " << path << endl;
   ProcessDirectory("");
 
-  // make a MakeClass object using the above chain
-  MyLooper * looper = new MyLooper(chain);
+  TFile * newfile = new TFile("filtered_tree.root", "RECREATE");
+  newfile->cd();
 
-  // define output file name
-  string outputfilename = pre + output + post;
-
-  // tell the object to loop, and time it
   chrono::high_resolution_clock::time_point time_1 = chrono::high_resolution_clock::now();
-  looper->CustomLoop(outputfilename.c_str(), MAX_ENTRIES);
+  TTree * newtree = chain->CopyTree("nIDPhotons>0");
   chrono::high_resolution_clock::time_point time_2 = chrono::high_resolution_clock::now();
 
-  // report
   auto run_time = chrono::duration_cast<chrono::seconds>( time_2 - time_1 ).count();
-  cout << "Loop() took " << run_time << " seconds" << endl;  
+  cout << "CopyTree() took " << run_time << " seconds" << endl;
+
+  cout << "original tree " << chain->GetEntries() << " entires" << endl;
+  cout << "new tree      " << newtree->GetEntries() << " entires" << endl;
+
+  newtree->Write();
+  newfile->Close();
 }
 
 // helper function definitions
@@ -94,7 +77,7 @@ void ProcessEntity(struct dirent* entity)
 void ProcessFile(std::string file)
 {
     if (file.find(".root") != std::string::npos) {
-      //std::cout << "Found rootfile     : " << (file) << std::endl;
-      chain->Add((path + file).c_str());
+      std::cout << "Found rootfile     : " << (file) << std::endl;
+        chain->Add((path + file).c_str());
     }
 }
