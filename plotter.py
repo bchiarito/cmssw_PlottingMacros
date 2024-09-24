@@ -398,11 +398,30 @@ if options.printevents:
     num_selected_events += selected_tree.GetEntries()
     for event in selected_tree:
       if continue_dumping_events:
-        print("", "run ", event.runNum, " lumi ", event.lumiNum, " event", event.eventNum)
+        #print("", "run ", event.runNum, " lumi ", event.lumiNum, " event", event.eventNum)
+        print("", "run ", event.run, " lumi ", event.luminosityBlock, " event", event.event)
+        #print("  ", eval("event.event"))
+        twoprongvec = ROOT.Math.PtEtaPhiMVector(event.TwoProng_pt[event.CBL_RecoPhi_twoprongindex], event.TwoProng_eta[event.CBL_RecoPhi_twoprongindex], event.TwoProng_phi[event.CBL_RecoPhi_twoprongindex], event.TwoProng_mass[event.CBL_RecoPhi_twoprongindex])
+        photonvec = ROOT.Math.PtEtaPhiMVector(event.Photon_pt[event.CBL_RecoPhi_photonindex], event.Photon_eta[event.CBL_RecoPhi_photonindex], event.Photon_phi[event.CBL_RecoPhi_photonindex], event.Photon_mass[event.CBL_RecoPhi_photonindex])
+        print("  ", event.CBL_RecoPhi_mass, event.Photon_pt[event.CBL_RecoPhi_photonindex], event.TwoProng_pt[event.CBL_RecoPhi_twoprongindex])
+        print("  ", event.CBL_RecoPhi_mass, photonvec.Pt(), twoprongvec.Pt())
+        print("  ", ROOT.Math.VectorUtil.DeltaR(twoprongvec, photonvec))
+        print("  Phi:", event.CBL_RecoPhi_pt, event.CBL_RecoPhi_eta, event.CBL_RecoPhi_phi, event.CBL_RecoPhi_mass)
+        print("  photon:", photonvec.Pt(), photonvec.Eta(), photonvec.Phi(), photonvec.M())
+        print("  photon:", event.CBL_RecoPhi_Photon_pt, event.CBL_RecoPhi_Photon_eta, event.CBL_RecoPhi_Photon_phi, event.CBL_RecoPhi_Photon_mass)
+        print("  twoprong:", twoprongvec.Pt(), twoprongvec.Eta(), twoprongvec.Phi(), twoprongvec.M())
+        print("  twoprong:", event.CBL_RecoPhi_TwoProng_pt, event.CBL_RecoPhi_TwoProng_eta, event.CBL_RecoPhi_TwoProng_phi, event.CBL_RecoPhi_TwoProng_mass)
+        print("  twoprong index:", event.CBL_RecoPhi_twoprongindex)
+        print("  ntwoprong:", event.nTwoProng)
+        print("  :", event.CBL_Region)
+        for n in range(event.nTwoProng):
+          print("    twoprong:", n, event.TwoProng_isTight[n], event.TwoProng_pt[n])
+          
         num_selected_events_dumped += 1
         if num_selected_events_dumped % 20 == 0:
-          inp = raw_input("[Enter] to continue printing events, 'stop' to stop: ")
-          if inp == 'stop':
+          inp = 'q'
+          #inp = raw_input("[Enter] to continue printing events, 'q' to quit: ")
+          if inp == 'q':
             continue_dumping_events = False
       else:
         break
